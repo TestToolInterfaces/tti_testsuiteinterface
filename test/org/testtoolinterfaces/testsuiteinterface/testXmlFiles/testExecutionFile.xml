@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<execution>
+	<action sequence="1">
+	  <description>A description of the first action step.</description>
+	  <command param1="action" param2="4">
+		action1
+	  </command>
+	  <script>
+	    <executable>actionScript_1</executable>
+	  </script>
+	</action>
+	<action sequence="5">
+	  <description>A description of the second action step.</description>
+	  <command param1="action" param2="4">
+		action3
+	  </command>
+	  <script>
+	    <executable>actionScript_3</executable>
+	  </script>
+	</action>
+	<check sequence="3">
+	  <description>A description of the check step.</description>
+	  <command param1="check" param2="4">
+		check1
+	  </command>
+	  <script>
+	    <executable>checkScript_1</executable>
+	  </script>
+	</check>
+</execution>

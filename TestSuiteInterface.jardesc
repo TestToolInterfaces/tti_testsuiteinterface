@@ -14,6 +14,7 @@
         <javaElement handleIdentifier="=Utils/src"/>
         <javaElement handleIdentifier="=TestSuite/src"/>
         <javaElement handleIdentifier="=TestSuiteInterface/src"/>
+        <file path="/TestSuiteInterface/TestSuiteInterface.manifest"/>
         <file path="/TestSuiteInterface/License_lgpl-3.0.txt"/>
     </selectedElements>
 </jardesc>

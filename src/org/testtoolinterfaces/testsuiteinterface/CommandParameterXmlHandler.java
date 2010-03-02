@@ -1,7 +1,6 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
 import org.testtoolinterfaces.testsuite.Parameter;
-import org.testtoolinterfaces.testsuite.TestCase;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
@@ -29,7 +28,7 @@ public class CommandParameterXmlHandler extends XmlHandler
 	
 //	private ParameterFactory myFactory;
 	private String myCurrentParameterId = "";
-	private String myCurrentParameterType = "";
+//	private String myCurrentParameterType = "";
 	private int myCurrentSequence = Integer.MAX_VALUE;
     private String myCurrentValue = "";
 
@@ -54,7 +53,7 @@ public class CommandParameterXmlHandler extends XmlHandler
 		    	}
 		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_TYPE))
 		    	{
-		        	myCurrentParameterType = att.getValue(i);
+//		        	myCurrentParameterType = att.getValue(i);
 		    	}
 		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_SEQUENCE))
 		    	{
@@ -124,7 +123,7 @@ public class CommandParameterXmlHandler extends XmlHandler
 		Trace.println(Trace.LEVEL.SUITE);
 		
 		myCurrentParameterId = "";
-		myCurrentParameterType = "";
+//		myCurrentParameterType = "";
 		myCurrentSequence = Integer.MAX_VALUE;
 	    myCurrentValue = "";
 	}

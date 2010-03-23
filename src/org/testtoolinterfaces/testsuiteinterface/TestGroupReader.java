@@ -31,8 +31,7 @@ public class TestGroupReader
 	{
 		Trace.println(Trace.LEVEL.SUITE, "readTgFile( " + aTestGroupFile.getName() + " )", true);
 
-System.out.println("readTgFile - start");
-       // create a parser
+		// create a parser
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(false);
 		TestGroup testGroup;

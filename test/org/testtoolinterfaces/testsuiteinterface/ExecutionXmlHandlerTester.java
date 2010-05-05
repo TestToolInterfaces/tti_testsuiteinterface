@@ -1,9 +1,7 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -15,7 +13,6 @@ import org.testtoolinterfaces.testsuite.TestStepArrayList;
 import org.testtoolinterfaces.testsuite.TestStepFactory;
 import org.testtoolinterfaces.testsuite.TestStepFactoryImpl;
 import org.testtoolinterfaces.testsuiteinterface.ExecutionXmlHandler;
-import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 
@@ -85,20 +82,22 @@ public class ExecutionXmlHandlerTester extends TestCase
 	        // assign the handler to the parser
 	        xmlReader.setContentHandler(handler);
 
+			File jarFile = new File(  this.getClass().getProtectionDomain()
+				                         						.getCodeSource()
+				                         						.getLocation()
+				                         						.toURI() );
+			File testXmlFilesDir = new File ( jarFile.getParent(),  "test" + File.separator + 
+														"org" + File.separator +
+														"testtoolinterfaces" + File.separator +
+														"testsuiteinterface" + File.separator +
+														"testXmlFiles");
+			File xmlTestFile = new File ( testXmlFilesDir, aFileName);
 	        // parse the document
-	        xmlReader.parse("C:\\Users\\Femke\\Documents\\Arjan\\Projects\\TestSuiteInterface\\test\\org\\testtoolinterfaces\\testsuiteinterface\\testXmlFiles\\" + aFileName);
+	        xmlReader.parse(xmlTestFile.getAbsolutePath());
 
 	        return handler.getExecutionSteps();
 		}
-		catch (ParserConfigurationException e)
-		{
-			e.printStackTrace();
-		}
-		catch (SAXException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}

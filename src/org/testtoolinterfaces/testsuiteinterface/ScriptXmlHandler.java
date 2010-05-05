@@ -1,7 +1,7 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
 import org.testtoolinterfaces.testsuite.Parameter;
-import org.testtoolinterfaces.testsuite.ParameterTable;
+import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.TestScript;
 import org.testtoolinterfaces.testsuite.TestScriptImpl;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
@@ -32,7 +32,7 @@ public class ScriptXmlHandler extends XmlHandler
 
 	private String myScript = "";
 	private String myType = "standard";
-    private ParameterTable myParameters;
+    private ParameterArrayList myParameters;
 
 	private GenericTagAndStringXmlHandler myExecutableXmlHandler;
 	private CommandParameterXmlHandler myParameterXmlHandler;
@@ -42,7 +42,7 @@ public class ScriptXmlHandler extends XmlHandler
 		super(anXmlReader, START_ELEMENT);
 		Trace.println(Trace.LEVEL.CONSTRUCTOR);
 
-		myParameters = new ParameterTable();
+		myParameters = new ParameterArrayList();
 
 		myExecutableXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, EXECUTABLE_ELEMENT);
 		this.addStartElementHandler(EXECUTABLE_ELEMENT, myExecutableXmlHandler);
@@ -109,7 +109,7 @@ public class ScriptXmlHandler extends XmlHandler
 			try
 			{
 	    		Parameter parameter = myParameterXmlHandler.getParameter();
-	    		myParameters.put(parameter.getName(), parameter);
+	    		myParameters.add(parameter);
 			}
 			catch (SAXParseException e)
 			{
@@ -132,6 +132,6 @@ public class ScriptXmlHandler extends XmlHandler
 
 		myScript = "";
 		myType = "standard";
-		myParameters = new ParameterTable();
+		myParameters = new ParameterArrayList();
 	}
 }

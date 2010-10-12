@@ -10,8 +10,9 @@
             <packagesToUnSeal/>
         </sealing>
     </manifest>
-    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+    <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
         <javaElement handleIdentifier="=Utils/src"/>
+        <file path="/TestSuite/License_lgpl-3.0.txt"/>
         <javaElement handleIdentifier="=TestSuite/src"/>
         <javaElement handleIdentifier="=TestSuiteInterface/src"/>
         <file path="/TestSuiteInterface/TestSuiteInterface.manifest"/>

@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Name: org/testtoolinterfaces/testsuiteinterface/
-Specification-Title: Test Tool Interfaces Test Suite Interface
-Specification-Version: 0.2
-Specification-Vendor: TestToolInterfaces.org
-Implementation-Title: Test Suite Interface
-Implementation-Version: 0.2.0
-Implementation-Vendor: Open Source - Arjan Kranenburg
-

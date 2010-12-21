@@ -9,7 +9,7 @@ import org.xml.sax.helpers.LocatorImpl;
  * @author Arjan Kranenburg
  *
  */
-public class TestGroupReaderException extends Exception
+public class TestReaderException extends Exception
 {
 	/**
 	 * 
@@ -21,7 +21,7 @@ public class TestGroupReaderException extends Exception
 	/**
 	 * @param aMessage
 	 */
-	public TestGroupReaderException(String aMessage)
+	public TestReaderException(String aMessage)
 	{
 		super(aMessage);
 	}
@@ -29,7 +29,7 @@ public class TestGroupReaderException extends Exception
 	/**
 	 * @param aCause
 	 */
-	public TestGroupReaderException(Throwable aCause)
+	public TestReaderException(Throwable aCause)
 	{
 		super(aCause);
 	}
@@ -38,12 +38,12 @@ public class TestGroupReaderException extends Exception
 	 * @param aMessage
 	 * @param aCause
 	 */
-	public TestGroupReaderException(String aMessage, Throwable aCause)
+	public TestReaderException(String aMessage, Throwable aCause)
 	{
 		super(aMessage, aCause);
 	}
 
-	public TestGroupReaderException(String aMessage, LocatorImpl aLocatorImpl)
+	public TestReaderException(String aMessage, LocatorImpl aLocatorImpl)
 	{
 		super(aMessage);
 		myLocation = aLocatorImpl;

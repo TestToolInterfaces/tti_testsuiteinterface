@@ -1,9 +1,10 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import org.testtoolinterfaces.testsuite.TestCase;
-import org.testtoolinterfaces.testsuite.TestCaseFactory;
+import org.testtoolinterfaces.testsuite.TestCaseImpl;
 import org.testtoolinterfaces.testsuite.TestScript;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepArrayList;
@@ -15,26 +16,24 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.LocatorImpl;
 
-
-
 /**
  * @author Arjan Kranenburg 
  * 
- * <testcase id="..." type="..." sequence="...">
+ * <testcase id="..." [any="..."]>
  *  <description>...</description>
  *  <requirementId>...</requirementId>
- *  <initialization>
+ *  <prepare>
  *   ...
- *  </initialization>
+ *  </prepare>
  *  <execution>
  *   ...
  *  </execution>
- *  <script>
- *   ...
- *  </script>
  *  <restore>
  *   ...
  *  </restore>
+ *  <[any]>
+ *   ...
+ *  </[any]>
  * </testcase>
  */
 
@@ -42,48 +41,53 @@ public class TestCaseXmlHandler extends XmlHandler
 {
 	public static final String START_ELEMENT = "testcase";
 	public static final String ATTRIBUTE_ID = "id";
-	public static final String ATTRIBUTE_TYPE = "type";
-	public static final String ATTRIBUTE_SEQUENCE = "sequence";
 	
 	private static final String DESCRIPTION_ELEMENT = "description";
 	private static final String REQUIREMENT_ELEMENT = "requirementId";
+	
+	private static final String PREPARE_ELEMENT = "prepare";
+	private static final String EXECUTE_ELEMENT = "execute";
+	private static final String RESTORE_ELEMENT = "restore";
 
-	private TestCaseFactory myFactory;
-	private String myCurrentTestCaseId = "";
-	private String myCurrentTestCaseType = "";
-	private String myCurrentDescription = "";
-	private int myCurrentSequence = 0;
-    private TestScript myCurrentExecutionScript;
+	private String myTestCaseId;
+	private Hashtable<String, String> myAnyAttributes;
 
+	private String myDescription;
+	private TestScript myExecutionScript;
     private ArrayList<String> myRequirementIds;
-    private TestStepArrayList myInitializationSteps;
+    private TestStepArrayList myPrepareSteps;
     private TestStepArrayList myExecutionSteps;
     private TestStepArrayList myRestoreSteps;
+	private Hashtable<String, String> myAnyElements;
+	private String myCurrentAnyValue;
 
 	private GenericTagAndStringXmlHandler myDescriptionXmlHandler;
 	private GenericTagAndStringXmlHandler myRequirementIdXmlHandler;
-	private TestStepXmlHandler myInitializeXmlHandler;
-	private ExecutionXmlHandler myExecutionXmlHandler;
-	private ScriptXmlHandler myScriptXmlHandler;
-	private TestStepXmlHandler myRestoreXmlHandler;
+	private TestStepSequenceXmlHandler myPrepareXmlHandler;
+	private TestStepSequenceXmlHandler myExecutionXmlHandler;
+	private TestStepSequenceXmlHandler myRestoreXmlHandler;
 
 	/**
 	 * @param anXmlReader the xmlReader
-	 * @param aBaseDir the baseDir of the parent script 
-	 * @param aBaseLogDir a File Object to the Base log
-	 * 
-	 * @throws NullPointerException if aBaseLogDir is null
 	 */
-	public TestCaseXmlHandler( XMLReader anXmlReader, TestCaseFactory aFactory )
+	public TestCaseXmlHandler( XMLReader anXmlReader )
 	{
 		super(anXmlReader, START_ELEMENT);
 		Trace.println(Trace.CONSTRUCTOR);
 
-		myFactory = aFactory;
 		myRequirementIds = new ArrayList<String>();
-		myInitializationSteps = new TestStepArrayList();
+		myPrepareSteps = new TestStepArrayList();
 		myExecutionSteps = new TestStepArrayList();
 		myRestoreSteps = new TestStepArrayList();
+
+	    ArrayList<TestStep.StepType> prepRestAllowedTypes = new ArrayList<TestStep.StepType>();
+	    prepRestAllowedTypes.add( TestStep.StepType.action );
+	    prepRestAllowedTypes.add( TestStep.StepType.set );
+
+	    ArrayList<TestStep.StepType> execAllowedTypes = new ArrayList<TestStep.StepType>();
+	    execAllowedTypes.add( TestStep.StepType.action );
+	    execAllowedTypes.add( TestStep.StepType.check );
+	    execAllowedTypes.add( TestStep.StepType.set );
 
 	    myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
 		this.addStartElementHandler(DESCRIPTION_ELEMENT, myDescriptionXmlHandler);
@@ -93,25 +97,19 @@ public class TestCaseXmlHandler extends XmlHandler
 		this.addStartElementHandler(REQUIREMENT_ELEMENT, myRequirementIdXmlHandler);
 		myRequirementIdXmlHandler.addEndElementHandler(REQUIREMENT_ELEMENT, this);
 
-    	myInitializeXmlHandler = new TestStepXmlHandler( anXmlReader,
-    													 myFactory.getTestStepFactory(),
-    													 TestStep.ActionType.initialize );
-		this.addStartElementHandler(TestStep.ActionType.initialize.toString(), myInitializeXmlHandler);
-		myInitializeXmlHandler.addEndElementHandler(TestStep.ActionType.initialize.toString(), this);
+    	myPrepareXmlHandler = new TestStepSequenceXmlHandler( anXmlReader, PREPARE_ELEMENT, prepRestAllowedTypes );
+		this.addStartElementHandler(PREPARE_ELEMENT, myPrepareXmlHandler);
+		myPrepareXmlHandler.addEndElementHandler(PREPARE_ELEMENT, this);
 
-    	myExecutionXmlHandler = new ExecutionXmlHandler(anXmlReader, myFactory.getTestStepFactory());
-		this.addStartElementHandler(ExecutionXmlHandler.START_ELEMENT, myExecutionXmlHandler);
-		myExecutionXmlHandler.addEndElementHandler(ExecutionXmlHandler.START_ELEMENT, this);
+		myExecutionXmlHandler = new TestStepSequenceXmlHandler( anXmlReader, EXECUTE_ELEMENT, execAllowedTypes );
+		this.addStartElementHandler(EXECUTE_ELEMENT, myExecutionXmlHandler);
+		myExecutionXmlHandler.addEndElementHandler(EXECUTE_ELEMENT, this);
 
-		myScriptXmlHandler = new ScriptXmlHandler(anXmlReader);
-		this.addStartElementHandler(ScriptXmlHandler.START_ELEMENT, myScriptXmlHandler);
-		myScriptXmlHandler.addEndElementHandler(ScriptXmlHandler.START_ELEMENT, this);
+		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader, RESTORE_ELEMENT, prepRestAllowedTypes );
+		this.addStartElementHandler(RESTORE_ELEMENT, myRestoreXmlHandler);
+		myRestoreXmlHandler.addEndElementHandler(RESTORE_ELEMENT, this);
 
-		myRestoreXmlHandler = new TestStepXmlHandler( anXmlReader,
-													  myFactory.getTestStepFactory(),
-													  TestStep.ActionType.restore );
-		this.addStartElementHandler(TestStep.ActionType.restore.toString(), myRestoreXmlHandler);
-		myRestoreXmlHandler.addEndElementHandler(TestStep.ActionType.restore.toString(), this);
+		this.reset();
 	}
 	
     public void processElementAttributes(String aQualifiedName, Attributes att)
@@ -125,15 +123,7 @@ public class TestCaseXmlHandler extends XmlHandler
 	    		Trace.append( Trace.SUITE, ", " + att.getQName(i) + "=" + att.getValue(i) );
 		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_ID))
 		    	{
-		        	myCurrentTestCaseId = att.getValue(i);
-		    	}
-		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_TYPE))
-		    	{
-		        	myCurrentTestCaseType = att.getValue(i);
-		    	}
-		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_SEQUENCE))
-		    	{
-		    		myCurrentSequence = Integer.valueOf( att.getValue(i) ).intValue();
+		        	myTestCaseId = att.getValue(i);
 		    	}
 		    }
     	}
@@ -149,13 +139,18 @@ public class TestCaseXmlHandler extends XmlHandler
 	@Override
 	public void handleCharacters(String aValue)
 	{
-		//nop
+		myCurrentAnyValue = myCurrentAnyValue + aValue;
 	}
 
 	@Override
 	public void handleEndElement(String aQualifiedName)
 	{
-		//nop
+		if ( ! aQualifiedName.equalsIgnoreCase(START_ELEMENT) )
+    	{
+			// TODO This will overwrite previous occurrences of the same elements. But that is possible in XML.
+			myAnyAttributes.put(aQualifiedName, myCurrentAnyValue);
+			myCurrentAnyValue = "";
+    	}
 	}
 
 	/** 
@@ -172,7 +167,7 @@ public class TestCaseXmlHandler extends XmlHandler
 		Trace.println(Trace.SUITE);
     	if (aQualifiedName.equalsIgnoreCase(DESCRIPTION_ELEMENT))
     	{
-    		myCurrentDescription  = myDescriptionXmlHandler.getValue();
+    		myDescription  = myDescriptionXmlHandler.getValue();
         	myDescriptionXmlHandler.reset();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(REQUIREMENT_ELEMENT))
@@ -180,27 +175,26 @@ public class TestCaseXmlHandler extends XmlHandler
     		myRequirementIds.add(myRequirementIdXmlHandler.getValue());
     		myRequirementIdXmlHandler.reset();
     	}
-    	else if (aQualifiedName.equalsIgnoreCase(TestStep.ActionType.initialize.toString()))
+    	else if (aQualifiedName.equalsIgnoreCase(PREPARE_ELEMENT))
     	{
-    		myInitializationSteps.add(myInitializeXmlHandler.getActionStep());
-    		myInitializeXmlHandler.reset();
+    		myPrepareSteps = myPrepareXmlHandler.getSteps();
+    		myPrepareXmlHandler.reset();
     	}
-    	else if (aQualifiedName.equalsIgnoreCase(ExecutionXmlHandler.START_ELEMENT))
+    	else if (aQualifiedName.equalsIgnoreCase(EXECUTE_ELEMENT))
     	{
-    		myExecutionSteps = myExecutionXmlHandler.getExecutionSteps();
+    		myExecutionSteps = myExecutionXmlHandler.getSteps();
     		myExecutionXmlHandler.reset();
     	}
-    	else if (aQualifiedName.equalsIgnoreCase(ScriptXmlHandler.START_ELEMENT))
+    	else if (aQualifiedName.equalsIgnoreCase(RESTORE_ELEMENT))
     	{
-    		myCurrentExecutionScript = myScriptXmlHandler.getScript();
-    		myScriptXmlHandler.reset();
-    	}
-    	else if (aQualifiedName.equalsIgnoreCase(TestStep.ActionType.restore.toString()))
-    	{
-    		myRestoreSteps.add(myRestoreXmlHandler.getActionStep());
+    		myRestoreSteps = myRestoreXmlHandler.getSteps();
     		myRestoreXmlHandler.reset();
     	}
-		// else nothing (ignored)
+    	else
+    	{ // Programming fault
+			throw new Error( "Child XML Handler returned, but not recognized. The handler was probably defined " +
+			                 "in the Constructor but not handled in handleReturnFromChildElement()");
+    	}
 	}
 
 	/**
@@ -210,46 +204,39 @@ public class TestCaseXmlHandler extends XmlHandler
     {
 		Trace.println(Trace.SUITE);
 
-		if ( myCurrentTestCaseId.isEmpty() )
+		if ( myTestCaseId.isEmpty() )
 		{
 			throw new SAXParseException("Unknown TestCase ID", new LocatorImpl());
 		}
 
-		if ( myExecutionSteps.isEmpty() && myCurrentExecutionScript == null )
+		if ( myExecutionSteps.isEmpty() && myExecutionScript == null )
 		{
-			throw new SAXParseException("No Execution Steps found for " + myCurrentTestCaseId, new LocatorImpl());
+			throw new SAXParseException("No Execution Steps found for " + myTestCaseId, new LocatorImpl());
 		}
 
-       	TestCase testCase = myFactory.create( myCurrentTestCaseId,
-       										  myCurrentTestCaseType,
-       										  myCurrentSequence,
-       										  myCurrentDescription,
-       										  myRequirementIds,
-       										  myInitializationSteps.sort(),
-       										  myExecutionSteps.sort(),
-       										  myCurrentExecutionScript,
-       										  myRestoreSteps.sort() );
-    	
+       	TestCase testCase = (TestCase) new TestCaseImpl( myTestCaseId,
+       	                                                 myAnyAttributes,
+       	       										  	 myDescription,
+       	       										  	 myRequirementIds,
+       	       										  	 myPrepareSteps.sort(),
+       	       										  	 myExecutionSteps.sort(),
+       	       										  	 myRestoreSteps.sort(),
+       	       										  	 myAnyElements );
+
 		return testCase;
     }
-
-	public int getSequence()
-	{
-		Trace.println(Trace.GETTER, "getSequence() -> " + myCurrentSequence, true);
-		return myCurrentSequence;
-	}
 
 	public void reset()
 	{
 		Trace.println(Trace.SUITE);
-		myCurrentTestCaseId = "";
-		myCurrentTestCaseType = "";
-		myCurrentSequence = 0;
-		myCurrentDescription = "";
-		myCurrentExecutionScript = null;
-		
+		myTestCaseId = "";
+	    myAnyAttributes = new Hashtable<String, String>();
+
+	    myDescription = "";
 		myRequirementIds = new ArrayList<String>();
-		myInitializationSteps = new TestStepArrayList();
+		myPrepareSteps = new TestStepArrayList();
 		myRestoreSteps = new TestStepArrayList();
+		myAnyElements = new Hashtable<String, String>();
+	    myCurrentAnyValue = "";
 	}
 }

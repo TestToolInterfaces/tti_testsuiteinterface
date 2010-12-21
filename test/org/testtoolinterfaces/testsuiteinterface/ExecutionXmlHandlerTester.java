@@ -2,6 +2,8 @@ package org.testtoolinterfaces.testsuiteinterface;
 
 
 import java.io.File;
+import java.util.ArrayList;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -9,10 +11,11 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.junit.Before;
+import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepArrayList;
-import org.testtoolinterfaces.testsuite.TestStepFactory;
-import org.testtoolinterfaces.testsuite.TestStepFactoryImpl;
-import org.testtoolinterfaces.testsuiteinterface.ExecutionXmlHandler;
+import org.testtoolinterfaces.testsuite.TestStepCommand;
+import org.testtoolinterfaces.testsuite.TestStepSimple;
+import org.testtoolinterfaces.testsuiteinterface.TestStepSequenceXmlHandler;
 import org.xml.sax.XMLReader;
 
 
@@ -43,18 +46,29 @@ public class ExecutionXmlHandlerTester extends TestCase
     	Assert.assertEquals("Incorrect sequence Nr", 3, steps.get(2).getSequenceNr());
 
     	Assert.assertEquals( "Incorrect TestStep",
+    						 TestStep.StepType.action,
+    						 steps.get(0).getStepType() );
+    	Assert.assertEquals( "Incorrect TestStep",
     						 "A description of the first action step.",
-    						 steps.get(0).getDescription() );
+    						 ((TestStepSimple) steps.get(0)).getDescription() );
+
+    	Assert.assertEquals( "Incorrect TestStep",
+    						 TestStep.StepType.action,
+    						 steps.get(1).getStepType() );
     	Assert.assertEquals( "Incorrect TestStep",
     						 "A description of the second action step.",
-    						 steps.get(1).getDescription() );
+    						 ((TestStepSimple) steps.get(1)).getDescription() );
+
+    	Assert.assertEquals( "Incorrect TestStep",
+    						 TestStep.StepType.check,
+    						 steps.get(2).getStepType() );
     	Assert.assertEquals( "Incorrect TestStep",
 				 			 "A description of the check step.",
-				 			 steps.get(2).getDescription() );
+				 			((TestStepSimple) steps.get(2)).getDescription() );
 
-    	Assert.assertEquals("Incorrect Command", "actionScript_1", steps.get(0).getCommand());
-    	Assert.assertEquals("Incorrect Command", "actionScript_3", steps.get(1).getCommand());
-    	Assert.assertEquals("Incorrect Command", "checkScript_1", steps.get(2).getCommand());
+    	Assert.assertEquals("Incorrect Command", "actionScript_1", ((TestStepCommand) steps.get(0)).getCommand());
+    	Assert.assertEquals("Incorrect Command", "actionScript_3", ((TestStepCommand) steps.get(1)).getCommand());
+    	Assert.assertEquals("Incorrect Command", "checkScript_1", ((TestStepCommand) steps.get(2)).getCommand());
 
 	}
 	
@@ -76,8 +90,10 @@ public class ExecutionXmlHandlerTester extends TestCase
 			XMLReader xmlReader = saxParser.getXMLReader();
 
 	        // create a handler
-			TestStepFactory testStepFactory = new TestStepFactoryImpl();
-	        ExecutionXmlHandler handler = new ExecutionXmlHandler(xmlReader, testStepFactory);
+			ArrayList<TestStep.StepType> allowedStepList = new ArrayList<TestStep.StepType>();
+			allowedStepList.add(TestStep.StepType.action);
+			allowedStepList.add(TestStep.StepType.check);
+			TestStepSequenceXmlHandler handler = new TestStepSequenceXmlHandler(xmlReader, "execution", allowedStepList);
 
 	        // assign the handler to the parser
 	        xmlReader.setContentHandler(handler);
@@ -95,7 +111,7 @@ public class ExecutionXmlHandlerTester extends TestCase
 	        // parse the document
 	        xmlReader.parse(xmlTestFile.getAbsolutePath());
 
-	        return handler.getExecutionSteps();
+	        return handler.getSteps();
 		}
 		catch (Exception e)
 		{

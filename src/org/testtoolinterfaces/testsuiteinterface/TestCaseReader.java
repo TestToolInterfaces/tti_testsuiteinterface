@@ -6,16 +6,16 @@ import java.io.IOError;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.testtoolinterfaces.testsuite.TestGroup;
+import org.testtoolinterfaces.testsuite.TestCase;
 import org.testtoolinterfaces.utils.Trace;
 import org.xml.sax.XMLReader;
 
-public class TestGroupReader
+public class TestCaseReader
 {
 	/**
-	 * @param aTestGroupFactory
+	 * 
 	 */
-	public TestGroupReader()
+	public TestCaseReader()
 	{
 		Trace.println(Trace.LEVEL.CONSTRUCTOR);
 	}
@@ -23,30 +23,29 @@ public class TestGroupReader
 	/** 
 	 * @throws IOError when reading fails
 	 */
-	public TestGroup readTgFile( File aTestGroupFile )
+	public TestCase readTcFile( File aTestCaseFile )
 	{
-		Trace.println(Trace.LEVEL.SUITE, "readTgFile( " + aTestGroupFile.getAbsolutePath() + " )", true);
+		Trace.println(Trace.LEVEL.SUITE, "readTcFile( " + aTestCaseFile.getName() + " )", true);
 
 		// create a parser
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(false);
-		TestGroup testGroup;
+		TestCase testCase;
 		try
 		{
 			SAXParser saxParser = spf.newSAXParser();
 			XMLReader xmlReader = saxParser.getXMLReader();
 
 	        // create a handler
-			TestGroupXmlHandler handler = new TestGroupXmlHandler(xmlReader);
+			TestCaseXmlHandler handler = new TestCaseXmlHandler(xmlReader);
 
 	        // assign the handler to the parser
 	        xmlReader.setContentHandler(handler);
 
 	        // parse the document
-System.out.println( "Loading Test Group: " + aTestGroupFile.getAbsolutePath() );
-	        xmlReader.parse(aTestGroupFile.getAbsolutePath());
+	        xmlReader.parse(aTestCaseFile.getAbsolutePath());
 	        
-	        testGroup = handler.getTestGroup();
+	        testCase = handler.getTestCase();
 		}
 		catch (Exception e)
 		{
@@ -54,6 +53,6 @@ System.out.println( "Loading Test Group: " + aTestGroupFile.getAbsolutePath() );
 			throw new IOError( e );
 		}
 
-		return testGroup;
+		return testCase;
 	}
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+ 
+<project name="TestSuiteInterface" default="CreateJarFile">
+	<target name="CreateJarFile">
+
+		<delete file="../TestSuiteInterface.jar"/>
+		<property name="version.num" value="0.2.0"/>
+	    <buildnumber file="build.num"/>
+		
+		<jar destfile="../TestSuiteInterface.jar" duplicate="preserve" index="true">
+			<zipfileset dir="bin" prefix="" />
+			<zipfileset dir="src" prefix="" />
+			<zipfileset src="lib/TestSuite.jar" />
+
+			<manifest>
+		        <attribute name="Created-By" value="TestToolInterfaces.org"/>
+		        <attribute name="Built-By" value="${user.name}"/>
+		        <attribute name="Implementation-Title" value="Test Tool Interfaces - Test Suite Interface" />
+		        <attribute name="Implementation-Version" value="${version.num}.${build.number}"/> 
+		        <attribute name="Implementation-Vendor" value="Open Source - Arjan Kranenburg" />
+		        <attribute name="Specification-Title" value="Test Tool Interfaces - Test Suite Interface" />
+		        <attribute name="Specification-Version" value="0.2" />
+		        <attribute name="Specification-Vendor" value="TestToolInterfaces.org" />
+		    </manifest>
+		</jar>
+	</target>
+</project>

@@ -45,10 +45,10 @@ public class TestCaseLinkXmlHandler extends TestLinkXmlHandler
 		}
 
 		TestCaseLink testCaseLink = new TestCaseLink( id,
-		                                                  this.getType(),
-		                                                  this.getSequence(),
-		                                                  link,
-		                                                  this.getAnyAttributes() );
+		                                              this.getType(),
+		                                              this.getSequence(),
+		                                              link,
+		                                              this.getAnyAttributes() );
 
 		return testCaseLink;
 	}

@@ -43,7 +43,6 @@ public class TestGroupReader
 	        xmlReader.setContentHandler(handler);
 
 	        // parse the document
-System.out.println( "Loading Test Group: " + aTestGroupFile.getAbsolutePath() );
 	        xmlReader.parse(aTestGroupFile.getAbsolutePath());
 	        
 	        testGroup = handler.getTestGroup();

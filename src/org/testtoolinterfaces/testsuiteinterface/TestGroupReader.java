@@ -17,7 +17,7 @@ public class TestGroupReader
 	 */
 	public TestGroupReader()
 	{
-		Trace.println(Trace.LEVEL.CONSTRUCTOR);
+		Trace.println(Trace.CONSTRUCTOR);
 	}
 
 	/** 
@@ -25,7 +25,7 @@ public class TestGroupReader
 	 */
 	public TestGroup readTgFile( File aTestGroupFile )
 	{
-		Trace.println(Trace.LEVEL.SUITE, "readTgFile( " + aTestGroupFile.getAbsolutePath() + " )", true);
+		Trace.println(Trace.SUITE, "readTgFile( " + aTestGroupFile.getPath() + " )", true);
 
 		// create a parser
         SAXParserFactory spf = SAXParserFactory.newInstance();

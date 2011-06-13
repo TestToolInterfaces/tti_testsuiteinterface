@@ -12,12 +12,26 @@ import org.xml.sax.XMLReader;
 
 public class TestGroupReader
 {
+	private TestInterfaceList myInterfaceList;
+	private boolean myCheckStepParameter;
+	
 	/**
 	 * @param aTestGroupFactory
 	 */
-	public TestGroupReader()
+	public TestGroupReader( TestInterfaceList anInterfaceList )
+	{
+		this( anInterfaceList, false );
+	}
+
+	/**
+	 * @param aTestGroupFactory
+	 */
+	public TestGroupReader( TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{
 		Trace.println(Trace.CONSTRUCTOR);
+		
+		myInterfaceList = anInterfaceList;
+		myCheckStepParameter = aCheckStepParameter;
 	}
 
 	/** 
@@ -37,7 +51,7 @@ public class TestGroupReader
 			XMLReader xmlReader = saxParser.getXMLReader();
 
 	        // create a handler
-			TestGroupXmlHandler handler = new TestGroupXmlHandler(xmlReader);
+			TestGroupXmlHandler handler = new TestGroupXmlHandler(xmlReader, myInterfaceList, myCheckStepParameter);
 
 	        // assign the handler to the parser
 	        xmlReader.setContentHandler(handler);

@@ -5,7 +5,6 @@ import java.util.Hashtable;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
 /**
@@ -82,7 +81,7 @@ public class TestStepScriptXmlHandler extends XmlHandler
 	 * @param aQualifiedName the name of the childElement
 	 * 
 	 */
-	public void handleGoToChildElement(String aQualifiedName) throws SAXParseException
+	public void handleGoToChildElement(String aQualifiedName)
 	{
 		// nop
 	}

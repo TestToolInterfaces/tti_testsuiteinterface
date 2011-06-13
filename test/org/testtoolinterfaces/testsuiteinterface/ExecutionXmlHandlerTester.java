@@ -11,6 +11,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.junit.Before;
+import org.testtoolinterfaces.testsuite.TestInterface_stub;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepArrayList;
 import org.testtoolinterfaces.testsuite.TestStepCommand;
@@ -66,9 +67,9 @@ public class ExecutionXmlHandlerTester extends TestCase
 				 			 "A description of the check step.",
 				 			((TestStepSimple) steps.get(2)).getDescription() );
 
-    	Assert.assertEquals("Incorrect Command", "actionScript_1", ((TestStepCommand) steps.get(0)).getCommand());
-    	Assert.assertEquals("Incorrect Command", "actionScript_3", ((TestStepCommand) steps.get(1)).getCommand());
-    	Assert.assertEquals("Incorrect Command", "checkScript_1", ((TestStepCommand) steps.get(2)).getCommand());
+    	Assert.assertEquals("Incorrect Command", "action1", ((TestStepCommand) steps.get(0)).getCommand());
+    	Assert.assertEquals("Incorrect Command", "action3", ((TestStepCommand) steps.get(1)).getCommand());
+    	Assert.assertEquals("Incorrect Command", "check1", ((TestStepCommand) steps.get(2)).getCommand());
 
 	}
 	
@@ -89,11 +90,23 @@ public class ExecutionXmlHandlerTester extends TestCase
 			saxParser = spf.newSAXParser();
 			XMLReader xmlReader = saxParser.getXMLReader();
 
-	        // create a handler
+	        // create a Test Interface List
+			TestInterfaceListHelper testInterfaceList = new TestInterfaceListHelper();
+			TestInterface_stub testInterface = new TestInterface_stub("ifName");
+			testInterface.addCommand( "action1" );
+			testInterface.addCommand( "action3" );
+			testInterface.addCommand( "check1" );
+			testInterfaceList.put(testInterface);
+
+			// create a handler
 			ArrayList<TestStep.StepType> allowedStepList = new ArrayList<TestStep.StepType>();
 			allowedStepList.add(TestStep.StepType.action);
 			allowedStepList.add(TestStep.StepType.check);
-			TestStepSequenceXmlHandler handler = new TestStepSequenceXmlHandler(xmlReader, "execution", allowedStepList);
+			TestStepSequenceXmlHandler handler = new TestStepSequenceXmlHandler( xmlReader,
+			                                                                     "execute",
+			                                                                     allowedStepList,
+			                                                                     testInterfaceList,
+			                                                                     false );
 
 	        // assign the handler to the parser
 	        xmlReader.setContentHandler(handler);

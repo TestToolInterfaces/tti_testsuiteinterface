@@ -3,9 +3,9 @@ package org.testtoolinterfaces.testsuiteinterface;
 import java.io.File;
 
 import org.testtoolinterfaces.testsuite.TestCaseLink;
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.LocatorImpl;
 
 /**
  * @author Arjan Kranenburg 
@@ -27,7 +27,7 @@ public class TestCaseLinkXmlHandler extends TestLinkXmlHandler
 		this.reset();
 	}
 
-	public TestCaseLink getTestCaseLink() throws TestReaderException
+	public TestCaseLink getTestCaseLink() throws TestSuiteException
 	{
 		Trace.println(Trace.SUITE);
 
@@ -36,12 +36,12 @@ public class TestCaseLinkXmlHandler extends TestLinkXmlHandler
 		
 		if ( id.isEmpty() )
 		{
-			throw new TestReaderException( "Unknown TestCase ID", new LocatorImpl());
+			throw new TestSuiteException( "Unknown TestCase ID" );
 		}
 
 		if ( link == null )
 		{
-			throw new TestReaderException( "Link to TestCase not specified", new LocatorImpl());
+			throw new TestSuiteException( "Link to TestCase not specified", id, this.getSequence() );
 		}
 
 		TestCaseLink testCaseLink = new TestCaseLink( id,

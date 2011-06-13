@@ -1,30 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<execution>
-	<action sequence="1">
+  <execute>
+    <action interface="ifName" sequence="1">
 	  <description>A description of the first action step.</description>
-	  <command param1="action" param2="4">
-		action1
-	  </command>
-	  <script>
-	    <executable>actionScript_1</executable>
-	  </script>
+	  <command>action1</command>
+	  <parameter id="URL" type="string" sequence="1">http://http://www.google.com/</parameter>
 	</action>
-	<action sequence="5">
+    <action interface="ifName" sequence="5">
 	  <description>A description of the second action step.</description>
-	  <command param1="action" param2="4">
-		action3
-	  </command>
-	  <script>
-	    <executable>actionScript_3</executable>
-	  </script>
+	  <command>action3</command>
+	  <parameter id="TIME" type="int" sequence="1">15</parameter>
 	</action>
-	<check sequence="3">
+    <check interface="ifName" sequence="3">
 	  <description>A description of the check step.</description>
-	  <command param1="check" param2="4">
-		check1
-	  </command>
-	  <script>
-	    <executable>checkScript_1</executable>
-	  </script>
+	  <command>check1</command>
 	</check>
-</execution>
+  </execute>

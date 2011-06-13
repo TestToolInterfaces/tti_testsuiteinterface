@@ -2,9 +2,12 @@ package org.testtoolinterfaces.testsuiteinterface;
 
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
+import org.testtoolinterfaces.testsuite.TestInterface;
 import org.testtoolinterfaces.testsuite.TestStep;
+import org.testtoolinterfaces.testsuite.TestStepCommand;
 import org.testtoolinterfaces.testsuite.TestStepScript;
 import org.testtoolinterfaces.testsuite.TestStepSimple;
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.testsuite.TestStepSimple.SimpleType;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.Trace;
@@ -12,7 +15,6 @@ import org.testtoolinterfaces.utils.Warning;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXParseException;
-//import org.xml.sax.Locator;
 import org.xml.sax.XMLReader;
 
 /**
@@ -33,48 +35,61 @@ import org.xml.sax.XMLReader;
 public class TestStepXmlHandler extends XmlHandler
 {
 	private static final String ATTRIBUTE_SEQUENCE = "sequence";
+	private static final String ATTRIBUTE_INTERFACE = "interface";
 
+	private static final String COMMAND_ELEMENT = "command";
 	private static final String DESCRIPTION_ELEMENT = "description";
 
 	private GenericTagAndStringXmlHandler myDescriptionXmlHandler;
-//	private CommandXmlHandler myCommandXmlHandler;
+	private GenericTagAndStringXmlHandler myCommandXmlHandler;
 	private TestStepScriptXmlHandler myScriptXmlHandler;
-	private CommandParameterXmlHandler myParameterXmlHandler;
+	private ParameterXmlHandler myParameterXmlHandler;
 
+	private boolean myCheckStepParams = false;
 	private int mySequence;
 	
+	private String myCommand;
+	private String myInterface;
 	private String myDescription;
 	private String myExecutionScript;
 	private String myScriptType;
     private ParameterArrayList myParameters;
+    
+    private TestInterfaceList myInterfaces;
 
-	public TestStepXmlHandler( XMLReader anXmlReader, SimpleType aTag )
+	public TestStepXmlHandler( XMLReader anXmlReader,
+	                           SimpleType aTag,
+	                           TestInterfaceList anInterfaceList,
+	                           boolean aCheckStepParameter )
 	{
 		super(anXmlReader, aTag.toString());
-		Trace.println(Trace.LEVEL.CONSTRUCTOR, "ActionXmlHandler( anXmlreader, " + aTag + " )", true);
+		Trace.println(Trace.CONSTRUCTOR, "ActionXmlHandler( anXmlreader, " + aTag + " )", true);
 
 		myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
 		this.addStartElementHandler(DESCRIPTION_ELEMENT, myDescriptionXmlHandler);
 		myDescriptionXmlHandler.addEndElementHandler(DESCRIPTION_ELEMENT, this);
 
-//		myCommandXmlHandler = new CommandXmlHandler(anXmlReader);
-//		this.addStartElementHandler(CommandXmlHandler.START_ELEMENT, myCommandXmlHandler);
-//		myCommandXmlHandler.addEndElementHandler(CommandXmlHandler.START_ELEMENT, this);
+		myCommandXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, COMMAND_ELEMENT);
+		this.addStartElementHandler(COMMAND_ELEMENT, myCommandXmlHandler);
+		myCommandXmlHandler.addEndElementHandler(COMMAND_ELEMENT, this);
 
 		myScriptXmlHandler = new TestStepScriptXmlHandler(anXmlReader);
 		this.addStartElementHandler(TestStepScriptXmlHandler.ELEMENT_START, myScriptXmlHandler);
 		myScriptXmlHandler.addEndElementHandler(TestStepScriptXmlHandler.ELEMENT_START, this);
 
-		myParameterXmlHandler = new CommandParameterXmlHandler(anXmlReader);
-		this.addStartElementHandler(CommandParameterXmlHandler.START_ELEMENT, myParameterXmlHandler);
-		myParameterXmlHandler.addEndElementHandler(CommandParameterXmlHandler.START_ELEMENT, this);
+		myParameterXmlHandler = new ParameterXmlHandler(anXmlReader);
+		this.addStartElementHandler(ParameterXmlHandler.START_ELEMENT, myParameterXmlHandler);
+		myParameterXmlHandler.addEndElementHandler(ParameterXmlHandler.START_ELEMENT, this);
 		
+		myCheckStepParams = aCheckStepParameter;
+		myInterfaces = anInterfaceList;
+
 		reset();
 	}
 
     public void processElementAttributes(String aQualifiedName, Attributes att)
     {
-		Trace.println(Trace.LEVEL.SUITE, "processElementAttributes( "
+		Trace.println(Trace.SUITE, "processElementAttributes( "
 				+ aQualifiedName + " )", true );
     	if (aQualifiedName.equalsIgnoreCase(this.getStartElement()))
     	{
@@ -83,8 +98,13 @@ public class TestStepXmlHandler extends XmlHandler
 		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_SEQUENCE))
 		    	{
 		    		mySequence = Integer.valueOf( att.getValue(i) ).intValue();
-		    		Trace.println( Trace.LEVEL.ALL, "        mySequence -> " + mySequence);
+		    		Trace.println( Trace.ALL, "        mySequence -> " + mySequence);
     	    	}
+		    	else if( att.getQName(i).equalsIgnoreCase(ATTRIBUTE_INTERFACE) )
+		    	{
+		    		myInterface = att.getValue(i);
+		    		Trace.println( Trace.ALL, "        myInterface -> " + myInterface);
+		    	}
 		    }
     	}
     }
@@ -115,9 +135,13 @@ public class TestStepXmlHandler extends XmlHandler
 	@Override
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 	{
-		// TODO Add Command.
-		Trace.println(Trace.LEVEL.SUITE);
-    	if (aQualifiedName.equalsIgnoreCase(DESCRIPTION_ELEMENT))
+		Trace.println(Trace.SUITE);
+    	if (aQualifiedName.equalsIgnoreCase(COMMAND_ELEMENT))
+    	{
+    		myCommand  = myCommandXmlHandler.getValue();
+    		myCommandXmlHandler.reset();
+    	}
+    	else if (aQualifiedName.equalsIgnoreCase(DESCRIPTION_ELEMENT))
     	{
     		myDescription  = myDescriptionXmlHandler.getValue();
         	myDescriptionXmlHandler.reset();
@@ -128,7 +152,7 @@ public class TestStepXmlHandler extends XmlHandler
     		myScriptType = myScriptXmlHandler.getScriptType();
     		myScriptXmlHandler.reset();
     	}
-    	else if (aQualifiedName.equalsIgnoreCase(CommandParameterXmlHandler.START_ELEMENT))
+    	else if (aQualifiedName.equalsIgnoreCase(ParameterXmlHandler.START_ELEMENT))
     	{
 			try
 			{
@@ -146,45 +170,59 @@ public class TestStepXmlHandler extends XmlHandler
 		// else nothing (ignored)
 	}
 
-	public TestStepSimple getActionStep()
+	public TestStepSimple getActionStep() throws TestSuiteException
 	{
-		Trace.println(Trace.LEVEL.SUITE);
+		Trace.println(Trace.SUITE);
 
 		TestStepSimple testStep;
-// TODO Switch on script or command
 		
-// TODO What to do with myInterface?
-		
-//		TestCommand command = TestCommand.getEmptyInstance();
-//		try
-//		{
-//			command = myCommandXmlHandler.getCommand();
-//		}
-//		catch (Exception e)
-//		{
-//			Locator locator = this.getLocator();
-//			Warning.println( "No suitable command found in " + this.getStartElement() + "-block at line " 
-//					+ locator.getLineNumber() + " of:\n         " + locator.getSystemId() );
-//			Warning.println( e.getMessage() );
-//			Trace.printException(Trace.LEVEL.ALL, e);
-//		}
+		if ( myCommand != null )
+		{
+			TestInterface iFace = myInterfaces.getInterface(myInterface);
+			if( ! iFace.hasCommand(myCommand) )
+			{
+				throw new TestSuiteException( "Command " + myCommand + " not known for interface " + iFace.getInterfaceName() );
+			}
+			
+			if( myCheckStepParams )
+			{
+				iFace.verifyParameters(myCommand, myParameters);
+			}
 
-		testStep = new TestStepScript( TestStep.StepType.valueOf(this.getStartElement()),
-		                               mySequence,
-		                               myDescription,
-		                               myExecutionScript,
-		                               myScriptType,
-		                               myParameters );
+			testStep = new TestStepCommand( TestStep.StepType.valueOf(this.getStartElement()),
+			                                mySequence,
+			                                myDescription,
+			                                myCommand,
+			                                iFace,
+			                                myParameters );
+
+		}
+		else if ( myExecutionScript != null )
+		{
+			testStep = new TestStepScript( TestStep.StepType.valueOf(this.getStartElement()),
+			                               mySequence,
+			                               myDescription,
+			                               myExecutionScript,
+			                               myScriptType,
+			                               myParameters );
+
+		}
+		else
+		{
+			throw new TestSuiteException( "No command or execution script found" );
+		}
 
 		return testStep;
 	}
 
 	public void reset()
 	{
-		Trace.println(Trace.LEVEL.SUITE);
+		Trace.println(Trace.SUITE);
 
 		mySequence = 0;
 		
+		myCommand = null;
+		myInterface = "Default";
 		myDescription = "";
 		myExecutionScript = null;
 		myScriptType = "";

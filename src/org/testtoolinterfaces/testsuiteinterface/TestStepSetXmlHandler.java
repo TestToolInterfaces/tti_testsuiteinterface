@@ -34,12 +34,15 @@ public class TestStepSetXmlHandler extends XmlHandler
 
 	private TestStepSetCaseXmlHandler myCaseXmlHandler;
 
-	public TestStepSetXmlHandler( XMLReader anXmlReader, ArrayList<TestStep.StepType> anAllowedStepTypes )
+	public TestStepSetXmlHandler( XMLReader anXmlReader,
+	                              ArrayList<TestStep.StepType> anAllowedStepTypes,
+	                              TestInterfaceList anInterfaceList,
+	                              boolean aCheckStepParameter )
 	{
 		super(anXmlReader, START_ELEMENT);
-		Trace.println(Trace.LEVEL.CONSTRUCTOR);
+		Trace.println(Trace.CONSTRUCTOR);
 
-    	myCaseXmlHandler = new TestStepSetCaseXmlHandler(anXmlReader, anAllowedStepTypes);
+    	myCaseXmlHandler = new TestStepSetCaseXmlHandler(anXmlReader, anAllowedStepTypes, anInterfaceList, aCheckStepParameter);
 		this.addStartElementHandler(TestStepSetCaseXmlHandler.START_ELEMENT, myCaseXmlHandler);
 		myCaseXmlHandler.addEndElementHandler(TestStepSetCaseXmlHandler.START_ELEMENT, this);
 
@@ -91,7 +94,7 @@ public class TestStepSetXmlHandler extends XmlHandler
 	@Override
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 	{
-		Trace.println(Trace.LEVEL.SUITE);
+		Trace.println(Trace.SUITE);
     	if (aQualifiedName.equalsIgnoreCase(TestStepSetCaseXmlHandler.START_ELEMENT))
     	{
     		myCases.add(myCaseXmlHandler.getCase());
@@ -104,13 +107,13 @@ public class TestStepSetXmlHandler extends XmlHandler
 	 */
 	public TestStepSet getSet()
 	{
-		Trace.println(Trace.LEVEL.GETTER);
+		Trace.println(Trace.GETTER);
 		return new TestStepSet( this.mySequence, myCases );
 	}
 
 	public void reset()
 	{
-		Trace.println(Trace.LEVEL.SUITE);
+		Trace.println(Trace.SUITE);
 		
 		mySequence = 0;
     	myCases = new ArrayList<TestStepSetCase>();

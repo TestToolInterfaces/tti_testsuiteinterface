@@ -6,7 +6,9 @@ import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepArrayList;
 import org.testtoolinterfaces.testsuite.TestStepSetCase;
 import org.testtoolinterfaces.testsuite.TestStepSimple;
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
+import org.testtoolinterfaces.utils.Warning;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
@@ -43,16 +45,19 @@ public class TestStepSetCaseXmlHandler extends XmlHandler
 	private TestStepXmlHandler myCheckXmlHandler;
 	private TestStepSequenceXmlHandler myTestStepSequenceXmlHandler;
 
-	public TestStepSetCaseXmlHandler( XMLReader anXmlReader, ArrayList<TestStep.StepType> anAllowedStepTypes )
+	public TestStepSetCaseXmlHandler( XMLReader anXmlReader,
+	                                  ArrayList<TestStep.StepType> anAllowedStepTypes,
+	                                  TestInterfaceList anInterfaceList,
+	                                  boolean aCheckStepParameter )
 	{
 		super(anXmlReader, START_ELEMENT);
-		Trace.println(Trace.LEVEL.CONSTRUCTOR);
+		Trace.println(Trace.CONSTRUCTOR);
 
-    	myCheckXmlHandler = new TestStepXmlHandler(anXmlReader, TestStepSimple.SimpleType.check);
+    	myCheckXmlHandler = new TestStepXmlHandler(anXmlReader, TestStepSimple.SimpleType.check, anInterfaceList, aCheckStepParameter);
 		this.addStartElementHandler(ELEMENT_CHECK, myCheckXmlHandler);
 		myCheckXmlHandler.addEndElementHandler(ELEMENT_CHECK, this);
 
-		myTestStepSequenceXmlHandler = new TestStepSequenceXmlHandler(anXmlReader, "then", anAllowedStepTypes);
+		myTestStepSequenceXmlHandler = new TestStepSequenceXmlHandler(anXmlReader, "then", anAllowedStepTypes, anInterfaceList, aCheckStepParameter);
 		this.addStartElementHandler(ELEMENT_THEN, myTestStepSequenceXmlHandler);
 		myTestStepSequenceXmlHandler.addEndElementHandler(ELEMENT_THEN, this);
 
@@ -63,7 +68,7 @@ public class TestStepSetCaseXmlHandler extends XmlHandler
     {
 		Trace.print(Trace.SUITE, "processElementAttributes( " 
 		            + aQualifiedName, true );
-    	if (aQualifiedName.equalsIgnoreCase(TestCaseXmlHandler.START_ELEMENT))
+    	if (aQualifiedName.equalsIgnoreCase(TestStepSetCaseXmlHandler.START_ELEMENT))
     	{
 		    for (int i = 0; i < anAtt.getLength(); i++)
 		    {
@@ -111,7 +116,16 @@ public class TestStepSetCaseXmlHandler extends XmlHandler
 		Trace.println(Trace.SUITE);
     	if (aQualifiedName.equalsIgnoreCase(ELEMENT_CHECK))
     	{
-    		myCheck  = myCheckXmlHandler.getActionStep();
+    		try
+			{
+				myCheck  = myCheckXmlHandler.getActionStep();
+			}
+			catch (TestSuiteException anException)
+			{
+				String message = "Cannot read TestStep: " + anException.getMessage();
+				Warning.println(message);
+				Trace.print(Trace.ALL, message);
+			}
         	myCheckXmlHandler.reset();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(ELEMENT_THEN))
@@ -131,14 +145,14 @@ public class TestStepSetCaseXmlHandler extends XmlHandler
 	 */
 	public TestStepSetCase getCase()
 	{
-		Trace.println(Trace.LEVEL.GETTER);
+		Trace.println(Trace.GETTER);
 		// TODO
 		return new TestStepSetCase( myCaseId, myAfter, myCheck, myThen );
 	}
 
 	public void reset()
 	{
-		Trace.println(Trace.LEVEL.SUITE);
+		Trace.println(Trace.SUITE);
 		myCaseId = "";
 		myAfter = "";
 

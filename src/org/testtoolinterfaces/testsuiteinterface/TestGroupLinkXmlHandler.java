@@ -3,9 +3,9 @@ package org.testtoolinterfaces.testsuiteinterface;
 import java.io.File;
 
 import org.testtoolinterfaces.testsuite.TestGroupLink;
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.LocatorImpl;
 
 /**
  * @author Arjan Kranenburg 
@@ -27,7 +27,7 @@ public class TestGroupLinkXmlHandler extends TestLinkXmlHandler
 		this.reset();
 	}
 
-	public TestGroupLink getTestGroupLink() throws TestReaderException
+	public TestGroupLink getTestGroupLink() throws TestSuiteException
 	{
 		Trace.println(Trace.SUITE);
 
@@ -36,19 +36,19 @@ public class TestGroupLinkXmlHandler extends TestLinkXmlHandler
 		
 		if ( id.isEmpty() )
 		{
-			throw new TestReaderException( "Unknown TestGroup ID", new LocatorImpl());
+			throw new TestSuiteException( "Unknown TestGroup ID" );
 		}
 
 		if ( link == null )
 		{
-			throw new TestReaderException( "Link to TestGroup not specified", new LocatorImpl());
+			throw new TestSuiteException( "Link to TestGroup not specified", id, this.getSequence() );
 		}
 
 		TestGroupLink testGrouplink = new TestGroupLink( id,
-		                                                         this.getType(),
-			                                                     this.getSequence(),
-			                                                     link,
-			                                                     this.getAnyAttributes() );
+		                                                 this.getType(),
+			                                             this.getSequence(),
+			                                             link,
+			                                             this.getAnyAttributes() );
 
 		return testGrouplink;
 	}

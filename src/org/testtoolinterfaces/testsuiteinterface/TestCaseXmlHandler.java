@@ -8,13 +8,14 @@ import org.testtoolinterfaces.testsuite.TestCaseImpl;
 import org.testtoolinterfaces.testsuite.TestScript;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepArrayList;
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXParseException;
+//import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.LocatorImpl;
+//import org.xml.sax.helpers.LocatorImpl;
 
 /**
  * @author Arjan Kranenburg 
@@ -70,7 +71,7 @@ public class TestCaseXmlHandler extends XmlHandler
 	/**
 	 * @param anXmlReader the xmlReader
 	 */
-	public TestCaseXmlHandler( XMLReader anXmlReader )
+	public TestCaseXmlHandler( XMLReader anXmlReader, TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{
 		super(anXmlReader, START_ELEMENT);
 		Trace.println(Trace.CONSTRUCTOR);
@@ -97,15 +98,27 @@ public class TestCaseXmlHandler extends XmlHandler
 		this.addStartElementHandler(REQUIREMENT_ELEMENT, myRequirementIdXmlHandler);
 		myRequirementIdXmlHandler.addEndElementHandler(REQUIREMENT_ELEMENT, this);
 
-    	myPrepareXmlHandler = new TestStepSequenceXmlHandler( anXmlReader, PREPARE_ELEMENT, prepRestAllowedTypes );
+    	myPrepareXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
+    	                                                      PREPARE_ELEMENT,
+    	                                                      prepRestAllowedTypes,
+    	                                                      anInterfaceList,
+    	                                                      aCheckStepParameter );
 		this.addStartElementHandler(PREPARE_ELEMENT, myPrepareXmlHandler);
 		myPrepareXmlHandler.addEndElementHandler(PREPARE_ELEMENT, this);
 
-		myExecutionXmlHandler = new TestStepSequenceXmlHandler( anXmlReader, EXECUTE_ELEMENT, execAllowedTypes );
+		myExecutionXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
+		                                                        EXECUTE_ELEMENT,
+		                                                        execAllowedTypes,
+		                                                        anInterfaceList,
+		                                                        aCheckStepParameter );
 		this.addStartElementHandler(EXECUTE_ELEMENT, myExecutionXmlHandler);
 		myExecutionXmlHandler.addEndElementHandler(EXECUTE_ELEMENT, this);
 
-		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader, RESTORE_ELEMENT, prepRestAllowedTypes );
+		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
+		                                                      RESTORE_ELEMENT,
+		                                                      prepRestAllowedTypes,
+		                                                      anInterfaceList,
+		                                                      aCheckStepParameter );
 		this.addStartElementHandler(RESTORE_ELEMENT, myRestoreXmlHandler);
 		myRestoreXmlHandler.addEndElementHandler(RESTORE_ELEMENT, this);
 
@@ -197,21 +210,50 @@ public class TestCaseXmlHandler extends XmlHandler
     	}
 	}
 
+//	/**
+//     * @throws SAXParseException 
+//     */
+//    public TestCase getTestCase() throws SAXParseException
+//    {
+//		Trace.println(Trace.SUITE);
+//
+//		if ( myTestCaseId.isEmpty() )
+//		{
+//			throw new SAXParseException("Unknown TestCase ID", new LocatorImpl());
+//		}
+//
+//		if ( myExecutionSteps.isEmpty() && myExecutionScript == null )
+//		{
+//			throw new SAXParseException("No Execution Steps found for " + myTestCaseId, new LocatorImpl());
+//		}
+//
+//       	TestCase testCase = (TestCase) new TestCaseImpl( myTestCaseId,
+//       	                                                 myAnyAttributes,
+//       	       										  	 myDescription,
+//       	       										  	 myRequirementIds,
+//       	       										  	 myPrepareSteps.sort(),
+//       	       										  	 myExecutionSteps.sort(),
+//       	       										  	 myRestoreSteps.sort(),
+//       	       										  	 myAnyElements );
+//
+//		return testCase;
+//    }
+
 	/**
-     * @throws SAXParseException 
+     * @throws TestSuiteException 
      */
-    public TestCase getTestCase() throws SAXParseException
+    public TestCase getTestCase() throws TestSuiteException
     {
 		Trace.println(Trace.SUITE);
 
 		if ( myTestCaseId.isEmpty() )
 		{
-			throw new SAXParseException("Unknown TestCase ID", new LocatorImpl());
+			throw new TestSuiteException("Unknown TestCase ID");
 		}
 
 		if ( myExecutionSteps.isEmpty() && myExecutionScript == null )
 		{
-			throw new SAXParseException("No Execution Steps found for " + myTestCaseId, new LocatorImpl());
+			throw new TestSuiteException("No Execution Steps found", myTestCaseId);
 		}
 
        	TestCase testCase = (TestCase) new TestCaseImpl( myTestCaseId,
@@ -226,7 +268,7 @@ public class TestCaseXmlHandler extends XmlHandler
 		return testCase;
     }
 
-	public void reset()
+    public void reset()
 	{
 		Trace.println(Trace.SUITE);
 		myTestCaseId = "";

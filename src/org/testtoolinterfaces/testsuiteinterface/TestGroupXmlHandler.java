@@ -9,14 +9,12 @@ import org.testtoolinterfaces.testsuite.TestGroup;
 import org.testtoolinterfaces.testsuite.TestGroupImpl;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepArrayList;
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.Trace;
-import org.testtoolinterfaces.utils.Warning;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.LocatorImpl;
 
 
 /**
@@ -72,7 +70,7 @@ public class TestGroupXmlHandler extends XmlHandler
 	private TestGroupLinkXmlHandler myTestGroupLinkXmlHandler;
 	private TestStepSequenceXmlHandler myRestoreXmlHandler;
 	
-	public TestGroupXmlHandler( XMLReader anXmlReader )
+	public TestGroupXmlHandler( XMLReader anXmlReader, TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{
 		super(anXmlReader, START_ELEMENT);
 		Trace.println(Trace.CONSTRUCTOR);
@@ -94,7 +92,11 @@ public class TestGroupXmlHandler extends XmlHandler
 		this.addStartElementHandler(REQUIREMENT_ELEMENT, myRequirementIdXmlHandler);
 		myRequirementIdXmlHandler.addEndElementHandler(REQUIREMENT_ELEMENT, this);
 
-    	myPrepareXmlHandler = new TestStepSequenceXmlHandler( anXmlReader, PREPARE_ELEMENT, allowedTypes );
+    	myPrepareXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
+    	                                                      PREPARE_ELEMENT,
+    	                                                      allowedTypes,
+    	                                                      anInterfaceList,
+    	                                                      aCheckStepParameter );
 		this.addStartElementHandler(PREPARE_ELEMENT, myPrepareXmlHandler);
 		myPrepareXmlHandler.addEndElementHandler(PREPARE_ELEMENT, this);
 
@@ -106,7 +108,11 @@ public class TestGroupXmlHandler extends XmlHandler
 		this.addStartElementHandler(TestGroupLinkXmlHandler.START_ELEMENT, myTestGroupLinkXmlHandler);
 		myTestGroupLinkXmlHandler.addEndElementHandler(TestGroupLinkXmlHandler.START_ELEMENT, this);
 
-		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader, RESTORE_ELEMENT, allowedTypes );
+		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
+		                                                      RESTORE_ELEMENT,
+		                                                      allowedTypes,
+		                                                      anInterfaceList,
+		                                                      aCheckStepParameter );
 		this.addStartElementHandler(RESTORE_ELEMENT, myRestoreXmlHandler);
 		myRestoreXmlHandler.addEndElementHandler(RESTORE_ELEMENT, this);
 		
@@ -163,13 +169,14 @@ public class TestGroupXmlHandler extends XmlHandler
 	 * @param aQualifiedName the name of the childElement
 	 * 
 	 */
-	public void handleGoToChildElement(String aQualifiedName) throws SAXParseException
+	public void handleGoToChildElement(String aQualifiedName)
 	{
 		//nop
 	}
 
 	@Override
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
+				throws TestSuiteException
 	{
 		Trace.println(Trace.SUITE, "handleReturnFromChildElement( " + aQualifiedName + " )", true);
 
@@ -190,28 +197,12 @@ public class TestGroupXmlHandler extends XmlHandler
     	}
     	else if (aQualifiedName.equalsIgnoreCase(TestGroupLinkXmlHandler.START_ELEMENT))
     	{
-			try
-			{
-				myTestEntries.add((TestEntry) myTestGroupLinkXmlHandler.getTestGroupLink());
-			}
-			catch (TestReaderException e)
-			{
-				Warning.println("Cannot add TestGroup: " + e.getMessage());
-				Trace.print(Trace.SUITE, e);
-			}
+			myTestEntries.add((TestEntry) myTestGroupLinkXmlHandler.getTestGroupLink());
 			myTestGroupLinkXmlHandler.reset();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(TestCaseLinkXmlHandler.START_ELEMENT))
     	{
-			try
-			{
-				myTestEntries.add((TestEntry) myTestCaseLinkXmlHandler.getTestCaseLink());
-			}
-			catch (TestReaderException e)
-			{
-				Warning.println("Cannot add TestCase: " + e.getMessage());
-				Trace.print(Trace.SUITE, e);
-			}
+			myTestEntries.add((TestEntry) myTestCaseLinkXmlHandler.getTestCaseLink());
 			myTestCaseLinkXmlHandler.reset();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(RESTORE_ELEMENT))
@@ -242,13 +233,13 @@ public class TestGroupXmlHandler extends XmlHandler
 	    myCurrentAnyValue = "";
 	}
 
-	public TestGroup getTestGroup() throws TestReaderException
+	public TestGroup getTestGroup() throws TestSuiteException
 	{
 		Trace.println(Trace.SUITE);
 
 		if ( myTestGroupId.isEmpty() )
 		{
-			throw new TestReaderException( "Unknown TestGroup ID", new LocatorImpl());
+			throw new TestSuiteException( "Unknown TestGroup ID" );
 		}
 
       	TestGroup testGroup = (TestGroup) new TestGroupImpl( myTestGroupId,

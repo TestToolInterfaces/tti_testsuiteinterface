@@ -4,6 +4,8 @@ import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.ParameterHash;
 import org.testtoolinterfaces.testsuite.ParameterVariable;
+import org.testtoolinterfaces.testsuite.TestInterface;
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
@@ -15,13 +17,13 @@ import org.xml.sax.helpers.LocatorImpl;
 
 
 /**
- * @author Arjan Kranenburg 
- * 
  *  <parameter id="..." sequence="..." type="...">
  *    <value>...</value>
  *    <parameter>...</parameter>
  *    <variable>...</variable>
  *  </parameter>
+ * 
+ * @author Arjan Kranenburg 
  * 
  */
 public class ParameterXmlHandler extends XmlHandler
@@ -45,6 +47,8 @@ public class ParameterXmlHandler extends XmlHandler
 	private ParameterArrayList mySubParameters;	
     private String myVariableName;
 
+    private TestInterface myCurrentInterface;
+    
 	public ParameterXmlHandler( XMLReader anXmlReader )
 	{
 		super(anXmlReader, START_ELEMENT);
@@ -166,14 +170,21 @@ public class ParameterXmlHandler extends XmlHandler
 		Parameter parameter;
 		if ( ! myValue.isEmpty() )
 		{
-			if ( myParameterType.equalsIgnoreCase( "int" ) )
+			try
 			{
-				parameter = new Parameter(myParameterId, new Integer(myValue) );
+				if ( myCurrentInterface != null )
+				{
+					parameter = myCurrentInterface.createParameter( myParameterId, myParameterType, myValue );
+				}
+				else
+				{
+					parameter = DefaultParameterCreator.createParameter(myParameterId, myParameterType, myValue);
+				}			
 			}
-			else
+			catch (TestSuiteException tse)
 			{
-				parameter = new Parameter(myParameterId, (String) myValue);
-			}			
+				throw new SAXParseException(tse.getMessage(), new LocatorImpl(), tse);
+			}
 		}
 		else if ( ! myVariableName.isEmpty() )
 		{
@@ -203,5 +214,21 @@ public class ParameterXmlHandler extends XmlHandler
 		myValue = "";
 	    mySubParameters = new ParameterArrayList();
 	    myVariableName = "";
+	}
+
+	/**
+	 * Sets the Test Interface to the current interface in use
+	 * Also sets the Test Interfaces of the child ParameterXmlHandlers (if any)
+	 * 
+	 * @param anInterface the Current TestInterface to use
+	 */
+	public void setCurrentInterface(TestInterface anInterface)
+	{
+		myCurrentInterface = anInterface;
+		
+		if ( myParameterXmlHandler != null )
+		{
+			myParameterXmlHandler.setCurrentInterface( anInterface );
+		}
 	}
 }

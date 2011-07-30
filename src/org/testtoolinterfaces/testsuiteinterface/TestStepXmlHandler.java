@@ -103,6 +103,10 @@ public class TestStepXmlHandler extends XmlHandler
 		    	else if( att.getQName(i).equalsIgnoreCase(ATTRIBUTE_INTERFACE) )
 		    	{
 		    		myInterface = att.getValue(i);
+
+		    		TestInterface iFace = myInterfaces.getInterface(myInterface);
+					myParameterXmlHandler.setCurrentInterface(iFace);
+
 		    		Trace.println( Trace.ALL, "        myInterface -> " + myInterface);
 		    	}
 		    }
@@ -223,6 +227,9 @@ public class TestStepXmlHandler extends XmlHandler
 		
 		myCommand = null;
 		myInterface = "Default";
+		TestInterface defaultInterface = myInterfaces.getInterface(myInterface);
+		myParameterXmlHandler.setCurrentInterface(defaultInterface);
+
 		myDescription = "";
 		myExecutionScript = null;
 		myScriptType = "";

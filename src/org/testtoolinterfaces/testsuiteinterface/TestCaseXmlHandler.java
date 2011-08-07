@@ -70,6 +70,8 @@ public class TestCaseXmlHandler extends XmlHandler
 
 	/**
 	 * @param anXmlReader the xmlReader
+	 * @param anInterfaceList a list of interfaces
+	 * @param aCheckStepParameter flag to indicate if specified parameters of a step must be verified in the interface
 	 */
 	public TestCaseXmlHandler( XMLReader anXmlReader, TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{

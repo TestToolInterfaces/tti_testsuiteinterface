@@ -3,6 +3,7 @@ package org.testtoolinterfaces.testsuiteinterface;
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.TestInterface;
+import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepCommand;
 import org.testtoolinterfaces.testsuite.TestStepScript;
@@ -87,7 +88,8 @@ public class TestStepXmlHandler extends XmlHandler
 		reset();
 	}
 
-    public void processElementAttributes(String aQualifiedName, Attributes att)
+	@Override
+    public void processElementAttributes(String aQualifiedName, Attributes att) throws TestSuiteException
     {
 		Trace.println(Trace.SUITE, "processElementAttributes( "
 				+ aQualifiedName + " )", true );
@@ -105,6 +107,10 @@ public class TestStepXmlHandler extends XmlHandler
 		    		myInterface = att.getValue(i);
 
 		    		TestInterface iFace = myInterfaces.getInterface(myInterface);
+					if( iFace == null )
+					{
+						throw new TestSuiteException( "Unknown interface: " + myInterface );
+					}
 					myParameterXmlHandler.setCurrentInterface(iFace);
 
 		    		Trace.println( Trace.ALL, "        myInterface -> " + myInterface);

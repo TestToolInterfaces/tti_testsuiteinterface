@@ -2,11 +2,18 @@ package org.testtoolinterfaces.testsuiteinterface;
 
 import java.io.File;
 import java.io.IOError;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.testtoolinterfaces.testsuite.TestEntryArrayList;
 import org.testtoolinterfaces.testsuite.TestGroup;
+import org.testtoolinterfaces.testsuite.TestGroupImpl;
+import org.testtoolinterfaces.testsuite.TestInterfaceList;
+import org.testtoolinterfaces.testsuite.TestStepArrayList;
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
 import org.xml.sax.XMLReader;
 
@@ -64,7 +71,33 @@ public class TestGroupReader
 		catch (Exception e)
 		{
 			Trace.print(Trace.SUITE, e);
-			throw new IOError( e );
+			Throwable cause = e.getCause();
+			if ( TestSuiteException.class.isInstance( e ) 
+				 || TestSuiteException.class.isInstance( cause ) )
+			{
+				String description = "Failed to read Test Group: " + aTestGroupFile.getName() + "\n";
+				if ( TestSuiteException.class.isInstance( e ) )
+				{
+					description += e.getLocalizedMessage() + "\n";
+				}
+				else
+				{
+					description += cause.getLocalizedMessage() + "\n";
+				}
+				testGroup = new TestGroupImpl( aTestGroupFile.getName() + "_ERROR",
+				                               new Hashtable<String, String>(),
+				                               description,
+				                               new ArrayList<String>(),
+				                               new TestStepArrayList(),
+				                               new TestEntryArrayList(),
+				                               new TestStepArrayList(),
+				                               new Hashtable<String, String>() );
+			}
+			else
+			{
+							Trace.print(Trace.SUITE, e);
+							throw new IOError( e );
+			}
 		}
 
 		return testGroup;

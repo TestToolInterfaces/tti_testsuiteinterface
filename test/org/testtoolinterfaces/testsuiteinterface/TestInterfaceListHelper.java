@@ -3,6 +3,7 @@ package org.testtoolinterfaces.testsuiteinterface;
 import java.util.Hashtable;
 
 import org.testtoolinterfaces.testsuite.TestInterface;
+import org.testtoolinterfaces.testsuite.TestInterfaceList;
 
 public class TestInterfaceListHelper implements TestInterfaceList
 {

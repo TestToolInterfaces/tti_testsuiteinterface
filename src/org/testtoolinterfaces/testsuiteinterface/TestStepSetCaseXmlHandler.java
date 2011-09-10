@@ -2,6 +2,7 @@ package org.testtoolinterfaces.testsuiteinterface;
 
 import java.util.ArrayList;
 
+import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepArrayList;
 import org.testtoolinterfaces.testsuite.TestStepSetCase;

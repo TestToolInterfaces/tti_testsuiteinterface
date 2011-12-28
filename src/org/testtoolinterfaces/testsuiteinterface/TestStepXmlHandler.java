@@ -9,7 +9,7 @@ import org.testtoolinterfaces.testsuite.TestStepCommand;
 import org.testtoolinterfaces.testsuite.TestStepScript;
 import org.testtoolinterfaces.testsuite.TestStepSimple;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
-import org.testtoolinterfaces.testsuite.TestStepSimple.SimpleType;
+import org.testtoolinterfaces.testsuite.TestStep.StepType;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.Warning;
@@ -59,7 +59,7 @@ public class TestStepXmlHandler extends XmlHandler
     private TestInterfaceList myInterfaces;
 
 	public TestStepXmlHandler( XMLReader anXmlReader,
-	                           SimpleType aTag,
+	                           StepType aTag,
 	                           TestInterfaceList anInterfaceList,
 	                           boolean aCheckStepParameter )
 	{

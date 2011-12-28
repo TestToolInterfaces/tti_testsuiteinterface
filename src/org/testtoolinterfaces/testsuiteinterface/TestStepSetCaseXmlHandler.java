@@ -8,6 +8,7 @@ import org.testtoolinterfaces.testsuite.TestStepArrayList;
 import org.testtoolinterfaces.testsuite.TestStepSetCase;
 import org.testtoolinterfaces.testsuite.TestStepSimple;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.testsuite.TestStep.StepType;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.Warning;
 import org.testtoolinterfaces.utils.XmlHandler;
@@ -54,7 +55,7 @@ public class TestStepSetCaseXmlHandler extends XmlHandler
 		super(anXmlReader, START_ELEMENT);
 		Trace.println(Trace.CONSTRUCTOR);
 
-    	myCheckXmlHandler = new TestStepXmlHandler(anXmlReader, TestStepSimple.SimpleType.check, anInterfaceList, aCheckStepParameter);
+    	myCheckXmlHandler = new TestStepXmlHandler(anXmlReader, StepType.check, anInterfaceList, aCheckStepParameter);
 		this.addStartElementHandler(ELEMENT_CHECK, myCheckXmlHandler);
 		myCheckXmlHandler.addEndElementHandler(ELEMENT_CHECK, this);
 

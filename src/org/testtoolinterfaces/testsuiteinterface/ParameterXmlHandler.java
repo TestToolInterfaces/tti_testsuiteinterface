@@ -168,7 +168,8 @@ public class ParameterXmlHandler extends XmlHandler
 		}
 
 		Parameter parameter;
-		if ( ! myValue.isEmpty() )
+//		if ( ! myValue.isEmpty() )
+		if ( myValue != null )
 		{
 			try
 			{
@@ -211,7 +212,7 @@ public class ParameterXmlHandler extends XmlHandler
 		myParameterType = "string";
 		mySequence = Integer.MAX_VALUE;
 
-		myValue = "";
+		myValue = null;
 	    mySubParameters = new ParameterArrayList();
 	    myVariableName = "";
 	}

@@ -6,7 +6,6 @@ import org.testtoolinterfaces.testsuite.TestStep.StepType;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStepArrayList;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
-import org.testtoolinterfaces.testsuite.TestStepSimple.SimpleType;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
@@ -51,18 +50,18 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 		super(anXmlReader, aTag);
 		Trace.println(Trace.CONSTRUCTOR, "ActionXmlHandler( anXmlreader, " + aTag + ", " + anAllowedStepTypes.size() + " )", true);
 
-		myActionXmlHandler = new TestStepXmlHandler(anXmlReader, SimpleType.action, anInterfaceList, aCheckStepParameter);
+		myActionXmlHandler = new TestStepXmlHandler(anXmlReader, StepType.action, anInterfaceList, aCheckStepParameter);
 		if ( anAllowedStepTypes.contains(StepType.action) )
 		{
-			this.addStartElementHandler(SimpleType.action.toString(), myActionXmlHandler);
-			myActionXmlHandler.addEndElementHandler(SimpleType.action.toString(), this);
+			this.addStartElementHandler(StepType.action.toString(), myActionXmlHandler);
+			myActionXmlHandler.addEndElementHandler(StepType.action.toString(), this);
 		}
 
-		myCheckXmlHandler = new TestStepXmlHandler(anXmlReader, SimpleType.check, anInterfaceList, aCheckStepParameter);
+		myCheckXmlHandler = new TestStepXmlHandler(anXmlReader, StepType.check, anInterfaceList, aCheckStepParameter);
 		if ( anAllowedStepTypes.contains(StepType.check) )
 		{
-			this.addStartElementHandler(SimpleType.check.toString(), myCheckXmlHandler);
-			myCheckXmlHandler.addEndElementHandler(SimpleType.check.toString(), this);
+			this.addStartElementHandler(StepType.check.toString(), myCheckXmlHandler);
+			myCheckXmlHandler.addEndElementHandler(StepType.check.toString(), this);
 		}
 
 		myTestStepSetXmlHandler = null; // Created when needed to prevent loops

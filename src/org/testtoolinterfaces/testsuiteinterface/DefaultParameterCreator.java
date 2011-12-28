@@ -3,7 +3,7 @@
  */
 package org.testtoolinterfaces.testsuiteinterface;
 
-import org.testtoolinterfaces.testsuite.Parameter;
+import org.testtoolinterfaces.testsuite.ParameterImpl;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 
 /**
@@ -29,18 +29,18 @@ public abstract class DefaultParameterCreator
 	 * 
 	 * @throws TestSuiteException when the type is not supported
 	 */
-	public static Parameter createParameter( String aName,
+	public static ParameterImpl createParameter( String aName,
 	                                         String aType,
 	                                         String aValue ) throws TestSuiteException
 	{
 		if ( aType.equalsIgnoreCase( "string" ) )
 		{
-			return new Parameter(aName, (String) aValue);
+			return new ParameterImpl(aName, (String) aValue);
 		}			
 
 		if ( aType.equalsIgnoreCase( "int" ) )
 		{
-			return new Parameter(aName, new Integer(aValue) );
+			return new ParameterImpl(aName, new Integer(aValue) );
 		}
 
 		throw new TestSuiteException("Parameter type " + aType + " is not supported for this interface", aName);

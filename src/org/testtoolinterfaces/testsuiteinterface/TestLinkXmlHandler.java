@@ -52,7 +52,11 @@ public abstract class TestLinkXmlHandler extends XmlHandler
 	{
 		Trace.print(Trace.SUITE, "handleCharacters( " 
 		            + aValue, true );
-		myLink = new File( aValue.trim() );
+		String link = aValue.trim();
+		if ( ! link.isEmpty() )
+		{
+			myLink = new File( link );
+		}
     }
     
 	@Override

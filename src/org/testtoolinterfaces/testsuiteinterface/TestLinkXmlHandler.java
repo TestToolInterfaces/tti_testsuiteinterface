@@ -26,7 +26,7 @@ public abstract class TestLinkXmlHandler extends XmlHandler
 	public static final String ELEMENT_TYPE = "type";
 	public static final String ELEMENT_SEQ = "sequence";
 	
-	private File myLink;
+	private String myLink;
 
 	private String myId;
 	private String myType;
@@ -55,7 +55,7 @@ public abstract class TestLinkXmlHandler extends XmlHandler
 		String link = aValue.trim();
 		if ( ! link.isEmpty() )
 		{
-			myLink = new File( link );
+			myLink += link;
 		}
     }
     
@@ -115,7 +115,7 @@ public abstract class TestLinkXmlHandler extends XmlHandler
 	{
 		Trace.println(Trace.SUITE);
 
-		myLink = null;
+		myLink = "";
 		
 		myId = "";
 		myType = "";
@@ -128,7 +128,7 @@ public abstract class TestLinkXmlHandler extends XmlHandler
 	 */
 	public File getLink()
 	{
-		return myLink;
+		return new File( myLink );
 	}
 
 	/**

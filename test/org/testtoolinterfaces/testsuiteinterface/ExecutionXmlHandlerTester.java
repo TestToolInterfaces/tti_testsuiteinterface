@@ -2,7 +2,6 @@ package org.testtoolinterfaces.testsuiteinterface;
 
 
 import java.io.File;
-import java.util.ArrayList;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -11,11 +10,11 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.junit.Before;
+import org.testtoolinterfaces.testsuite.TestEntry;
 import org.testtoolinterfaces.testsuite.TestInterface_stub;
 import org.testtoolinterfaces.testsuite.TestStep;
-import org.testtoolinterfaces.testsuite.TestStepArrayList;
 import org.testtoolinterfaces.testsuite.TestStepCommand;
-import org.testtoolinterfaces.testsuite.TestStepSimple;
+import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuiteinterface.TestStepSequenceXmlHandler;
 import org.xml.sax.XMLReader;
 
@@ -38,49 +37,49 @@ public class ExecutionXmlHandlerTester extends TestCase
 	 */
 	public void testCase_getExecutionSteps()
 	{
-		TestStepArrayList steps = parseFile("testExecutionFile.xml");
+		TestStepSequence stepSeq = parseFile("testExecutionFile.xml");
+		TestStep[] steps = stepSeq.toArray();
 
-    	Assert.assertEquals("Incorrect number of test steps", 3, steps.size());
+    	Assert.assertEquals("Incorrect number of test steps", 3, steps.length);
 
-    	Assert.assertEquals("Incorrect sequence Nr", 1, steps.get(0).getSequenceNr());
-    	Assert.assertEquals("Incorrect sequence Nr", 5, steps.get(1).getSequenceNr());
-    	Assert.assertEquals("Incorrect sequence Nr", 3, steps.get(2).getSequenceNr());
+    	Assert.assertEquals("Incorrect sequence Nr", 1, steps[0].getSequenceNr());
+    	Assert.assertEquals("Incorrect sequence Nr", 3, steps[1].getSequenceNr());
+    	Assert.assertEquals("Incorrect sequence Nr", 5, steps[2].getSequenceNr());
 
     	Assert.assertEquals( "Incorrect TestStep",
-    						 TestStep.StepType.action,
-    						 steps.get(0).getStepType() );
-    	Assert.assertEquals( "Incorrect TestStep",
+    						 TestEntry.TYPE.Step,
+    						 steps[0].getType() );
+    	Assert.assertEquals( "Incorrect TestStep description",
     						 "A description of the first action step.",
-    						 ((TestStepSimple) steps.get(0)).getDescription() );
+    						 steps[0].getDescription() );
 
     	Assert.assertEquals( "Incorrect TestStep",
-    						 TestStep.StepType.action,
-    						 steps.get(1).getStepType() );
-    	Assert.assertEquals( "Incorrect TestStep",
-    						 "A description of the second action step.",
-    						 ((TestStepSimple) steps.get(1)).getDescription() );
-
-    	Assert.assertEquals( "Incorrect TestStep",
-    						 TestStep.StepType.check,
-    						 steps.get(2).getStepType() );
-    	Assert.assertEquals( "Incorrect TestStep",
+    						 TestEntry.TYPE.Step,
+    						 steps[1].getType() );
+    	Assert.assertEquals( "Incorrect TestStep description",
 				 			 "A description of the check step.",
-				 			((TestStepSimple) steps.get(2)).getDescription() );
+				 			 steps[1].getDescription() );
 
-    	Assert.assertEquals("Incorrect Command", "action1", ((TestStepCommand) steps.get(0)).getCommand());
-    	Assert.assertEquals("Incorrect Command", "action3", ((TestStepCommand) steps.get(1)).getCommand());
-    	Assert.assertEquals("Incorrect Command", "check1", ((TestStepCommand) steps.get(2)).getCommand());
+    	Assert.assertEquals( "Incorrect TestStep",
+    						 TestEntry.TYPE.Step,
+    						 steps[2].getType() );
+    	Assert.assertEquals( "Incorrect TestStep description",
+    						 "A description of the second action step.",
+    						 steps[2].getDescription() );
 
+    	Assert.assertEquals("Incorrect Command", "action1", ((TestStepCommand) steps[0]).getCommand());
+    	Assert.assertEquals("Incorrect Command", "action3", ((TestStepCommand) steps[2]).getCommand());
+    	Assert.assertEquals("Incorrect Command", "check1", ((TestStepCommand) steps[1]).getCommand());
 	}
 	
 	public void testCase_noSteps()
 	{
-		TestStepArrayList steps = parseFile("testExecutionFile_noSteps.xml");
+		TestStepSequence steps = parseFile("testExecutionFile_noSteps.xml");
 
     	Assert.assertEquals("Incorrect number of test steps", 0, steps.size());
 	}
 	
-	private TestStepArrayList parseFile(String aFileName)
+	private TestStepSequence parseFile(String aFileName)
 	{
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(false);
@@ -99,12 +98,8 @@ public class ExecutionXmlHandlerTester extends TestCase
 			testInterfaceList.put(testInterface);
 
 			// create a handler
-			ArrayList<TestStep.StepType> allowedStepList = new ArrayList<TestStep.StepType>();
-			allowedStepList.add(TestStep.StepType.action);
-			allowedStepList.add(TestStep.StepType.check);
 			TestStepSequenceXmlHandler handler = new TestStepSequenceXmlHandler( xmlReader,
 			                                                                     "execute",
-			                                                                     allowedStepList,
 			                                                                     testInterfaceList,
 			                                                                     false );
 
@@ -131,6 +126,6 @@ public class ExecutionXmlHandlerTester extends TestCase
 			e.printStackTrace();
 		}
 		
-		return new TestStepArrayList();
+		return new TestStepSequence();
 	}
 }

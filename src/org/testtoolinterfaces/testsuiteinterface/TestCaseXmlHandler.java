@@ -6,9 +6,8 @@ import java.util.Hashtable;
 import org.testtoolinterfaces.testsuite.TestCase;
 import org.testtoolinterfaces.testsuite.TestCaseImpl;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
-import org.testtoolinterfaces.testsuite.TestScript;
-import org.testtoolinterfaces.testsuite.TestStep;
-import org.testtoolinterfaces.testsuite.TestStepArrayList;
+import org.testtoolinterfaces.testsuite.TestLink;
+import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.Trace;
@@ -43,6 +42,7 @@ public class TestCaseXmlHandler extends XmlHandler
 {
 	public static final String START_ELEMENT = "testcase";
 	public static final String ATTRIBUTE_ID = "id";
+	public static final String ATTRIBUTE_SEQUENCE = "sequence";
 	
 	private static final String DESCRIPTION_ELEMENT = "description";
 	private static final String REQUIREMENT_ELEMENT = "requirementId";
@@ -55,11 +55,12 @@ public class TestCaseXmlHandler extends XmlHandler
 	private Hashtable<String, String> myAnyAttributes;
 
 	private String myDescription;
-	private TestScript myExecutionScript;
+	private TestLink myExecutionScript;
+	private int mySequenceNr;
     private ArrayList<String> myRequirementIds;
-    private TestStepArrayList myPrepareSteps;
-    private TestStepArrayList myExecutionSteps;
-    private TestStepArrayList myRestoreSteps;
+    private TestStepSequence myPrepareSteps;
+    private TestStepSequence myExecutionSteps;
+    private TestStepSequence myRestoreSteps;
 	private Hashtable<String, String> myAnyElements;
 	private String myCurrentAnyValue;
 
@@ -79,19 +80,14 @@ public class TestCaseXmlHandler extends XmlHandler
 		super(anXmlReader, START_ELEMENT);
 		Trace.println(Trace.CONSTRUCTOR);
 
-		myRequirementIds = new ArrayList<String>();
-		myPrepareSteps = new TestStepArrayList();
-		myExecutionSteps = new TestStepArrayList();
-		myRestoreSteps = new TestStepArrayList();
-
-	    ArrayList<TestStep.StepType> prepRestAllowedTypes = new ArrayList<TestStep.StepType>();
-	    prepRestAllowedTypes.add( TestStep.StepType.action );
-	    prepRestAllowedTypes.add( TestStep.StepType.set );
-
-	    ArrayList<TestStep.StepType> execAllowedTypes = new ArrayList<TestStep.StepType>();
-	    execAllowedTypes.add( TestStep.StepType.action );
-	    execAllowedTypes.add( TestStep.StepType.check );
-	    execAllowedTypes.add( TestStep.StepType.set );
+//	    ArrayList<TestStep.StepType> prepRestAllowedTypes = new ArrayList<TestStep.StepType>();
+//	    prepRestAllowedTypes.add( TestStep.StepType.action );
+//	    prepRestAllowedTypes.add( TestStep.StepType.set );
+//
+//	    ArrayList<TestStep.StepType> execAllowedTypes = new ArrayList<TestStep.StepType>();
+//	    execAllowedTypes.add( TestStep.StepType.action );
+//	    execAllowedTypes.add( TestStep.StepType.check );
+//	    execAllowedTypes.add( TestStep.StepType.set );
 
 	    myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
 		this.addStartElementHandler(DESCRIPTION_ELEMENT, myDescriptionXmlHandler);
@@ -103,7 +99,7 @@ public class TestCaseXmlHandler extends XmlHandler
 
     	myPrepareXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
     	                                                      PREPARE_ELEMENT,
-    	                                                      prepRestAllowedTypes,
+//    	                                                      prepRestAllowedTypes,
     	                                                      anInterfaceList,
     	                                                      aCheckStepParameter );
 		this.addStartElementHandler(PREPARE_ELEMENT, myPrepareXmlHandler);
@@ -111,7 +107,7 @@ public class TestCaseXmlHandler extends XmlHandler
 
 		myExecutionXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
 		                                                        EXECUTE_ELEMENT,
-		                                                        execAllowedTypes,
+//		                                                        execAllowedTypes,
 		                                                        anInterfaceList,
 		                                                        aCheckStepParameter );
 		this.addStartElementHandler(EXECUTE_ELEMENT, myExecutionXmlHandler);
@@ -119,7 +115,7 @@ public class TestCaseXmlHandler extends XmlHandler
 
 		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
 		                                                      RESTORE_ELEMENT,
-		                                                      prepRestAllowedTypes,
+//		                                                      prepRestAllowedTypes,
 		                                                      anInterfaceList,
 		                                                      aCheckStepParameter );
 		this.addStartElementHandler(RESTORE_ELEMENT, myRestoreXmlHandler);
@@ -128,18 +124,26 @@ public class TestCaseXmlHandler extends XmlHandler
 		this.reset();
 	}
 	
-    public void processElementAttributes(String aQualifiedName, Attributes att)
+    public void processElementAttributes(String aQualifiedName, Attributes anAtt)
     {
 		Trace.print(Trace.SUITE, "processElementAttributes( " 
 	            + aQualifiedName, true );
     	if (aQualifiedName.equalsIgnoreCase(TestCaseXmlHandler.START_ELEMENT))
     	{
-		    for (int i = 0; i < att.getLength(); i++)
+		    for (int i = 0; i < anAtt.getLength(); i++)
 		    {
-	    		Trace.append( Trace.SUITE, ", " + att.getQName(i) + "=" + att.getValue(i) );
-		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_ID))
+	    		Trace.append( Trace.SUITE, ", " + anAtt.getQName(i) + "=" + anAtt.getValue(i) );
+		    	if (anAtt.getQName(i).equalsIgnoreCase(ATTRIBUTE_ID))
 		    	{
-		        	myTestCaseId = att.getValue(i);
+		        	myTestCaseId = anAtt.getValue(i);
+		    	}
+		    	else if (anAtt.getQName(i).equalsIgnoreCase(ATTRIBUTE_SEQUENCE))
+		    	{
+		        	mySequenceNr = Integer.valueOf( anAtt.getValue(i) ).intValue();
+		    	}
+		    	else
+		    	{
+		    		myAnyAttributes.put(anAtt.getQName(i), anAtt.getValue(i));
 		    	}
 		    }
     	}
@@ -164,7 +168,7 @@ public class TestCaseXmlHandler extends XmlHandler
 		if ( ! aQualifiedName.equalsIgnoreCase(START_ELEMENT) )
     	{
 			// TODO This will overwrite previous occurrences of the same elements. But that is possible in XML.
-			myAnyAttributes.put(aQualifiedName, myCurrentAnyValue);
+			myAnyElements.put(aQualifiedName, myCurrentAnyValue);
 			myCurrentAnyValue = "";
     	}
 	}
@@ -260,12 +264,13 @@ public class TestCaseXmlHandler extends XmlHandler
 		}
 
        	TestCase testCase = (TestCase) new TestCaseImpl( myTestCaseId,
-       	                                                 myAnyAttributes,
        	       										  	 myDescription,
+       	       										  	 mySequenceNr,
        	       										  	 myRequirementIds,
-       	       										  	 myPrepareSteps.sort(),
-       	       										  	 myExecutionSteps.sort(),
-       	       										  	 myRestoreSteps.sort(),
+       	       										  	 myPrepareSteps,
+       	       										  	 myExecutionSteps,
+       	       										  	 myRestoreSteps,
+       	                                                 myAnyAttributes,
        	       										  	 myAnyElements );
 
 		return testCase;
@@ -275,12 +280,15 @@ public class TestCaseXmlHandler extends XmlHandler
 	{
 		Trace.println(Trace.SUITE);
 		myTestCaseId = "";
+	    mySequenceNr = 0;
 	    myAnyAttributes = new Hashtable<String, String>();
 
 	    myDescription = "";
-		myRequirementIds = new ArrayList<String>();
-		myPrepareSteps = new TestStepArrayList();
-		myRestoreSteps = new TestStepArrayList();
+	    myRequirementIds = new ArrayList<String>();
+		myPrepareSteps = new TestStepSequence();
+		myExecutionSteps = new TestStepSequence();
+		myRestoreSteps = new TestStepSequence();
+
 		myAnyElements = new Hashtable<String, String>();
 	    myCurrentAnyValue = "";
 	}

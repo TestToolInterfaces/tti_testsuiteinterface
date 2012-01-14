@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import org.testtoolinterfaces.testsuite.TestEntry;
-import org.testtoolinterfaces.testsuite.TestEntryArrayList;
+import org.testtoolinterfaces.testsuite.TestEntrySequence;
 import org.testtoolinterfaces.testsuite.TestGroup;
 import org.testtoolinterfaces.testsuite.TestGroupImpl;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
-import org.testtoolinterfaces.testsuite.TestStep;
-import org.testtoolinterfaces.testsuite.TestStepArrayList;
+import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.Trace;
@@ -45,7 +44,8 @@ import org.xml.sax.XMLReader;
 public class TestGroupXmlHandler extends XmlHandler
 {
 	public static final String START_ELEMENT = "testgroup";
-	public static final String ELEMENT_ID = "id";
+	public static final String ATTRIBUTE_ID = "id";
+	public static final String ATTRIBUTE_SEQUENCE = "sequence";
 	
 	private static final String DESCRIPTION_ELEMENT = "description";
 	private static final String REQUIREMENT_ELEMENT = "requirementid";
@@ -55,12 +55,13 @@ public class TestGroupXmlHandler extends XmlHandler
 
 	private String myTestGroupId;
 	private Hashtable<String, String> myAnyAttributes;
+	private int mySequenceNr;
 
 	private String myDescription;
     private ArrayList<String> myRequirementIds;
-    private TestStepArrayList myPrepareSteps;
-    private TestEntryArrayList myTestEntries;
-    private TestStepArrayList myRestoreSteps;
+    private TestStepSequence myPrepareSteps;
+    private TestEntrySequence myTestEntries;
+    private TestStepSequence myRestoreSteps;
 	private Hashtable<String, String> myAnyElements;
 	private String myCurrentAnyValue;
 
@@ -76,14 +77,9 @@ public class TestGroupXmlHandler extends XmlHandler
 		super(anXmlReader, START_ELEMENT);
 		Trace.println(Trace.CONSTRUCTOR);
 		
-	    myRequirementIds = new ArrayList<String>();
-	    myPrepareSteps = new TestStepArrayList();
-		myTestEntries = new TestEntryArrayList();
-	    myRestoreSteps = new TestStepArrayList();
-	    
-	    ArrayList<TestStep.StepType> allowedTypes = new ArrayList<TestStep.StepType>();
-	    allowedTypes.add( TestStep.StepType.action );
-	    allowedTypes.add( TestStep.StepType.set );
+//	    ArrayList<TestStep.StepType> allowedTypes = new ArrayList<TestStep.StepType>();
+//	    allowedTypes.add( TestStep.StepType.action );
+//	    allowedTypes.add( TestStep.StepType.set );
 
 	    myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
 		this.addStartElementHandler(DESCRIPTION_ELEMENT, myDescriptionXmlHandler);
@@ -95,7 +91,7 @@ public class TestGroupXmlHandler extends XmlHandler
 
     	myPrepareXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
     	                                                      PREPARE_ELEMENT,
-    	                                                      allowedTypes,
+//    	                                                      allowedTypes,
     	                                                      anInterfaceList,
     	                                                      aCheckStepParameter );
 		this.addStartElementHandler(PREPARE_ELEMENT, myPrepareXmlHandler);
@@ -111,7 +107,7 @@ public class TestGroupXmlHandler extends XmlHandler
 
 		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
 		                                                      RESTORE_ELEMENT,
-		                                                      allowedTypes,
+//		                                                      allowedTypes,
 		                                                      anInterfaceList,
 		                                                      aCheckStepParameter );
 		this.addStartElementHandler(RESTORE_ELEMENT, myRestoreXmlHandler);
@@ -143,22 +139,26 @@ public class TestGroupXmlHandler extends XmlHandler
     	}
     }
 
-    public void processElementAttributes(String aQualifiedName, Attributes att)
+    public void processElementAttributes(String aQualifiedName, Attributes anAtt)
     {
 		Trace.print(Trace.SUITE, "processElementAttributes( " 
 	            + aQualifiedName, true );
      	if (aQualifiedName.equalsIgnoreCase(START_ELEMENT))
     	{
-		    for (int i = 0; i < att.getLength(); i++)
+		    for (int i = 0; i < anAtt.getLength(); i++)
 		    {
-	    		Trace.append( Trace.SUITE, ", " + att.getQName(i) + "=" + att.getValue(i) );
-		    	if (att.getQName(i).equalsIgnoreCase(ELEMENT_ID))
+	    		Trace.append( Trace.SUITE, ", " + anAtt.getQName(i) + "=" + anAtt.getValue(i) );
+		    	if (anAtt.getQName(i).equalsIgnoreCase(ATTRIBUTE_ID))
 		    	{
-		        	myTestGroupId = att.getValue(i);
+		        	myTestGroupId = anAtt.getValue(i);
+		    	}
+		    	else if (anAtt.getQName(i).equalsIgnoreCase(ATTRIBUTE_SEQUENCE))
+		    	{
+		        	mySequenceNr = Integer.valueOf( anAtt.getValue(i) ).intValue();
 		    	}
 		    	else
 		    	{
-		    		myAnyAttributes.put(att.getQName(i), att.getValue(i));
+		    		myAnyAttributes.put(anAtt.getQName(i), anAtt.getValue(i));
 		    	}
 		    }
     	}
@@ -223,13 +223,14 @@ public class TestGroupXmlHandler extends XmlHandler
 		Trace.println(Trace.SUITE);
 
 		myTestGroupId = "";
+	    mySequenceNr = 0;
 	    myAnyAttributes = new Hashtable<String, String>();
 
 	    myDescription = "";
 	    myRequirementIds = new ArrayList<String>();
-	    myPrepareSteps = new TestStepArrayList();
-		myTestEntries = new TestEntryArrayList();
-	    myRestoreSteps = new TestStepArrayList();
+	    myPrepareSteps = new TestStepSequence();
+		myTestEntries = new TestEntrySequence();
+	    myRestoreSteps = new TestStepSequence();
 		myAnyElements = new Hashtable<String, String>();
 	    myCurrentAnyValue = "";
 	}
@@ -244,12 +245,13 @@ public class TestGroupXmlHandler extends XmlHandler
 		}
 
       	TestGroup testGroup = (TestGroup) new TestGroupImpl( myTestGroupId,
-      	                                                     myAnyAttributes,
       	                                                     myDescription,
+           	       										  	 mySequenceNr,
       	                                                     myRequirementIds,
-      	                                                     myPrepareSteps.sort(),
-      	                                                     myTestEntries.sort(),
-      	                                                     myRestoreSteps.sort(),
+      	                                                     myPrepareSteps,
+      	                                                     myTestEntries,
+      	                                                     myRestoreSteps,
+      	                                                     myAnyAttributes,
       	                                                     myAnyElements );
 
 		return testGroup;

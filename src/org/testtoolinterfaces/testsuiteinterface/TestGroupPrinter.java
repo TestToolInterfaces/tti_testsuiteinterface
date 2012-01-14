@@ -4,16 +4,17 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
 import java.io.File;
+import java.util.Iterator;
 
 import org.testtoolinterfaces.testsuite.LooseTestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestCaseLink;
 import org.testtoolinterfaces.testsuite.TestEntry;
-import org.testtoolinterfaces.testsuite.TestEntryArrayList;
+import org.testtoolinterfaces.testsuite.TestEntrySequence;
 import org.testtoolinterfaces.testsuite.TestGroup;
 import org.testtoolinterfaces.testsuite.TestGroupLink;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStep;
-import org.testtoolinterfaces.testsuite.TestStepArrayList;
+import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestEntry.TYPE;
 import org.testtoolinterfaces.utils.Trace;
 
@@ -61,21 +62,20 @@ public class TestGroupPrinter
 		System.out.println( anIndent + aTestGroup.getDescription() );
 		System.out.println( anIndent + "Sequence Number: " + aTestGroup.getSequenceNr() );
 		System.out.println( anIndent + "=================== Preparation =====================" );
-		TestStepArrayList prepares = aTestGroup.getPrepareSteps();
-		prepares.sort();
-		int prepSize = prepares.size();
-		for (int i=0; i< prepSize; i++)
+		TestStepSequence prepares = aTestGroup.getPrepareSteps();
+		Iterator<TestStep> itr1 = prepares.iterator();
+		while(itr1.hasNext() )
 		{
-			TestStep step = prepares.get(i);
-			System.out.println( anIndent + step.getSequenceNr() + " - " + step.getStepType() );
+			TestStep step = itr1.next();
+			System.out.println( anIndent + step.getSequenceNr() + " - " + step.getType() );
 		}
+
 		System.out.println( anIndent + "=================== Execution =======================" );
-		TestEntryArrayList executes = aTestGroup.getExecutionEntries();
-		executes.sort();
-		int execSize = executes.size();
-		for (int i=0; i< execSize; i++)
+		TestEntrySequence executes = aTestGroup.getExecutionEntries();
+		Iterator<TestEntry> itr2 = executes.iterator();
+		while(itr2.hasNext() )
 		{
-			TestEntry entry = executes.get(i);
+			TestEntry entry = itr2.next();
 			if ( entry.getType() == TYPE.Group )
 			{
 				printTestGroup( (TestGroup) entry, aBaseDir, anIndent + "  " );
@@ -100,15 +100,16 @@ public class TestGroupPrinter
 				}
 			}
 		}
+
 		System.out.println( anIndent + "=================== Cleanup =========================" );
-		TestStepArrayList restores = aTestGroup.getRestoreSteps();
-		restores.sort();
-		int restSize = restores.size();
-		for (int i=0; i< restSize; i++)
+		TestStepSequence restores = aTestGroup.getRestoreSteps();
+		Iterator<TestStep> itr3 = restores.iterator();
+		while(itr3.hasNext() )
 		{
-			TestStep step = restores.get(i);
-			System.out.println( anIndent + step.getSequenceNr() + " - " + step.getStepType() );
+			TestStep step = itr3.next();
+			System.out.println( anIndent + step.getSequenceNr() + " - " + step.getType() );
 		}
+
 		System.out.println( anIndent + "=====================================================" );
 	}
 

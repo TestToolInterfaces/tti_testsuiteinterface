@@ -1,5 +1,7 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
+import java.util.Hashtable;
+
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.TestInterface;
@@ -7,9 +9,9 @@ import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepCommand;
 import org.testtoolinterfaces.testsuite.TestStepScript;
-import org.testtoolinterfaces.testsuite.TestStepSimple;
+import org.testtoolinterfaces.testsuite.TestStepSelection;
+import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
-import org.testtoolinterfaces.testsuite.TestStep.StepType;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.Warning;
@@ -21,71 +23,108 @@ import org.xml.sax.XMLReader;
 /**
  * @author Arjan Kranenburg 
  * 
- * <action|check sequence=... interface=...>
+ * <teststep|if sequence=...>
  *  <description>
- *  ...
+ *    ...
  *  </description>
- *  <command>
+ *  <parameter>
+ *    ...
+ *  </parameter>
+ *  <command> ... </command>]
+ *  <script> ... </script>
+ *  <then>...</then>
+ *  <else>...</else>
+ *  <if>
+ *    <then>...</then>
+ *    <else>...</else>
+ *  </if>
  *  ...
- *  </command>
- *  <script>
- *  ...
- *  </script>
- * </action|check>
+ * </teststep|if>
  */
 public class TestStepXmlHandler extends XmlHandler
 {
-	private static final String ATTRIBUTE_SEQUENCE = "sequence";
-	private static final String ATTRIBUTE_INTERFACE = "interface";
+	public static final String START_ELEMENT = "teststep";
+	public static final String IF_ELEMENT = "if";
+	private static final String THEN_ELEMENT = "then";
+	private static final String ELSE_ELEMENT = "else";
 
-	private static final String COMMAND_ELEMENT = "command";
+	private static final String ATTRIBUTE_SEQUENCE = "sequence";
+
 	private static final String DESCRIPTION_ELEMENT = "description";
 
-	private GenericTagAndStringXmlHandler myDescriptionXmlHandler;
-	private GenericTagAndStringXmlHandler myCommandXmlHandler;
+    private TestInterfaceList myInterfaces;
+	private boolean myCheckStepParams = false;
+
+	// The sub-handlers
+    private GenericTagAndStringXmlHandler myDescriptionXmlHandler;
+	private CommandXmlHandler myCommandXmlHandler;
 	private TestStepScriptXmlHandler myScriptXmlHandler;
 	private ParameterXmlHandler myParameterXmlHandler;
+	private TestStepXmlHandler myIfXmlHandler;
+	private TestStepSequenceXmlHandler myThenXmlHandler;
+	private TestStepSequenceXmlHandler myElseXmlHandler;
 
-	private boolean myCheckStepParams = false;
+	// Needed to create the TestStep
 	private int mySequence;
-	
-	private String myCommand;
-	private String myInterface;
 	private String myDescription;
-	private String myExecutionScript;
-	private String myScriptType;
     private ParameterArrayList myParameters;
-    
-    private TestInterfaceList myInterfaces;
+	private Hashtable<String, String> myAnyAttributes;
+	private Hashtable<String, String> myAnyElements;
+	private String myAnyValue;
+	
+    // In case of a TestStepCommand
+	private String myCommand;
+	private TestInterface myInterface;
+
+    // In case of a TestStepScript
+	private String myScript;
+	private String myScriptType;
+
+    // In case of a TestStepSelection
+	private TestStep myIfStep;
+	private TestStepSequence myThenSteps;
+	private TestStepSequence myElseSteps;
 
 	public TestStepXmlHandler( XMLReader anXmlReader,
-	                           StepType aTag,
 	                           TestInterfaceList anInterfaceList,
 	                           boolean aCheckStepParameter )
 	{
-		super(anXmlReader, aTag.toString());
-		Trace.println(Trace.CONSTRUCTOR, "ActionXmlHandler( anXmlreader, " + aTag + " )", true);
+		this( anXmlReader, START_ELEMENT, anInterfaceList, aCheckStepParameter);
+	}
+
+	public TestStepXmlHandler( XMLReader anXmlReader,
+	                           String aTag,
+	                           TestInterfaceList anInterfaceList,
+	                           boolean aCheckStepParameter )
+	{
+		super(anXmlReader, aTag);
+		Trace.println(Trace.CONSTRUCTOR, "TestStepXmlHandler( anXmlreader )", true);
 
 		myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
 		this.addStartElementHandler(DESCRIPTION_ELEMENT, myDescriptionXmlHandler);
 		myDescriptionXmlHandler.addEndElementHandler(DESCRIPTION_ELEMENT, this);
 
-		myCommandXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, COMMAND_ELEMENT);
-		this.addStartElementHandler(COMMAND_ELEMENT, myCommandXmlHandler);
-		myCommandXmlHandler.addEndElementHandler(COMMAND_ELEMENT, this);
+		myParameterXmlHandler = new ParameterXmlHandler(anXmlReader);
+		this.addStartElementHandler(ParameterXmlHandler.START_ELEMENT, myParameterXmlHandler);
+		myParameterXmlHandler.addEndElementHandler(ParameterXmlHandler.START_ELEMENT, this);
+
+		myCommandXmlHandler = new CommandXmlHandler(anXmlReader, anInterfaceList);
+		this.addStartElementHandler(CommandXmlHandler.START_ELEMENT, myCommandXmlHandler);
+		myCommandXmlHandler.addEndElementHandler(CommandXmlHandler.START_ELEMENT, this);
 
 		myScriptXmlHandler = new TestStepScriptXmlHandler(anXmlReader);
 		this.addStartElementHandler(TestStepScriptXmlHandler.ELEMENT_START, myScriptXmlHandler);
 		myScriptXmlHandler.addEndElementHandler(TestStepScriptXmlHandler.ELEMENT_START, this);
 
-		myParameterXmlHandler = new ParameterXmlHandler(anXmlReader);
-		this.addStartElementHandler(ParameterXmlHandler.START_ELEMENT, myParameterXmlHandler);
-		myParameterXmlHandler.addEndElementHandler(ParameterXmlHandler.START_ELEMENT, this);
-		
-		myCheckStepParams = aCheckStepParameter;
+		myIfXmlHandler = null; // Created when needed to prevent loops
+		myThenXmlHandler = null; // Created when needed to prevent loops
+		myElseXmlHandler = null; // Created when needed to prevent loops
+
 		myInterfaces = anInterfaceList;
+		myCheckStepParams = aCheckStepParameter;
 
 		reset();
+
 	}
 
 	@Override
@@ -102,18 +141,9 @@ public class TestStepXmlHandler extends XmlHandler
 		    		mySequence = Integer.valueOf( att.getValue(i) ).intValue();
 		    		Trace.println( Trace.ALL, "        mySequence -> " + mySequence);
     	    	}
-		    	else if( att.getQName(i).equalsIgnoreCase(ATTRIBUTE_INTERFACE) )
+		    	else
 		    	{
-		    		myInterface = att.getValue(i);
-
-		    		TestInterface iFace = myInterfaces.getInterface(myInterface);
-					if( iFace == null )
-					{
-						throw new TestSuiteException( "Unknown interface: " + myInterface );
-					}
-					myParameterXmlHandler.setCurrentInterface(iFace);
-
-		    		Trace.println( Trace.ALL, "        myInterface -> " + myInterface);
+		    		myAnyAttributes.put(att.getQName(i), att.getValue(i));
 		    	}
 		    }
     	}
@@ -128,39 +158,57 @@ public class TestStepXmlHandler extends XmlHandler
 	@Override
 	public void handleCharacters(String aValue)
 	{
-		//nop
+		myAnyValue += aValue;
 	}
 
 	@Override
 	public void handleEndElement(String aQualifiedName)
 	{
-    	//nop
+		if ( ! aQualifiedName.equalsIgnoreCase(this.getStartElement()) )
+    	{
+			// TODO This will overwrite previous occurrences of the same elements. But that is possible in XML.
+			myAnyElements.put(aQualifiedName, myAnyValue);
+			myAnyValue = "";
+    	}
 	}
 	
 	@Override
 	public void handleGoToChildElement(String aQualifiedName)
 	{
+     	if ( myIfXmlHandler == null && aQualifiedName.equalsIgnoreCase(IF_ELEMENT) )
+    	{
+     		// We'll create a TestStepXmlHandler for if-steps only when we need it.
+     		// Otherwise it would create an endless loop.
+    		myIfXmlHandler = new TestStepXmlHandler(this.getXmlReader(), IF_ELEMENT, myInterfaces, myCheckStepParams);
+    		this.addStartElementHandler(IF_ELEMENT, myIfXmlHandler);
+    		myIfXmlHandler.addEndElementHandler(IF_ELEMENT, this);
+    	}
+     	else if ( myThenXmlHandler == null && aQualifiedName.equalsIgnoreCase(THEN_ELEMENT) )
+    	{
+     		// We'll create a TestStepXmlHandler for if-steps only when we need it.
+     		// Otherwise it would create an endless loop.
+    		myThenXmlHandler = new TestStepSequenceXmlHandler(this.getXmlReader(), THEN_ELEMENT, myInterfaces, myCheckStepParams);
+    		this.addStartElementHandler(THEN_ELEMENT, myThenXmlHandler);
+    		myThenXmlHandler.addEndElementHandler(THEN_ELEMENT, this);
+    	}
+     	else if ( myElseXmlHandler == null && aQualifiedName.equalsIgnoreCase(ELSE_ELEMENT) )
+    	{
+     		// We'll create a TestStepXmlHandler for if-steps only when we need it.
+     		// Otherwise it would create an endless loop.
+    		myElseXmlHandler = new TestStepSequenceXmlHandler(this.getXmlReader(), ELSE_ELEMENT, myInterfaces, myCheckStepParams);
+    		this.addStartElementHandler(ELSE_ELEMENT, myElseXmlHandler);
+    		myElseXmlHandler.addEndElementHandler(ELSE_ELEMENT, this);
+    	}
 	}
 
 	@Override
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 	{
 		Trace.println(Trace.SUITE);
-    	if (aQualifiedName.equalsIgnoreCase(COMMAND_ELEMENT))
-    	{
-    		myCommand  = myCommandXmlHandler.getValue();
-    		myCommandXmlHandler.reset();
-    	}
-    	else if (aQualifiedName.equalsIgnoreCase(DESCRIPTION_ELEMENT))
+    	if (aQualifiedName.equalsIgnoreCase(DESCRIPTION_ELEMENT))
     	{
     		myDescription  = myDescriptionXmlHandler.getValue();
         	myDescriptionXmlHandler.reset();
-    	}
-    	else if (aQualifiedName.equalsIgnoreCase(TestStepScriptXmlHandler.ELEMENT_START))
-    	{
-    		myExecutionScript = myScriptXmlHandler.getScript();
-    		myScriptType = myScriptXmlHandler.getScriptType();
-    		myScriptXmlHandler.reset();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(ParameterXmlHandler.START_ELEMENT))
     	{
@@ -177,52 +225,134 @@ public class TestStepXmlHandler extends XmlHandler
     		
     		myParameterXmlHandler.reset();
     	}
+    	else if (aQualifiedName.equalsIgnoreCase(CommandXmlHandler.START_ELEMENT))
+    	{
+    		myCommand  = myCommandXmlHandler.getCommand();
+    		myInterface = myCommandXmlHandler.getInterface();
+    		myParameterXmlHandler.setCurrentInterface(myInterface);
+    		myCommandXmlHandler.reset();
+    	}
+    	else if (aQualifiedName.equalsIgnoreCase(TestStepScriptXmlHandler.ELEMENT_START))
+    	{
+    		myScript = myScriptXmlHandler.getScript();
+    		myScriptType = myScriptXmlHandler.getType();
+    		myScriptXmlHandler.reset();
+    	}
+    	else if (aQualifiedName.equalsIgnoreCase(IF_ELEMENT))
+    	{
+			try
+			{
+				myIfStep = myIfXmlHandler.getStep();
+			}
+			catch (TestSuiteException e)
+			{
+				Warning.println("Cannot get if-step: " + e.getMessage());
+				Trace.print(Trace.SUITE, e);
+			}
+			myIfXmlHandler.reset();
+    	}
+    	else if (aQualifiedName.equalsIgnoreCase(THEN_ELEMENT))
+    	{
+			myThenSteps = myThenXmlHandler.getSteps();
+			myThenXmlHandler.reset();
+    	}
+    	else if (aQualifiedName.equalsIgnoreCase(ELSE_ELEMENT))
+    	{
+			myElseSteps = myElseXmlHandler.getSteps();
+			myElseXmlHandler.reset();
+    	}
 		// else nothing (ignored)
 	}
 
-	public TestStepSimple getActionStep() throws TestSuiteException
+	public TestStep getStep() throws TestSuiteException
 	{
 		Trace.println(Trace.SUITE);
 
-		TestStepSimple testStep;
-		
+		TestStep testStep = null;
 		if ( myCommand != null )
 		{
-			TestInterface iFace = myInterfaces.getInterface(myInterface);
-			if( ! iFace.hasCommand(myCommand) )
-			{
-				throw new TestSuiteException( "Command " + myCommand + " not known for interface " + iFace.getInterfaceName() );
-			}
-			
-			if( myCheckStepParams )
-			{
-				iFace.verifyParameters(myCommand, myParameters);
-			}
-
-			testStep = new TestStepCommand( TestStep.StepType.valueOf(this.getStartElement()),
-			                                mySequence,
-			                                myDescription,
-			                                myCommand,
-			                                iFace,
-			                                myParameters );
-
+			testStep = createTestStepCommand();
 		}
-		else if ( myExecutionScript != null )
+		else if ( myScript != null )
 		{
-			testStep = new TestStepScript( TestStep.StepType.valueOf(this.getStartElement()),
-			                               mySequence,
-			                               myDescription,
-			                               myExecutionScript,
-			                               myScriptType,
-			                               myParameters );
-
+			testStep = createTestStepScript();
+		}
+		else if ( myIfStep != null && myThenSteps != null )
+		{
+			testStep = createTestStepSelection();
 		}
 		else
 		{
-			throw new TestSuiteException( "No command or execution script found" );
+			throw new TestSuiteException( "Cannot make a TestStep Command, Script, or Selection from given information" );
+		}
+		
+		return testStep;
+	}
+
+	/**
+	 * @return
+	 * @throws Error
+	 * @throws TestSuiteException
+	 */
+	private TestStepCommand createTestStepCommand() throws Error, TestSuiteException
+	{
+		if( myInterface == null )
+		{
+			throw new Error( "Interface cannot be null" );
 		}
 
-		return testStep;
+		if( ! myInterface.hasCommand(myCommand) )
+		{
+			throw new TestSuiteException( "Command " + myCommand + " not known for interface " + myInterface.getInterfaceName() );
+		}
+
+		/*
+		 * TODO We should also create them
+		 * In XML the parameters could be defined before the command & interface,
+		 * and then myParameterXmlHandler.setCurrentInterface() is still set to default.
+		 * How to solve?
+		 * 
+		 */
+		if( myCheckStepParams )
+		{
+			myInterface.verifyParameters(myCommand, myParameters);
+		}
+
+		return new TestStepCommand( mySequence,
+		                            myDescription,
+		                            myCommand,
+		                            myInterface,
+		                            myParameters,
+		                            myAnyAttributes,
+		                            myAnyElements );
+	}
+
+	/**
+	 * @return
+	 */
+	private TestStepScript createTestStepScript()
+	{
+		return new TestStepScript( mySequence,
+		                           myDescription,
+		                           myScript,
+		                           myScriptType,
+		                           myParameters,
+		                           myAnyAttributes,
+		                           myAnyElements );
+	}
+
+	/**
+	 * @return
+	 */
+	private TestStepSelection createTestStepSelection()
+	{
+		return new TestStepSelection( mySequence,
+		                              myDescription,
+		                              myIfStep,
+		                              myThenSteps,
+		                              myElseSteps,
+		                              myAnyAttributes,
+		                              myAnyElements );
 	}
 
 	public void reset()
@@ -230,15 +360,21 @@ public class TestStepXmlHandler extends XmlHandler
 		Trace.println(Trace.SUITE);
 
 		mySequence = 0;
-		
-		myCommand = null;
-		myInterface = "Default";
-		TestInterface defaultInterface = myInterfaces.getInterface(myInterface);
-		myParameterXmlHandler.setCurrentInterface(defaultInterface);
-
 		myDescription = "";
-		myExecutionScript = null;
-		myScriptType = "";
 		myParameters = new ParameterArrayList();
+		myAnyAttributes = new Hashtable<String, String>();
+		myAnyElements = new Hashtable<String, String>();
+	    myAnyValue = "";
+	
+		myCommand = null;
+		myInterface = myInterfaces.getInterface( CommandXmlHandler.DEFAULT_INTERFACE_NAME );
+		myParameterXmlHandler.setCurrentInterface(myInterface);
+
+		myScript = null;
+		myScriptType = "";
+		
+        myIfStep = null;
+        myThenSteps = null;
+        myElseSteps = null;
 	}
 }

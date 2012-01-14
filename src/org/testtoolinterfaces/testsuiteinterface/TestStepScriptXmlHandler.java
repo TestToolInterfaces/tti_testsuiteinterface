@@ -102,7 +102,7 @@ public class TestStepScriptXmlHandler extends XmlHandler
 	}
 
 	/**
-	 * @return the myScript
+	 * @return the Test script
 	 */
 	public String getScript()
 	{
@@ -110,9 +110,9 @@ public class TestStepScriptXmlHandler extends XmlHandler
 	}
 
 	/**
-	 * @return the myType
+	 * @return the Script Type
 	 */
-	public String getScriptType()
+	public String getType()
 	{
 		return myType;
 	}

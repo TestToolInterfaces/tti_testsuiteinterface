@@ -1,8 +1,9 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
-import java.io.File;
 import java.util.Hashtable;
 
+import org.testtoolinterfaces.testsuite.TestLink;
+import org.testtoolinterfaces.testsuite.TestLinkImpl;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
@@ -126,9 +127,9 @@ public abstract class TestLinkXmlHandler extends XmlHandler
 	/**
 	 * @return the myLink
 	 */
-	public File getLink()
+	public TestLink getLink()
 	{
-		return new File( myLink );
+		return new TestLinkImpl( myLink, myType );
 	}
 
 	/**
@@ -137,14 +138,6 @@ public abstract class TestLinkXmlHandler extends XmlHandler
 	public String getId()
 	{
 		return myId;
-	}
-
-	/**
-	 * @return the myType
-	 */
-	public String getType()
-	{
-		return myType;
 	}
 
 	/**

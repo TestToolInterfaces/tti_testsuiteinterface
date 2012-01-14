@@ -8,11 +8,11 @@ import java.util.Hashtable;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.testtoolinterfaces.testsuite.TestEntryArrayList;
+import org.testtoolinterfaces.testsuite.TestEntrySequence;
 import org.testtoolinterfaces.testsuite.TestGroup;
 import org.testtoolinterfaces.testsuite.TestGroupImpl;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
-import org.testtoolinterfaces.testsuite.TestStepArrayList;
+import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
 import org.xml.sax.XMLReader;
@@ -85,12 +85,13 @@ public class TestGroupReader
 					description += cause.getLocalizedMessage() + "\n";
 				}
 				testGroup = new TestGroupImpl( aTestGroupFile.getName() + "_ERROR",
-				                               new Hashtable<String, String>(),
 				                               description,
+				                               0,
 				                               new ArrayList<String>(),
-				                               new TestStepArrayList(),
-				                               new TestEntryArrayList(),
-				                               new TestStepArrayList(),
+				                               new TestStepSequence(),
+				                               new TestEntrySequence(),
+				                               new TestStepSequence(),
+				                               new Hashtable<String, String>(),
 				                               new Hashtable<String, String>() );
 			}
 			else

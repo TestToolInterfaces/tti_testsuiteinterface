@@ -1,8 +1,9 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
-import java.io.File;
+import java.util.Hashtable;
 
 import org.testtoolinterfaces.testsuite.TestGroupLink;
+import org.testtoolinterfaces.testsuite.TestLink;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
 import org.xml.sax.XMLReader;
@@ -31,7 +32,7 @@ public class TestGroupLinkXmlHandler extends TestLinkXmlHandler
 	{
 		Trace.println(Trace.SUITE);
 
-		File link = this.getLink();
+		TestLink link = this.getLink();
 		String id = this.getId();
 		
 		if ( id.isEmpty() )
@@ -45,10 +46,10 @@ public class TestGroupLinkXmlHandler extends TestLinkXmlHandler
 		}
 
 		TestGroupLink testGrouplink = new TestGroupLink( id,
-		                                                 this.getType(),
 			                                             this.getSequence(),
 			                                             link,
-			                                             this.getAnyAttributes() );
+			                                             this.getAnyAttributes(),
+			                                             new Hashtable<String, String>());
 
 		return testGrouplink;
 	}

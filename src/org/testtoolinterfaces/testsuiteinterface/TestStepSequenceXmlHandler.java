@@ -1,10 +1,7 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
-import java.util.ArrayList;
-
-import org.testtoolinterfaces.testsuite.TestStep.StepType;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
-import org.testtoolinterfaces.testsuite.TestStepArrayList;
+import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
@@ -16,58 +13,56 @@ import org.xml.sax.XMLReader;
  * @author Arjan Kranenburg 
  * 
  * <[tag]>
- *  <action>
+ *  <teststep>
  *  ...
- *  </action>
- *  <check>
- *  ...
- *  </check>
- *  <set>
- *  ...
- *  </set>
+ *  </teststep>
  * </[tag]>
  * 
  */
 public class TestStepSequenceXmlHandler extends XmlHandler
 {
-    private TestStepArrayList mySteps;
+	private static final String TAG_ACTION   = "action";
+	private static final String TAG_CHECK    = "check";
+	
+    private TestStepSequence mySteps;
 
+	private TestStepXmlHandler myStepXmlHandler;
+	private TestStepXmlHandler myIfXmlHandler;
 	private TestStepXmlHandler myActionXmlHandler;
 	private TestStepXmlHandler myCheckXmlHandler;
-	private TestStepSetXmlHandler myTestStepSetXmlHandler;
 	
-	private ArrayList<StepType> myAllowedStepTypes;
+//	private ArrayList<StepType> myAllowedStepTypes;
 	
-	private TestInterfaceList myInterfaceList;
-	private boolean myCheckStepParameter;
+//	private TestInterfaceList myInterfaceList;
+//	private boolean myCheckStepParameter;
 
 	public TestStepSequenceXmlHandler( XMLReader anXmlReader,
 	                                   String aTag,
-	                                   ArrayList<StepType> anAllowedStepTypes,
+//	                                   ArrayList<StepType> anAllowedStepTypes,
 	                                   TestInterfaceList anInterfaceList,
 	                                   boolean aCheckStepParameter )
 	{
 		super(anXmlReader, aTag);
-		Trace.println(Trace.CONSTRUCTOR, "ActionXmlHandler( anXmlreader, " + aTag + ", " + anAllowedStepTypes.size() + " )", true);
+		Trace.println(Trace.CONSTRUCTOR, "ActionXmlHandler( anXmlreader, " + aTag + " )", true);
 
-		myActionXmlHandler = new TestStepXmlHandler(anXmlReader, StepType.action, anInterfaceList, aCheckStepParameter);
-		if ( anAllowedStepTypes.contains(StepType.action) )
-		{
-			this.addStartElementHandler(StepType.action.toString(), myActionXmlHandler);
-			myActionXmlHandler.addEndElementHandler(StepType.action.toString(), this);
-		}
+		myStepXmlHandler = new TestStepXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
+		this.addStartElementHandler(TestStepXmlHandler.START_ELEMENT, myStepXmlHandler);
+		myStepXmlHandler.addEndElementHandler(TestStepXmlHandler.START_ELEMENT, this);
 
-		myCheckXmlHandler = new TestStepXmlHandler(anXmlReader, StepType.check, anInterfaceList, aCheckStepParameter);
-		if ( anAllowedStepTypes.contains(StepType.check) )
-		{
-			this.addStartElementHandler(StepType.check.toString(), myCheckXmlHandler);
-			myCheckXmlHandler.addEndElementHandler(StepType.check.toString(), this);
-		}
+		myIfXmlHandler = new TestStepXmlHandler(anXmlReader, TestStepXmlHandler.IF_ELEMENT, anInterfaceList, aCheckStepParameter);
+		this.addStartElementHandler(TestStepXmlHandler.IF_ELEMENT, myIfXmlHandler);
+		myIfXmlHandler.addEndElementHandler(TestStepXmlHandler.IF_ELEMENT, this);
 
-		myTestStepSetXmlHandler = null; // Created when needed to prevent loops
-		myAllowedStepTypes = anAllowedStepTypes;
-		myInterfaceList = anInterfaceList;
-		myCheckStepParameter = aCheckStepParameter;
+		myActionXmlHandler = new TestStepXmlHandler(anXmlReader, TAG_ACTION, anInterfaceList, aCheckStepParameter);
+		this.addStartElementHandler(TAG_ACTION, myActionXmlHandler);
+		myActionXmlHandler.addEndElementHandler(TAG_ACTION, this);
+
+		myCheckXmlHandler = new TestStepXmlHandler(anXmlReader, TAG_CHECK, anInterfaceList, aCheckStepParameter);
+		this.addStartElementHandler(TAG_CHECK, myCheckXmlHandler);
+		myCheckXmlHandler.addEndElementHandler(TAG_CHECK, this);
+
+//		myInterfaceList = anInterfaceList;
+//		myCheckStepParameter = aCheckStepParameter;
 
 		this.reset();
 	}
@@ -98,20 +93,7 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 	@Override
 	public void handleGoToChildElement(String aQualifiedName)
 	{
-     	if (aQualifiedName.equalsIgnoreCase(StepType.set.toString()))
-    	{
-     		// We'll create a myTestStepSetXmlHandler for TestStep Sets only when we need it.
-     		// Otherwise it would create an endless loop.
-    		myTestStepSetXmlHandler = new TestStepSetXmlHandler( this.getXmlReader(),
-    		                                                     myAllowedStepTypes,
-    		                                                     myInterfaceList,
-    		                                                     myCheckStepParameter );
-    		if ( myAllowedStepTypes.contains(StepType.set) )
-    		{
-    			this.addStartElementHandler(StepType.set.toString(), myTestStepSetXmlHandler);
-    			myTestStepSetXmlHandler.addEndElementHandler(StepType.set.toString(), this);
-    		}
-    	}
+    	//nop
 	}
 
 	@Override
@@ -119,19 +101,24 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 				throws TestSuiteException
 	{
 		Trace.println(Trace.SUITE);
-    	if (aQualifiedName.equalsIgnoreCase(StepType.check.toString()))
+    	if (aQualifiedName.equalsIgnoreCase(TestStepXmlHandler.START_ELEMENT))
     	{
-    		mySteps.add( myCheckXmlHandler.getActionStep() );
+    		mySteps.add( myStepXmlHandler.getStep() );
+    		myStepXmlHandler.reset();
+    	}
+    	else if (aQualifiedName.equalsIgnoreCase(TestStepXmlHandler.IF_ELEMENT))
+    	{
+    		mySteps.add( myIfXmlHandler.getStep() );
+    		myIfXmlHandler.reset();
+    	}
+    	else if (aQualifiedName.equalsIgnoreCase(TAG_CHECK))
+    	{
+    		mySteps.add( myCheckXmlHandler.getStep() );
         	myCheckXmlHandler.reset();
     	}
-    	else if (aQualifiedName.equalsIgnoreCase(StepType.action.toString()))
+    	else if (aQualifiedName.equalsIgnoreCase(TAG_ACTION))
     	{
-    		mySteps.add( myActionXmlHandler.getActionStep() );
-        	myActionXmlHandler.reset();
-    	}
-    	else if (aQualifiedName.equalsIgnoreCase(StepType.set.toString()))
-    	{
-    		mySteps.add( this.myTestStepSetXmlHandler.getSet() );
+    		mySteps.add( myActionXmlHandler.getStep() );
         	myActionXmlHandler.reset();
     	}
     	else
@@ -144,7 +131,7 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 	/**
 	 * @return
 	 */
-	public TestStepArrayList getSteps()
+	public TestStepSequence getSteps()
 	{
 		Trace.println(Trace.GETTER);
 		return mySteps;
@@ -153,6 +140,6 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 	public void reset()
 	{
 		Trace.println(Trace.SUITE);
-		mySteps = new TestStepArrayList();
+		mySteps = new TestStepSequence();
 	}
 }

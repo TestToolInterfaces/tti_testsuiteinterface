@@ -10,7 +10,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 
 /**
- * @author Arjan Kranenburg 
+ * Abstract XmlHandler to read the link part of an XML file.
+ * Known subclasses are testgrouplink and testcaselink.
  * 
  * <testgrouplink id="..." type="..." sequence="..." [any]="...">
  *   ...
@@ -20,12 +21,15 @@ import org.xml.sax.XMLReader;
  *   ...
  * </testcaselink>
  * 
+ * @author Arjan Kranenburg 
+ * @see http://www.testtoolinterfaces.org
+ * 
  */
 public abstract class TestLinkXmlHandler extends XmlHandler
 {
-	public static final String ELEMENT_ID = "id";
-	public static final String ELEMENT_TYPE = "type";
-	public static final String ELEMENT_SEQ = "sequence";
+	private static final String ELEMENT_ID = "id";
+	private static final String ELEMENT_TYPE = "type";
+	private static final String ELEMENT_SEQ = "sequence";
 	
 	private String myLink;
 
@@ -34,6 +38,12 @@ public abstract class TestLinkXmlHandler extends XmlHandler
 	private int mySequence;
 	private Hashtable<String, String> myAnyAttributes;
 
+	/**
+	 * Creates the XML Handler
+	 * 
+	 * @param anXmlReader		The XML Reader
+	 * @param aStartElement		The start element
+	 */
 	public TestLinkXmlHandler( XMLReader anXmlReader, String aStartElement )
 	{
 		super(anXmlReader, aStartElement);
@@ -66,6 +76,7 @@ public abstract class TestLinkXmlHandler extends XmlHandler
 		//nop
     }
 
+	@Override
     public void processElementAttributes(String aQualifiedName, Attributes att)
     {
 		Trace.print(Trace.SUITE, "processElementAttributes( " 
@@ -97,10 +108,6 @@ public abstract class TestLinkXmlHandler extends XmlHandler
     }
 
 	@Override
-	/** 
-	 * @param aQualifiedName the name of the childElement
-	 * 
-	 */
 	public void handleGoToChildElement(String aQualifiedName)
 	{
 		// nop
@@ -112,6 +119,7 @@ public abstract class TestLinkXmlHandler extends XmlHandler
 		// nop
 	}
 
+	@Override
 	public void reset()
 	{
 		Trace.println(Trace.SUITE);
@@ -125,33 +133,33 @@ public abstract class TestLinkXmlHandler extends XmlHandler
 	}
 
 	/**
-	 * @return the myLink
+	 * @return the link
 	 */
-	public TestLink getLink()
+	protected TestLink getLink()
 	{
 		return new TestLinkImpl( myLink, myType );
 	}
 
 	/**
-	 * @return the myId
+	 * @return the id
 	 */
-	public String getId()
+	protected String getId()
 	{
 		return myId;
 	}
 
 	/**
-	 * @return the mySequence
+	 * @return the sequence number
 	 */
-	public int getSequence()
+	protected int getSequence()
 	{
 		return mySequence;
 	}
 
 	/**
-	 * @return the myAnyAttributes
+	 * @return a HashTable of Any other Attributes
 	 */
-	public Hashtable<String, String> getAnyAttributes()
+	protected Hashtable<String, String> getAnyAttributes()
 	{
 		return myAnyAttributes;
 	}

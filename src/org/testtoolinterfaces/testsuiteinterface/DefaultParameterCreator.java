@@ -7,16 +7,17 @@ import org.testtoolinterfaces.testsuite.ParameterImpl;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 
 /**
- * Utility class for creating parameters from a type and string representation of a value
+ * Abstract Utility class for creating parameters from a type and string representation of a value.
  * 
- * @author Arjan
+ * @author Arjan Kranenburg
+ * @see http://www.testtoolinterfaces.org
  *
  */
 public abstract class DefaultParameterCreator
 {
 	/**
 	 * Creates a parameter with a value based on the type and a string representation
-	 * of the value. E.g. type="int" and value="3" wil create a parameter with value Integer("3")
+	 * of the value. E.g. type="int" and value="3" will create a parameter with value Integer("3")
 	 * 
 	 * supported types by this creator:
 	 * - string
@@ -30,8 +31,8 @@ public abstract class DefaultParameterCreator
 	 * @throws TestSuiteException when the type is not supported
 	 */
 	public static ParameterImpl createParameter( String aName,
-	                                         String aType,
-	                                         String aValue ) throws TestSuiteException
+	                                             String aType,
+	                                             String aValue ) throws TestSuiteException
 	{
 		if ( aType.equalsIgnoreCase( "string" ) )
 		{

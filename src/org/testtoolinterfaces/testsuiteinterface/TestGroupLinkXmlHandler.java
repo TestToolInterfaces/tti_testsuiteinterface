@@ -9,17 +9,24 @@ import org.testtoolinterfaces.utils.Trace;
 import org.xml.sax.XMLReader;
 
 /**
- * @author Arjan Kranenburg 
- * 
+ * XmlHandler to read the testgrouplink part of an XML file
  * <testgrouplink id="..." type="..." sequence="..." [any]="...">
  *   ...
  * </testgrouplink>
  *
+ * @author Arjan Kranenburg 
+ * @see http://www.testtoolinterfaces.org
+ * 
  */
 public class TestGroupLinkXmlHandler extends TestLinkXmlHandler
 {
 	public static final String START_ELEMENT = "testgrouplink";
 
+	/**
+	 * Creates the XML Handler
+	 * 
+	 * @param anXmlReader		The XML Reader
+	 */
 	public TestGroupLinkXmlHandler( XMLReader anXmlReader )
 	{
 		super(anXmlReader, START_ELEMENT);
@@ -28,6 +35,10 @@ public class TestGroupLinkXmlHandler extends TestLinkXmlHandler
 		this.reset();
 	}
 
+	/**
+	 * @return the TestGroupLink
+	 * @throws TestSuiteException when the Id is not set or when the link is not defined.
+	 */
 	public TestGroupLink getTestGroupLink() throws TestSuiteException
 	{
 		Trace.println(Trace.SUITE);

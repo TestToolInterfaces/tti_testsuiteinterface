@@ -17,21 +17,23 @@ import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
 import org.xml.sax.XMLReader;
 
+/**
+ * Class to read TestGroups from a TTI-XML file
+ * 
+ * @author Arjan Kranenburg
+ * @see http://www.testtoolinterfaces.org
+ *
+ */
 public class TestGroupReader
 {
 	private TestInterfaceList myInterfaceList;
 	private boolean myCheckStepParameter;
 	
 	/**
-	 * @param aTestGroupFactory
-	 */
-	public TestGroupReader( TestInterfaceList anInterfaceList )
-	{
-		this( anInterfaceList, false );
-	}
+	 * Creates the reader
 
-	/**
-	 * @param aTestGroupFactory
+	 * @param anInterfaceList		A list of supported interfaces.
+	 * @param aCheckStepParameter	Flag to indicate if parameters in steps must be checked.
 	 */
 	public TestGroupReader( TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{
@@ -41,8 +43,24 @@ public class TestGroupReader
 		myCheckStepParameter = aCheckStepParameter;
 	}
 
+	/**
+	 * Creates the reader, without checking the parameters of steps
+	 * 
+	 * @param anInterfaceList		A list of supported interfaces.
+	 */
+	public TestGroupReader( TestInterfaceList anInterfaceList )
+	{
+		this( anInterfaceList, false );
+	}
+
 	/** 
-	 * @throws IOError when reading fails
+	 * Reads the TTI-XML file
+	 * 
+	 * @param aTestGroupFile		The TTI-XML file to read
+	 * @return	The TestGroup
+	 * 
+	 * @throws	IOError when reading fails, although most faults are just ignored to
+	 * 			continue with the next Test Group.
 	 */
 	public TestGroup readTgFile( File aTestGroupFile )
 	{

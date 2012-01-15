@@ -8,25 +8,32 @@ import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 
 /**
- * @author Arjan Kranenburg 
+ * XmlHandler to read the script part of a TestStepScript from a TTI-XML file.
  * 
  * <script type="..." [any]="...">
  *   ...
  * </script>
  *
+ * @author Arjan Kranenburg 
+ * @see http://www.testtoolinterfaces.org
+ * 
  */
-public class TestStepScriptXmlHandler extends XmlHandler
+public class ScriptXmlHandler extends XmlHandler
 {
 	public static final String ELEMENT_START = "script";
 
 	private static final String ATTRIBUTE_TYPE = "type";
 	
 	private String myScript;
-
 	private String myType;
 	private Hashtable<String, String> myAnyAttributes;
 
-	public TestStepScriptXmlHandler( XMLReader anXmlReader )
+	/**
+	 * Creates the XML Handler
+	 * 
+	 * @param anXmlReader the xmlReader
+	 */
+	public ScriptXmlHandler( XMLReader anXmlReader )
 	{
 		super(anXmlReader, ELEMENT_START);
 		Trace.println(Trace.CONSTRUCTOR);
@@ -54,6 +61,7 @@ public class TestStepScriptXmlHandler extends XmlHandler
 		//nop
     }
 
+	@Override
     public void processElementAttributes(String aQualifiedName, Attributes att)
     {
 		Trace.print(Trace.SUITE, "processElementAttributes( " 
@@ -77,10 +85,6 @@ public class TestStepScriptXmlHandler extends XmlHandler
     }
 
 	@Override
-	/** 
-	 * @param aQualifiedName the name of the childElement
-	 * 
-	 */
 	public void handleGoToChildElement(String aQualifiedName)
 	{
 		// nop
@@ -92,6 +96,7 @@ public class TestStepScriptXmlHandler extends XmlHandler
 		// nop
 	}
 
+	@Override
 	public void reset()
 	{
 		Trace.println(Trace.SUITE);
@@ -118,7 +123,7 @@ public class TestStepScriptXmlHandler extends XmlHandler
 	}
 
 	/**
-	 * @return the myAnyAttributes
+	 * @return a HashTable of Any other Attributes
 	 */
 	public Hashtable<String, String> getAnyAttributes()
 	{

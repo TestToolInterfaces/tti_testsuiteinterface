@@ -15,6 +15,7 @@ import org.xml.sax.XMLReader;
  * </command>
 
  * @author Arjan Kranenburg 
+ * @see http://www.testtoolinterfaces.org
  * 
  */
 public class CommandXmlHandler extends XmlHandler
@@ -29,6 +30,12 @@ public class CommandXmlHandler extends XmlHandler
     
     private TestInterfaceList myInterfaces;
 
+	/**
+	 * Creates the XML Handler
+	 * 
+	 * @param anXmlReader		The XML Reader
+	 * @param anInterfaceList	A list of Supported Interfaces
+	 */
 	public CommandXmlHandler( XMLReader anXmlReader,
 	                           TestInterfaceList anInterfaceList )
 	{

@@ -1,6 +1,7 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
 import java.io.File;
+import java.io.IOError;
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,21 +15,23 @@ import org.testtoolinterfaces.utils.Trace;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+/**
+ * Class to read TestCases from a TTI-XML file
+ * 
+ * @author Arjan Kranenburg
+ * @see http://www.testtoolinterfaces.org
+ *
+ */
 public class TestCaseReader
 {
 	private TestInterfaceList myInterfaceList;
 	private boolean myCheckStepParameter;
 
 	/**
+	 * Creates the reader
 	 * 
-	 */
-	public TestCaseReader( TestInterfaceList anInterfaceList )
-	{
-		this( anInterfaceList, false );
-	}
-
-	/**
-	 * 
+	 * @param anInterfaceList		A list of supported interfaces.
+	 * @param aCheckStepParameter	Flag to indicate if parameters in steps must be checked.
 	 */
 	public TestCaseReader( TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{
@@ -38,8 +41,24 @@ public class TestCaseReader
 		myCheckStepParameter = aCheckStepParameter;
 	}
 
+	/**
+	 * Creates the reader, without checking the parameters of steps
+	 * 
+	 * @param anInterfaceList a list of supported interfaces
+	 */
+	public TestCaseReader( TestInterfaceList anInterfaceList )
+	{
+		this( anInterfaceList, false );
+	}
+
 	/** 
-	 * @throws TestSuiteException 
+	 * Reads the TTI-XML file
+	 * 
+	 * @param aTestCaseFile		The TTI-XML file to read
+	 * @return	The TestCase
+	 * @throws 	TestSuiteException	when something went wrong reading the file.
+	 * 			E.g. when the file has no read permissions or is not well-formatted.
+	 * @throws	IOError when disaster strikes.
 	 */
 	public TestCase readTcFile( File aTestCaseFile ) throws TestSuiteException
 	{

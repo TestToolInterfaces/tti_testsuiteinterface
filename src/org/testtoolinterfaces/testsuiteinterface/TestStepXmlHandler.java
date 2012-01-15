@@ -17,12 +17,9 @@ import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.Warning;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
 /**
- * @author Arjan Kranenburg 
- * 
  * <teststep|if sequence=...>
  *  <description>
  *    ...
@@ -31,15 +28,36 @@ import org.xml.sax.XMLReader;
  *    ...
  *  </parameter>
  *  <command> ... </command>]
- *  <script> ... </script>
- *  <then>...</then>
- *  <else>...</else>
- *  <if>
- *    <then>...</then>
- *    <else>...</else>
- *  </if>
  *  ...
  * </teststep|if>
+ * 
+ * <teststep|if sequence=...>
+ *  <description>
+ *    ...
+ *  </description>
+ *  <parameter>
+ *    ...
+ *  </parameter>
+ *  <script> ... </script>
+ *  ...
+ * </teststep|if>
+ * 
+ * <teststep|if sequence=...>
+ *  <description>
+ *    ...
+ *  </description>
+ *  <parameter>
+ *    ...
+ *  </parameter>
+ *  <if>...</if>
+ *  <then>...</then>
+ *  <else>...</else>
+ *  ...
+ * </teststep|if>
+ * 
+ * @author Arjan Kranenburg 
+ * @see http://www.testtoolinterfaces.org
+ * 
  */
 public class TestStepXmlHandler extends XmlHandler
 {
@@ -58,7 +76,7 @@ public class TestStepXmlHandler extends XmlHandler
 	// The sub-handlers
     private GenericTagAndStringXmlHandler myDescriptionXmlHandler;
 	private CommandXmlHandler myCommandXmlHandler;
-	private TestStepScriptXmlHandler myScriptXmlHandler;
+	private ScriptXmlHandler myScriptXmlHandler;
 	private ParameterXmlHandler myParameterXmlHandler;
 	private TestStepXmlHandler myIfXmlHandler;
 	private TestStepSequenceXmlHandler myThenXmlHandler;
@@ -85,13 +103,14 @@ public class TestStepXmlHandler extends XmlHandler
 	private TestStepSequence myThenSteps;
 	private TestStepSequence myElseSteps;
 
-	public TestStepXmlHandler( XMLReader anXmlReader,
-	                           TestInterfaceList anInterfaceList,
-	                           boolean aCheckStepParameter )
-	{
-		this( anXmlReader, START_ELEMENT, anInterfaceList, aCheckStepParameter);
-	}
-
+	/**
+	 * Creates the XML Handler
+	 * 
+	 * @param anXmlReader			The xmlReader
+	 * @param aTag					The start-element for this XML Handler
+	 * @param anInterfaceList		A list of interfaces
+	 * @param aCheckStepParameter	Flag to indicate if specified parameters of a step must be verified in the interface
+	 */
 	public TestStepXmlHandler( XMLReader anXmlReader,
 	                           String aTag,
 	                           TestInterfaceList anInterfaceList,
@@ -112,9 +131,9 @@ public class TestStepXmlHandler extends XmlHandler
 		this.addStartElementHandler(CommandXmlHandler.START_ELEMENT, myCommandXmlHandler);
 		myCommandXmlHandler.addEndElementHandler(CommandXmlHandler.START_ELEMENT, this);
 
-		myScriptXmlHandler = new TestStepScriptXmlHandler(anXmlReader);
-		this.addStartElementHandler(TestStepScriptXmlHandler.ELEMENT_START, myScriptXmlHandler);
-		myScriptXmlHandler.addEndElementHandler(TestStepScriptXmlHandler.ELEMENT_START, this);
+		myScriptXmlHandler = new ScriptXmlHandler(anXmlReader);
+		this.addStartElementHandler(ScriptXmlHandler.ELEMENT_START, myScriptXmlHandler);
+		myScriptXmlHandler.addEndElementHandler(ScriptXmlHandler.ELEMENT_START, this);
 
 		myIfXmlHandler = null; // Created when needed to prevent loops
 		myThenXmlHandler = null; // Created when needed to prevent loops
@@ -125,6 +144,20 @@ public class TestStepXmlHandler extends XmlHandler
 
 		reset();
 
+	}
+
+	/**
+	 * Creates the XML Handler for element teststep
+	 * 
+	 * @param anXmlReader the xmlReader
+	 * @param anInterfaceList a list of interfaces
+	 * @param aCheckStepParameter flag to indicate if specified parameters of a step must be verified in the interface
+	 */
+	public TestStepXmlHandler( XMLReader anXmlReader,
+	                           TestInterfaceList anInterfaceList,
+	                           boolean aCheckStepParameter )
+	{
+		this( anXmlReader, START_ELEMENT, anInterfaceList, aCheckStepParameter);
 	}
 
 	@Override
@@ -217,7 +250,7 @@ public class TestStepXmlHandler extends XmlHandler
 	    		Parameter parameter = myParameterXmlHandler.getParameter();
 	    		myParameters.add(parameter);
 			}
-			catch (SAXParseException e)
+			catch (TestSuiteException e)
 			{
 				Warning.println("Cannot add Parameter: " + e.getMessage());
 				Trace.print(Trace.SUITE, e);
@@ -227,13 +260,29 @@ public class TestStepXmlHandler extends XmlHandler
     	}
     	else if (aQualifiedName.equalsIgnoreCase(CommandXmlHandler.START_ELEMENT))
     	{
+    		if ( myCommand != null )
+    		{
+				Warning.println( "Command is defined twice. Last one is used." );   			
+    		}
+    		if ( myScript != null )
+    		{
+				Warning.println( "Both Command and Script are defined" );   			
+    		}
     		myCommand  = myCommandXmlHandler.getCommand();
     		myInterface = myCommandXmlHandler.getInterface();
     		myParameterXmlHandler.setCurrentInterface(myInterface);
     		myCommandXmlHandler.reset();
     	}
-    	else if (aQualifiedName.equalsIgnoreCase(TestStepScriptXmlHandler.ELEMENT_START))
+    	else if (aQualifiedName.equalsIgnoreCase(ScriptXmlHandler.ELEMENT_START))
     	{
+    		if ( myScript != null )
+    		{
+				Warning.println( "Script is defined twice. Last one is used." );   			
+    		}
+    		if ( myCommand != null )
+    		{
+				Warning.println( "Both Command and Script are defined" );   			
+    		}
     		myScript = myScriptXmlHandler.getScript();
     		myScriptType = myScriptXmlHandler.getType();
     		myScriptXmlHandler.reset();
@@ -264,6 +313,10 @@ public class TestStepXmlHandler extends XmlHandler
 		// else nothing (ignored)
 	}
 
+	/**
+	 * @return the TestStep
+	 * @throws TestSuiteException when not all information is defined
+	 */
 	public TestStep getStep() throws TestSuiteException
 	{
 		Trace.println(Trace.SUITE);
@@ -290,9 +343,11 @@ public class TestStepXmlHandler extends XmlHandler
 	}
 
 	/**
-	 * @return
-	 * @throws Error
-	 * @throws TestSuiteException
+	 * @return the TestStep as TestStepCommand
+	 * 
+	 * @throws TestSuiteException	When the interface does not support the command
+	 * 								or when the parameters are not correct defined for the command.
+	 * @throws Error				When the interface is null -> programming error.
 	 */
 	private TestStepCommand createTestStepCommand() throws Error, TestSuiteException
 	{
@@ -328,7 +383,8 @@ public class TestStepXmlHandler extends XmlHandler
 	}
 
 	/**
-	 * @return
+	 * @return the TestStep as TestStepScript
+	 * 
 	 */
 	private TestStepScript createTestStepScript()
 	{
@@ -342,7 +398,7 @@ public class TestStepXmlHandler extends XmlHandler
 	}
 
 	/**
-	 * @return
+	 * @return the TestStep as TestStepSelection
 	 */
 	private TestStepSelection createTestStepSelection()
 	{
@@ -355,6 +411,7 @@ public class TestStepXmlHandler extends XmlHandler
 		                              myAnyElements );
 	}
 
+	@Override
 	public void reset()
 	{
 		Trace.println(Trace.SUITE);

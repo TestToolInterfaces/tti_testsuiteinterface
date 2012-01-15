@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * @author Arjan Kranenburg
  *
  * Class for Unknown TestInterfaces
- * This can be used when Test Case Result files are read and where interfaces
+ * This can be used when TestGroup or TestCase files are read and where interfaces
  * are mentioned that are not known within this application.
  * This is not necessarily an error, since other applications can have these
  * interfaces defined.
@@ -20,24 +20,20 @@ import java.util.ArrayList;
  * The constructor and getInterfaceName() are the only methods that should be
  * used.
  */
-public class UndefinedTestInterface implements TestInterface
+public class UnknownTestInterface implements TestInterface
 {
-	String myName;
+	private String myName;
+
 	/**
+	 * Constructor for the UnknownTestInterface
 	 * 
+	 * @param aName	The name of the unknown interface
 	 */
-	public UndefinedTestInterface( String aName )
+	public UnknownTestInterface( String aName )
 	{
 		myName = aName;
 	}
 
-	/** 
-	 * Creates an parameter with the name and the value
-	 * The object type is String
-	 * @param aName
-	 * @param aType - ignored
-	 * @param aValue
-	 */
 	@Deprecated
 	@Override
 	public ParameterImpl createParameter(String aName, String aType, String aValue)
@@ -47,9 +43,6 @@ public class UndefinedTestInterface implements TestInterface
 		return param;
 	}
 
-	/**
-	 * Will return an ampty list
-	 */
 	@Deprecated
 	@Override
 	public ArrayList<String> getCommands()
@@ -57,18 +50,12 @@ public class UndefinedTestInterface implements TestInterface
 		return new ArrayList<String>();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.testtoolinterfaces.testsuite.TestInterface#getInterfaceName()
-	 */
 	@Override
 	public String getInterfaceName()
 	{
 		return myName;
 	}
 
-	/**
-	 * Will always return false
-	 */
 	@Deprecated
 	@Override
 	public boolean hasCommand(String aCommand)
@@ -76,10 +63,8 @@ public class UndefinedTestInterface implements TestInterface
 		return false;
 	}
 
-	/**
-	 * Will always return true
-	 */
 	@Deprecated
+	@Override
 	public boolean verifyParameters( String aCommand,
 									 ParameterArrayList aParameters )
 				   throws TestSuiteException

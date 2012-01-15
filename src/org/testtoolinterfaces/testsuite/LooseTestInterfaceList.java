@@ -6,36 +6,38 @@ package org.testtoolinterfaces.testsuite;
 import java.util.Hashtable;
 
 /**
+ * Wrapper for a list of TestInterfaces. A second list is kept as (read-only) reference.
+ * 
+ * When requested, it uses the reference list to look for a TestInterface.
+ * It creates an UndefinedInterface if it does not exist and stores that in its own list.
+ * 
  * @author Arjan Kranenburg
  *
- * Uses the interfaceList to look for TestInterfaces.
- * Creates an UndefinedInterface if it does not exist.
  */
 public class LooseTestInterfaceList implements TestInterfaceList
 {
-	TestInterfaceList myTestInterfaces = null;
+	TestInterfaceList myTestInterfaces;
 	Hashtable<String, TestInterface> myList;
 
 	/**
+	 * Constructs an empty List and keeps the TestInterfaceList as reference.
 	 * 
-	 */
-	public LooseTestInterfaceList()
-	{
-		myList = new Hashtable<String, TestInterface>();
-	}
-
-	/**
-	 * @param myTestInterfaces
+	 * @param myTestInterfaces	The reference TestInterfaceList
 	 */
 	public LooseTestInterfaceList(TestInterfaceList aTestInterfaces)
 	{
-		myTestInterfaces = aTestInterfaces;
 		myList = new Hashtable<String, TestInterface>();
+		myTestInterfaces = aTestInterfaces;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.testtoolinterfaces.testsuite.TestInterfaceList#getInterface(java.lang.String)
+	/**
+	 * Constructs an empty List with no reference to an existing TestInterfaceList.
 	 */
+	public LooseTestInterfaceList()
+	{
+		this( null );
+	}
+
 	@Override
 	public TestInterface getInterface(String anInterfaceName)
 	{
@@ -50,7 +52,7 @@ public class LooseTestInterfaceList implements TestInterfaceList
 			testInterface = myList.get(anInterfaceName);
 			if (testInterface == null)
 			{
-				testInterface = new UndefinedTestInterface( anInterfaceName );
+				testInterface = new UnknownTestInterface( anInterfaceName );
 				myList.put(anInterfaceName, testInterface);
 			}
 		}

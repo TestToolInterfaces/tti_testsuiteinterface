@@ -10,13 +10,10 @@ import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.LocatorImpl;
-
-
 
 /**
+ * XmlHandler to read the parameter part from a TTI-XML file
  *  <parameter id="..." sequence="..." type="...">
  *    <value>...</value>
  *    <parameter>...</parameter>
@@ -24,16 +21,17 @@ import org.xml.sax.helpers.LocatorImpl;
  *  </parameter>
  * 
  * @author Arjan Kranenburg 
+ * @see http://www.testtoolinterfaces.org
  * 
  */
 public class ParameterXmlHandler extends XmlHandler
 {
 	public static final String START_ELEMENT = "parameter";
-	public static final String ATTRIBUTE_ID = "id";
-	public static final String ATTRIBUTE_TYPE = "type";
-	public static final String ATTRIBUTE_SEQUENCE = "sequence";
-	public static final String VALUE_ELEMENT = "value";
-	public static final String VARIABLE_ELEMENT = "variable";
+	private static final String ATTRIBUTE_ID = "id";
+	private static final String ATTRIBUTE_TYPE = "type";
+	private static final String ATTRIBUTE_SEQUENCE = "sequence";
+	private static final String VALUE_ELEMENT = "value";
+	private static final String VARIABLE_ELEMENT = "variable";
 	
 	private ParameterXmlHandler	myParameterXmlHandler;
 	private GenericTagAndStringXmlHandler myValueXmlHandler;
@@ -49,6 +47,11 @@ public class ParameterXmlHandler extends XmlHandler
 
     private TestInterface myCurrentInterface;
     
+	/**
+	 * Creates the XML Handler
+	 * 
+	 * @param anXmlReader		The XML Reader
+	 */
 	public ParameterXmlHandler( XMLReader anXmlReader )
 	{
 		super(anXmlReader, START_ELEMENT);
@@ -67,7 +70,8 @@ public class ParameterXmlHandler extends XmlHandler
 		reset();
 	}
 
-    public void processElementAttributes(String aQualifiedName, Attributes att)
+	@Override
+	public void processElementAttributes(String aQualifiedName, Attributes att)
     {
 		Trace.print(Trace.SUITE, "processElementAttributes( "
 	            + aQualifiedName, true );
@@ -135,7 +139,7 @@ public class ParameterXmlHandler extends XmlHandler
 				Parameter subParam = myParameterXmlHandler.getParameter();
 	   			mySubParameters.add(subParam);
 			}
-			catch (SAXParseException e)
+			catch (TestSuiteException e)
 			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -159,33 +163,30 @@ public class ParameterXmlHandler extends XmlHandler
     	}
 	}
 
-	public Parameter getParameter() throws SAXParseException
+	/**
+	 * @return the parameter
+	 * @throws TestSuiteException when parameterId is not set, when there is no value
+	 * 							 or when the parameter cannot be created for the current interface.
+	 */
+	public Parameter getParameter() throws TestSuiteException
 	{
 		Trace.println(Trace.GETTER, "getParameter()", true);
 		if ( myParameterId.isEmpty() )
 		{
-			throw new SAXParseException("Unknown Parameter ID", new LocatorImpl());
+			throw new TestSuiteException("Unknown Parameter ID");
 		}
 
 		Parameter parameter;
-//		if ( ! myValue.isEmpty() )
 		if ( myValue != null )
 		{
-			try
+			if ( myCurrentInterface != null )
 			{
-				if ( myCurrentInterface != null )
-				{
-					parameter = myCurrentInterface.createParameter( myParameterId, myParameterType, myValue );
-				}
-				else
-				{
-					parameter = DefaultParameterCreator.createParameter(myParameterId, myParameterType, myValue);
-				}			
+				parameter = myCurrentInterface.createParameter( myParameterId, myParameterType, myValue );
 			}
-			catch (TestSuiteException tse)
+			else
 			{
-				throw new SAXParseException(tse.getMessage(), new LocatorImpl(), tse);
-			}
+				parameter = DefaultParameterCreator.createParameter(myParameterId, myParameterType, myValue);
+			}			
 		}
 		else if ( ! myVariableName.isEmpty() )
 		{
@@ -197,13 +198,14 @@ public class ParameterXmlHandler extends XmlHandler
 		}
 		else
 		{
-			throw new SAXParseException("Unknown Value, Variable, or Sub-Parameter", new LocatorImpl());
+			throw new TestSuiteException("Unknown Value, Variable, or Sub-Parameter");
 		}
 		parameter.setIndex(mySequence);
 
 		return parameter;
 	}
 
+	@Override
 	public void reset()
 	{
 		Trace.println(Trace.SUITE);

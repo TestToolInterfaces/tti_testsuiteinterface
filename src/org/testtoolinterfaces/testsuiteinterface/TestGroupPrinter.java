@@ -19,16 +19,20 @@ import org.testtoolinterfaces.testsuite.TestEntry.TYPE;
 import org.testtoolinterfaces.utils.Trace;
 
 /**
- * @author Arjan
+ * Simple tool to print the Test Group File
+ * It also serves as a debug tool for the structure of the group file.
+ * 
+ * @author Arjan Kranenburg
+ * @see http://www.testtoolinterfaces.org
  *
- * Simpel tool to print the Test Case Result File
- * It serves as well as a debug tool for the structure of the result file.
  */
 public class TestGroupPrinter
 {
-
 	/**
-	 * @param args
+	 * Main
+	 * 
+	 * @param args - first argument is the Test Group File, others are ignored.
+	 * 
 	 */
 	public static void main(String[] args)
 	{
@@ -53,7 +57,11 @@ public class TestGroupPrinter
 	}
 
 	/**
-	 * @param aTcResult
+	 * Prints the TestGroup to System.out
+	 * 
+	 * @param aTestGroup	The TestGroup to print
+	 * @param aBaseDir		The baseDir of the TestGroup, used when the TestGroup has links to other files.
+	 * @param anIndent		A string that will be printed before each line
 	 */
 	public static void printTestGroup(TestGroup aTestGroup, File aBaseDir, String anIndent)
 	{
@@ -114,9 +122,10 @@ public class TestGroupPrinter
 	}
 
 	/**
-	 * Reads the TestCaseResult File
+	 * Reads the TestGroup File
 	 * 
-	 * @param aRequestedFile
+	 * @param aRequestedFile	The TestGroup File
+	 * @return	The TestGroup
 	 */
 	private static TestGroup readFile(File aRequestedFile)
 	{

@@ -15,14 +15,13 @@ import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
 //import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
-//import org.xml.sax.helpers.LocatorImpl;
 
 /**
- * @author Arjan Kranenburg 
+ * XmlHandler to read the testcase part from a TTI-XML file.
  * 
  * <testcase id="..." [any="..."]>
  *  <description>...</description>
- *  <requirementId>...</requirementId>
+ *  <requirementid>...</requirementid>
  *  <prepare>
  *   ...
  *  </prepare>
@@ -36,16 +35,20 @@ import org.xml.sax.XMLReader;
  *   ...
  *  </[any]>
  * </testcase>
+ * 
+ * @author Arjan Kranenburg 
+ * @see http://www.testtoolinterfaces.org
+ * 
  */
 
 public class TestCaseXmlHandler extends XmlHandler
 {
 	public static final String START_ELEMENT = "testcase";
-	public static final String ATTRIBUTE_ID = "id";
-	public static final String ATTRIBUTE_SEQUENCE = "sequence";
+	private static final String ATTRIBUTE_ID = "id";
+	private static final String ATTRIBUTE_SEQUENCE = "sequence";
 	
 	private static final String DESCRIPTION_ELEMENT = "description";
-	private static final String REQUIREMENT_ELEMENT = "requirementId";
+	private static final String REQUIREMENT_ELEMENT = "requirementid";
 	
 	private static final String PREPARE_ELEMENT = "prepare";
 	private static final String EXECUTE_ELEMENT = "execute";
@@ -71,6 +74,8 @@ public class TestCaseXmlHandler extends XmlHandler
 	private TestStepSequenceXmlHandler myRestoreXmlHandler;
 
 	/**
+	 * Creates the XML Handler
+	 * 
 	 * @param anXmlReader the xmlReader
 	 * @param anInterfaceList a list of interfaces
 	 * @param aCheckStepParameter flag to indicate if specified parameters of a step must be verified in the interface
@@ -124,6 +129,7 @@ public class TestCaseXmlHandler extends XmlHandler
 		this.reset();
 	}
 	
+	@Override
     public void processElementAttributes(String aQualifiedName, Attributes anAtt)
     {
 		Trace.print(Trace.SUITE, "processElementAttributes( " 
@@ -173,9 +179,7 @@ public class TestCaseXmlHandler extends XmlHandler
     	}
 	}
 
-	/** 
-	 * @param aQualifiedName the name of the childElement
-	 */
+	@Override
 	public void handleGoToChildElement(String aQualifiedName)
 	{
 		//nop
@@ -217,37 +221,11 @@ public class TestCaseXmlHandler extends XmlHandler
     	}
 	}
 
-//	/**
-//     * @throws SAXParseException 
-//     */
-//    public TestCase getTestCase() throws SAXParseException
-//    {
-//		Trace.println(Trace.SUITE);
-//
-//		if ( myTestCaseId.isEmpty() )
-//		{
-//			throw new SAXParseException("Unknown TestCase ID", new LocatorImpl());
-//		}
-//
-//		if ( myExecutionSteps.isEmpty() && myExecutionScript == null )
-//		{
-//			throw new SAXParseException("No Execution Steps found for " + myTestCaseId, new LocatorImpl());
-//		}
-//
-//       	TestCase testCase = (TestCase) new TestCaseImpl( myTestCaseId,
-//       	                                                 myAnyAttributes,
-//       	       										  	 myDescription,
-//       	       										  	 myRequirementIds,
-//       	       										  	 myPrepareSteps.sort(),
-//       	       										  	 myExecutionSteps.sort(),
-//       	       										  	 myRestoreSteps.sort(),
-//       	       										  	 myAnyElements );
-//
-//		return testCase;
-//    }
-
-	/**
-     * @throws TestSuiteException 
+    /**
+     * Creates and returns the TestCase
+     * 
+     * @return the TestCase
+     * @throws TestSuiteException	When the id is empty or execution steps are not defined.
      */
     public TestCase getTestCase() throws TestSuiteException
     {
@@ -276,7 +254,8 @@ public class TestCaseXmlHandler extends XmlHandler
 		return testCase;
     }
 
-    public void reset()
+	@Override
+	public void reset()
 	{
 		Trace.println(Trace.SUITE);
 		myTestCaseId = "";

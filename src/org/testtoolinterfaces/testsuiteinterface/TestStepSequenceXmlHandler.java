@@ -10,13 +10,16 @@ import org.xml.sax.XMLReader;
 
 
 /**
- * @author Arjan Kranenburg 
+ * XmlHandler to read a sequence of teststeps from a TTI-XML file.
  * 
  * <[tag]>
  *  <teststep>
  *  ...
  *  </teststep>
  * </[tag]>
+ * 
+ * @author Arjan Kranenburg 
+ * @see http://www.testtoolinterfaces.org
  * 
  */
 public class TestStepSequenceXmlHandler extends XmlHandler
@@ -36,6 +39,14 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 //	private TestInterfaceList myInterfaceList;
 //	private boolean myCheckStepParameter;
 
+	/**
+	 * Creates the XML Handler
+	 * 
+	 * @param anXmlReader 			the xmlReader
+	 * @param aTag					the start-element for this XML Handler
+	 * @param anInterfaceList		a list of interfaces
+	 * @param aCheckStepParameter	flag to indicate if specified parameters of a step must be verified in the interface
+	 */
 	public TestStepSequenceXmlHandler( XMLReader anXmlReader,
 	                                   String aTag,
 //	                                   ArrayList<StepType> anAllowedStepTypes,
@@ -43,7 +54,7 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 	                                   boolean aCheckStepParameter )
 	{
 		super(anXmlReader, aTag);
-		Trace.println(Trace.CONSTRUCTOR, "ActionXmlHandler( anXmlreader, " + aTag + " )", true);
+		Trace.println(Trace.CONSTRUCTOR, "TestStepSequenceXmlHandler( anXmlreader, " + aTag + " )", true);
 
 		myStepXmlHandler = new TestStepXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
 		this.addStartElementHandler(TestStepXmlHandler.START_ELEMENT, myStepXmlHandler);
@@ -67,6 +78,7 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 		this.reset();
 	}
 
+	@Override
     public void processElementAttributes(String aQualifiedName, Attributes anAtt)
     {
     	//nop
@@ -129,7 +141,7 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 	}
 
 	/**
-	 * @return
+	 * @return the TestStepSequence
 	 */
 	public TestStepSequence getSteps()
 	{
@@ -137,6 +149,7 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 		return mySteps;
 	}
 
+	@Override
 	public void reset()
 	{
 		Trace.println(Trace.SUITE);

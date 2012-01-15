@@ -18,11 +18,11 @@ import org.xml.sax.XMLReader;
 
 
 /**
- * @author Arjan Kranenburg 
+ * XmlHandler to read the testgroup part from a TTI-XML file.
  * 
  * <testgroup id="..." [any="..."]>
  *  <description>...</description>
- *  <requirementId>...</requirementId>
+ *  <requirementid>...</requirementid>
  *  <prepare>
  *   ...
  *  </prepare>
@@ -40,12 +40,15 @@ import org.xml.sax.XMLReader;
  *  </[any]>
  * </testgroup>
  * 
+ * @author Arjan Kranenburg 
+ * @see http://www.testtoolinterfaces.org
+ * 
  */
 public class TestGroupXmlHandler extends XmlHandler
 {
 	public static final String START_ELEMENT = "testgroup";
-	public static final String ATTRIBUTE_ID = "id";
-	public static final String ATTRIBUTE_SEQUENCE = "sequence";
+	private static final String ATTRIBUTE_ID = "id";
+	private static final String ATTRIBUTE_SEQUENCE = "sequence";
 	
 	private static final String DESCRIPTION_ELEMENT = "description";
 	private static final String REQUIREMENT_ELEMENT = "requirementid";
@@ -72,6 +75,13 @@ public class TestGroupXmlHandler extends XmlHandler
 	private TestGroupLinkXmlHandler myTestGroupLinkXmlHandler;
 	private TestStepSequenceXmlHandler myRestoreXmlHandler;
 	
+	/**
+	 * Creates the XML Handler
+	 * 
+	 * @param anXmlReader the xmlReader
+	 * @param anInterfaceList a list of interfaces
+	 * @param aCheckStepParameter flag to indicate if specified parameters of a step must be verified in the interface
+	 */
 	public TestGroupXmlHandler( XMLReader anXmlReader, TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{
 		super(anXmlReader, START_ELEMENT);
@@ -139,6 +149,7 @@ public class TestGroupXmlHandler extends XmlHandler
     	}
     }
 
+	@Override
     public void processElementAttributes(String aQualifiedName, Attributes anAtt)
     {
 		Trace.print(Trace.SUITE, "processElementAttributes( " 
@@ -166,10 +177,6 @@ public class TestGroupXmlHandler extends XmlHandler
     }
 
 	@Override
-	/** 
-	 * @param aQualifiedName the name of the childElement
-	 * 
-	 */
 	public void handleGoToChildElement(String aQualifiedName)
 	{
 		//nop
@@ -218,6 +225,7 @@ public class TestGroupXmlHandler extends XmlHandler
     	}
 	}
 
+	@Override
 	public void reset()
 	{
 		Trace.println(Trace.SUITE);
@@ -235,6 +243,12 @@ public class TestGroupXmlHandler extends XmlHandler
 	    myCurrentAnyValue = "";
 	}
 
+    /**
+     * Creates and returns the TestGroup
+     * 
+     * @return the TestGroup
+     * @throws TestSuiteException	When the id is empty.
+     */
 	public TestGroup getTestGroup() throws TestSuiteException
 	{
 		Trace.println(Trace.SUITE);

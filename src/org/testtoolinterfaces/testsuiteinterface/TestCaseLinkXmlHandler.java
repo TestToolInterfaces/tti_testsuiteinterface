@@ -9,17 +9,24 @@ import org.testtoolinterfaces.utils.Trace;
 import org.xml.sax.XMLReader;
 
 /**
- * @author Arjan Kranenburg 
- *
+ * XmlHandler to read the testcaselink part of an XML file
  * <testcaselink id="..." type="..." sequence="..." [any]="...">
  *   ...
  * </testcaselink>
  * 
+ * @author Arjan Kranenburg 
+ * @see http://www.testtoolinterfaces.org
+ *
  */
 public class TestCaseLinkXmlHandler extends TestLinkXmlHandler
 {
 	public static final String START_ELEMENT = "testcaselink";
 
+	/**
+	 * Creates the XML Handler
+	 * 
+	 * @param anXmlReader		The XML Reader
+	 */
 	public TestCaseLinkXmlHandler( XMLReader anXmlReader )
 	{
 		super(anXmlReader, START_ELEMENT);
@@ -28,6 +35,10 @@ public class TestCaseLinkXmlHandler extends TestLinkXmlHandler
 		this.reset();
 	}
 
+	/**
+	 * @return the TestCaseLink
+	 * @throws TestSuiteException when the Id is not set or when the link is not defined.
+	 */
 	public TestCaseLink getTestCaseLink() throws TestSuiteException
 	{
 		Trace.println(Trace.SUITE);

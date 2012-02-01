@@ -1,4 +1,4 @@
-package org.testtoolinterfaces.testsuiteinterface;
+package org.testtoolinterfaces.testsuite;
 
 import java.util.Hashtable;
 

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<teststep sequence="1">
+  <description>A description of the first action step.</description>
+  <command interface="ifName">action1</command>
+  <parameter id="URL" type="string" sequence="1">
+    <value>http://www.google.com/</value>
+  </parameter>
+</teststep>

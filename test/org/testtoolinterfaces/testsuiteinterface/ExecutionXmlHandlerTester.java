@@ -1,6 +1,5 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
-
 import java.io.File;
 
 import javax.xml.parsers.SAXParser;
@@ -11,13 +10,13 @@ import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.testtoolinterfaces.testsuite.TestEntry;
+import org.testtoolinterfaces.testsuite.TestInterfaceListHelper;
 import org.testtoolinterfaces.testsuite.TestInterface_stub;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepCommand;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuiteinterface.TestStepSequenceXmlHandler;
 import org.xml.sax.XMLReader;
-
 
 public class ExecutionXmlHandlerTester extends TestCase
 {
@@ -106,17 +105,15 @@ public class ExecutionXmlHandlerTester extends TestCase
 	        // assign the handler to the parser
 	        xmlReader.setContentHandler(handler);
 
-			File jarFile = new File(  this.getClass().getProtectionDomain()
-				                         						.getCodeSource()
-				                         						.getLocation()
-				                         						.toURI() );
-			File testXmlFilesDir = new File ( jarFile.getParent(),  "test" + File.separator + 
-														"org" + File.separator +
-														"testtoolinterfaces" + File.separator +
-														"testsuiteinterface" + File.separator +
-														"testXmlFiles");
+			File testXmlFilesDir = new File ( "test" + File.separator +
+			                                  "org" + File.separator +
+			                                  "testtoolinterfaces" + File.separator +
+			                                  "testsuiteinterface" + File.separator +
+			                                  "testXmlFiles" );
+
 			File xmlTestFile = new File ( testXmlFilesDir, aFileName);
-	        // parse the document
+
+			// parse the document
 	        xmlReader.parse(xmlTestFile.getAbsolutePath());
 
 	        return handler.getSteps();

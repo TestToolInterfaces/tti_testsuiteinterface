@@ -3,8 +3,9 @@ package org.testtoolinterfaces.testsuiteinterface;
 import org.testtoolinterfaces.testsuite.TestInterface;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.Trace;
-import org.testtoolinterfaces.utils.XmlHandler;
+//import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 
@@ -18,14 +19,14 @@ import org.xml.sax.XMLReader;
  * @see http://www.testtoolinterfaces.org
  * 
  */
-public class CommandXmlHandler extends XmlHandler
+public class CommandXmlHandler extends GenericTagAndStringXmlHandler
 {
 	public static final String START_ELEMENT = "command";
 	public static final String DEFAULT_INTERFACE_NAME = "Default";
 	
 	private static final String ATTRIBUTE_INTERFACE = "interface";
 
-	private String myCommand;
+//	private String myCommand;
 	private TestInterface myInterface;
     
     private TestInterfaceList myInterfaces;
@@ -33,16 +34,21 @@ public class CommandXmlHandler extends XmlHandler
 	/**
 	 * Creates the XML Handler
 	 * 
-	 * @param anXmlReader		The XML Reader
-	 * @param anInterfaceList	A list of Supported Interfaces
+	 * @param anXmlReader			The XML Reader
+	 * @param anInterfaceList		A list of Supported Interfaces
+	 * @throws TestSuiteException	when the 'Default' interface is not in the interfacelist
 	 */
 	public CommandXmlHandler( XMLReader anXmlReader,
-	                           TestInterfaceList anInterfaceList )
+	                          TestInterfaceList anInterfaceList ) throws TestSuiteException
 	{
 		super(anXmlReader, START_ELEMENT);
 		Trace.println(Trace.CONSTRUCTOR, "CommandXmlHandler( anXmlreader )", true);
 
 		myInterfaces = anInterfaceList;
+		if( myInterfaces.getInterface(DEFAULT_INTERFACE_NAME) == null )
+		{
+			throw new TestSuiteException( "No default interface defined: " + DEFAULT_INTERFACE_NAME );
+		}
 		reset();
 	}
 
@@ -63,6 +69,7 @@ public class CommandXmlHandler extends XmlHandler
 			    		myInterface = myInterfaces.getInterface(iFaceName);
 						if( myInterface == null )
 						{
+							this.reset();
 							throw new TestSuiteException( "Unknown interface: " + iFaceName );
 						}
 			    		Trace.println( Trace.ALL, "        myInterface -> " + iFaceName);
@@ -72,40 +79,24 @@ public class CommandXmlHandler extends XmlHandler
     	}
     }
 
-	@Override
-	public void handleStartElement(String aQualifiedName)
-	{
-    	//nop
-	}
+//	@Override
+//	public void handleCharacters(String aValue)
+//	{
+//		Trace.print(Trace.SUITE, "handleCharacters( " 
+//		            + aValue + " )", true );
+//		String command = aValue.trim();
+//		if ( ! command.isEmpty() )
+//		{
+//			myCommand += command;
+//		}
+//	}
 
-	@Override
-	public void handleCharacters(String aValue)
+	/**
+	 * @Deprecated use getCommand() and getInterface()
+	 */
+	public String getValue()
 	{
-		Trace.print(Trace.SUITE, "handleCharacters( " 
-		            + aValue, true );
-		String command = aValue.trim();
-		if ( ! command.isEmpty() )
-		{
-			myCommand += command;
-		}
-	}
-
-	@Override
-	public void handleEndElement(String aQualifiedName)
-	{
-    	//nop
-	}
-	
-	@Override
-	public void handleGoToChildElement(String aQualifiedName)
-	{
-    	//nop
-	}
-
-	@Override
-	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
-	{
-    	//nop
+		return getCommand();
 	}
 
 	/**
@@ -113,7 +104,7 @@ public class CommandXmlHandler extends XmlHandler
 	 */
 	public String getCommand()
 	{
-		return myCommand;
+		return super.getValue();
 	}
 
 	/**
@@ -123,13 +114,19 @@ public class CommandXmlHandler extends XmlHandler
 	{
 		return myInterface;
 	}
-	
+
+	@Override
+	public String toString()
+	{
+		String stringRep = this.getInterface().getInterfaceName() + "->" + this.getCommand();
+		return START_ELEMENT + ": " + stringRep;
+	}
+
 	@Override
 	public void reset()
 	{
 		Trace.println(Trace.SUITE);
-
-		myCommand = "";
+		super.reset();
 		myInterface = myInterfaces.getInterface( DEFAULT_INTERFACE_NAME );
 	}
 }

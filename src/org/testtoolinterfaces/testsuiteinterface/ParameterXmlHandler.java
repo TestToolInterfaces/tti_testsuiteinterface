@@ -1,5 +1,7 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
+import java.util.Hashtable;
+
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.ParameterHash;
@@ -14,10 +16,13 @@ import org.xml.sax.XMLReader;
 
 /**
  * XmlHandler to read the parameter part from a TTI-XML file
- *  <parameter id="..." sequence="..." type="...">
+ *  <parameter id="..." sequence="..." type="..." [{any}="..."]>
  *    <value>...</value>
  *    <parameter>...</parameter>
  *    <variable>...</variable>
+ *    [<{any}>
+ *     ...
+ *    </{any}>]
  *  </parameter>
  * 
  * @author Arjan Kranenburg 
@@ -40,10 +45,13 @@ public class ParameterXmlHandler extends XmlHandler
 	private String myParameterId;
 	private String myParameterType;
 	private int mySequence;
+	private Hashtable<String, String> myAnyAttributes;
 
 	private String myValue;
 	private ParameterArrayList mySubParameters;	
     private String myVariableName;
+	private Hashtable<String, String> myAnyElements;
+	private String myCurrentAnyValue;
 
     private TestInterface myCurrentInterface;
     
@@ -60,37 +68,41 @@ public class ParameterXmlHandler extends XmlHandler
 		myParameterXmlHandler = null; // Created when needed to prevent loops
 
 		myValueXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, VALUE_ELEMENT);
-		this.addStartElementHandler(VALUE_ELEMENT, myValueXmlHandler);
-		myValueXmlHandler.addEndElementHandler(VALUE_ELEMENT, this);
+		this.addElementHandler(VALUE_ELEMENT, myValueXmlHandler);
 
 		myVariableXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, VARIABLE_ELEMENT);
-		this.addStartElementHandler(VARIABLE_ELEMENT, myVariableXmlHandler);
-		myVariableXmlHandler.addEndElementHandler(VARIABLE_ELEMENT, this);
+		this.addElementHandler(VARIABLE_ELEMENT, myVariableXmlHandler);
 
 		reset();
 	}
 
 	@Override
-	public void processElementAttributes(String aQualifiedName, Attributes att)
+	public void processElementAttributes(String aQualifiedName, Attributes anAtt)
     {
 		Trace.print(Trace.SUITE, "processElementAttributes( "
 	            + aQualifiedName, true );
     	if (aQualifiedName.equalsIgnoreCase(ParameterXmlHandler.START_ELEMENT))
     	{
-		    for (int i = 0; i < att.getLength(); i++)
+		    for (int i = 0; i < anAtt.getLength(); i++)
 		    {
-				Trace.append( Trace.SUITE, ", " + att.getQName(i) + "=" + att.getValue(i) );
-		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_ID))
+		    	String attName =  anAtt.getQName(i);
+		    	String attValue = anAtt.getValue(i);
+				Trace.append( Trace.SUITE, ", " + attName + "=" + attValue );
+		    	if (attName.equalsIgnoreCase(ATTRIBUTE_ID))
 		    	{
-		        	myParameterId = att.getValue(i);
+		        	myParameterId = attValue;
 		    	}
-		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_TYPE))
+		    	if (attName.equalsIgnoreCase(ATTRIBUTE_TYPE))
 		    	{
-		        	myParameterType = att.getValue(i);
+		        	myParameterType = attValue;
 		    	}
-		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_SEQUENCE))
+		    	if (attName.equalsIgnoreCase(ATTRIBUTE_SEQUENCE))
 		    	{
-		    		mySequence = Integer.valueOf( att.getValue(i) ).intValue();
+		    		mySequence = Integer.valueOf( attValue ).intValue();
+		    	}
+		    	else
+		    	{
+		    		myAnyAttributes.put(attName, attValue);
 		    	}
 		    }
     	}
@@ -118,13 +130,12 @@ public class ParameterXmlHandler extends XmlHandler
 	@Override
 	public void handleGoToChildElement(String aQualifiedName)
 	{
-     	if ( aQualifiedName.equalsIgnoreCase(START_ELEMENT) )
-    	{
+     	if ( myParameterXmlHandler == null && aQualifiedName.equalsIgnoreCase(START_ELEMENT) )
+     	{
      		// We'll create a ParameterXmlHandler for Sub Parameters only when we need it.
      		// Otherwise it would create an endless loop.
      		myParameterXmlHandler = new ParameterXmlHandler( this.getXmlReader() );
-   			this.addStartElementHandler(START_ELEMENT, myParameterXmlHandler);
-   			myParameterXmlHandler.addEndElementHandler(START_ELEMENT, this);
+   			this.addElementHandler(START_ELEMENT, myParameterXmlHandler);
     	}
 	}
 
@@ -213,10 +224,14 @@ public class ParameterXmlHandler extends XmlHandler
 		myParameterId = "";
 		myParameterType = "string";
 		mySequence = Integer.MAX_VALUE;
+	    myAnyAttributes = new Hashtable<String, String>();
 
 		myValue = null;
 	    mySubParameters = new ParameterArrayList();
 	    myVariableName = "";
+
+		myAnyElements = new Hashtable<String, String>();
+	    myCurrentAnyValue = "";
 	}
 
 	/**

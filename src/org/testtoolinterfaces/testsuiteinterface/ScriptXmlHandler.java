@@ -1,7 +1,5 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
-import java.util.Hashtable;
-
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
@@ -10,7 +8,7 @@ import org.xml.sax.XMLReader;
 /**
  * XmlHandler to read the script part of a TestStepScript from a TTI-XML file.
  * 
- * <script type="..." [any]="...">
+ * <script type="...">
  *   ...
  * </script>
  *
@@ -26,7 +24,6 @@ public class ScriptXmlHandler extends XmlHandler
 	
 	private String myScript;
 	private String myType;
-	private Hashtable<String, String> myAnyAttributes;
 
 	/**
 	 * Creates the XML Handler
@@ -75,10 +72,6 @@ public class ScriptXmlHandler extends XmlHandler
 		    	{
 		        	myType = att.getValue(i);
 		    	}
-		    	else
-		    	{
-		    		myAnyAttributes.put(att.getQName(i), att.getValue(i));
-		    	}
 		    }
     	}
 		Trace.append( Trace.SUITE, " )\n" );
@@ -103,7 +96,6 @@ public class ScriptXmlHandler extends XmlHandler
 
 		myScript = "";
 		myType = "";
-		myAnyAttributes = new Hashtable<String, String>();
 	}
 
 	/**
@@ -120,13 +112,5 @@ public class ScriptXmlHandler extends XmlHandler
 	public String getType()
 	{
 		return myType;
-	}
-
-	/**
-	 * @return a HashTable of Any other Attributes
-	 */
-	public Hashtable<String, String> getAnyAttributes()
-	{
-		return myAnyAttributes;
 	}
 }

@@ -20,7 +20,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 
 /**
- * <teststep|if sequence=...>
+ * <teststep sequence=...>
  *  <description>
  *    ...
  *  </description>
@@ -29,9 +29,9 @@ import org.xml.sax.XMLReader;
  *  </parameter>
  *  <command> ... </command>]
  *  ...
- * </teststep|if>
+ * </teststep>
  * 
- * <teststep|if sequence=...>
+ * <teststep sequence=...>
  *  <description>
  *    ...
  *  </description>
@@ -40,20 +40,46 @@ import org.xml.sax.XMLReader;
  *  </parameter>
  *  <script> ... </script>
  *  ...
- * </teststep|if>
+ * </teststep>
  * 
- * <teststep|if sequence=...>
+ * <if sequence=...>
  *  <description>
  *    ...
  *  </description>
  *  <parameter>
  *    ...
  *  </parameter>
- *  <if>...</if>
+ *  <command> ... </command>]
  *  <then>...</then>
  *  <else>...</else>
  *  ...
- * </teststep|if>
+ * </if>
+ * 
+ * <if sequence=...>
+ *  <description>
+ *    ...
+ *  </description>
+ *  <parameter>
+ *    ...
+ *  </parameter>
+ *  <script> ... </script>
+ *  <then>...</then>
+ *  <else>...</else>
+ *  ...
+ * </if>
+ * 
+ * <if sequence=...>
+ *  <description>
+ *    ...
+ *  </description>
+ *  <parameter>
+ *    ...
+ *  </parameter>
+ *  <if> ... </if>
+ *  <then>...</then>
+ *  <else>...</else>
+ *  ...
+ * </if>
  * 
  * @author Arjan Kranenburg 
  * @see http://www.testtoolinterfaces.org
@@ -120,20 +146,24 @@ public class TestStepXmlHandler extends XmlHandler
 		Trace.println(Trace.CONSTRUCTOR, "TestStepXmlHandler( anXmlreader )", true);
 
 		myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
-		this.addStartElementHandler(DESCRIPTION_ELEMENT, myDescriptionXmlHandler);
-		myDescriptionXmlHandler.addEndElementHandler(DESCRIPTION_ELEMENT, this);
+		this.addElementHandler(DESCRIPTION_ELEMENT, myDescriptionXmlHandler);
 
 		myParameterXmlHandler = new ParameterXmlHandler(anXmlReader);
-		this.addStartElementHandler(ParameterXmlHandler.START_ELEMENT, myParameterXmlHandler);
-		myParameterXmlHandler.addEndElementHandler(ParameterXmlHandler.START_ELEMENT, this);
+		this.addElementHandler(ParameterXmlHandler.START_ELEMENT, myParameterXmlHandler);
 
-		myCommandXmlHandler = new CommandXmlHandler(anXmlReader, anInterfaceList);
-		this.addStartElementHandler(CommandXmlHandler.START_ELEMENT, myCommandXmlHandler);
-		myCommandXmlHandler.addEndElementHandler(CommandXmlHandler.START_ELEMENT, this);
+		try
+		{
+			myCommandXmlHandler = new CommandXmlHandler(anXmlReader, anInterfaceList);
+		}
+		catch (TestSuiteException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.addElementHandler(CommandXmlHandler.START_ELEMENT, myCommandXmlHandler);
 
 		myScriptXmlHandler = new ScriptXmlHandler(anXmlReader);
-		this.addStartElementHandler(ScriptXmlHandler.ELEMENT_START, myScriptXmlHandler);
-		myScriptXmlHandler.addEndElementHandler(ScriptXmlHandler.ELEMENT_START, this);
+		this.addElementHandler(ScriptXmlHandler.ELEMENT_START, myScriptXmlHandler);
 
 		myIfXmlHandler = null; // Created when needed to prevent loops
 		myThenXmlHandler = null; // Created when needed to prevent loops
@@ -213,24 +243,21 @@ public class TestStepXmlHandler extends XmlHandler
      		// We'll create a TestStepXmlHandler for if-steps only when we need it.
      		// Otherwise it would create an endless loop.
     		myIfXmlHandler = new TestStepXmlHandler(this.getXmlReader(), IF_ELEMENT, myInterfaces, myCheckStepParams);
-    		this.addStartElementHandler(IF_ELEMENT, myIfXmlHandler);
-    		myIfXmlHandler.addEndElementHandler(IF_ELEMENT, this);
+    		this.addElementHandler(IF_ELEMENT, myIfXmlHandler);
     	}
      	else if ( myThenXmlHandler == null && aQualifiedName.equalsIgnoreCase(THEN_ELEMENT) )
     	{
      		// We'll create a TestStepXmlHandler for if-steps only when we need it.
      		// Otherwise it would create an endless loop.
     		myThenXmlHandler = new TestStepSequenceXmlHandler(this.getXmlReader(), THEN_ELEMENT, myInterfaces, myCheckStepParams);
-    		this.addStartElementHandler(THEN_ELEMENT, myThenXmlHandler);
-    		myThenXmlHandler.addEndElementHandler(THEN_ELEMENT, this);
+    		this.addElementHandler(THEN_ELEMENT, myThenXmlHandler);
     	}
      	else if ( myElseXmlHandler == null && aQualifiedName.equalsIgnoreCase(ELSE_ELEMENT) )
     	{
      		// We'll create a TestStepXmlHandler for if-steps only when we need it.
      		// Otherwise it would create an endless loop.
     		myElseXmlHandler = new TestStepSequenceXmlHandler(this.getXmlReader(), ELSE_ELEMENT, myInterfaces, myCheckStepParams);
-    		this.addStartElementHandler(ELSE_ELEMENT, myElseXmlHandler);
-    		myElseXmlHandler.addEndElementHandler(ELSE_ELEMENT, this);
+    		this.addElementHandler(ELSE_ELEMENT, myElseXmlHandler);
     	}
 	}
 
@@ -322,21 +349,24 @@ public class TestStepXmlHandler extends XmlHandler
 		Trace.println(Trace.SUITE);
 
 		TestStep testStep = null;
-		if ( myCommand != null )
-		{
-			testStep = createTestStepCommand();
-		}
-		else if ( myScript != null )
-		{
-			testStep = createTestStepScript();
-		}
-		else if ( myIfStep != null && myThenSteps != null )
+		if ( this.getStartElement().equalsIgnoreCase(IF_ELEMENT) )
 		{
 			testStep = createTestStepSelection();
 		}
 		else
 		{
-			throw new TestSuiteException( "Cannot make a TestStep Command, Script, or Selection from given information" );
+			if ( myCommand != null )
+			{
+				testStep = createTestStepCommand();
+			}
+			else if ( myScript != null )
+			{
+				testStep = createTestStepScript();
+			}
+			else
+			{
+				throw new TestSuiteException( "Cannot make a TestStep Command, Script, or Selection from given information" );
+			}
 		}
 		
 		return testStep;
@@ -399,12 +429,32 @@ public class TestStepXmlHandler extends XmlHandler
 
 	/**
 	 * @return the TestStep as TestStepSelection
+	 * @throws TestSuiteException 
 	 */
-	private TestStepSelection createTestStepSelection()
+	private TestStepSelection createTestStepSelection() throws TestSuiteException
 	{
+		if ( myThenSteps == null )
+		{
+			throw new TestSuiteException( "No then-step defined for selection" );
+		}
+
+		TestStep ifStep = null;
+		if ( myCommand != null )
+		{
+			ifStep = createTestStepCommand();
+		}
+		else if ( myScript != null )
+		{
+			ifStep = createTestStepScript();
+		}
+		else if ( myIfStep != null )
+		{
+			ifStep = myIfStep;
+		}
+
 		return new TestStepSelection( mySequence,
 		                              myDescription,
-		                              myIfStep,
+		                              ifStep,
 		                              myThenSteps,
 		                              myElseSteps,
 		                              myAnyAttributes,

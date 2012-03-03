@@ -92,36 +92,30 @@ public class TestGroupXmlHandler extends XmlHandler
 //	    allowedTypes.add( TestStep.StepType.set );
 
 	    myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
-		this.addStartElementHandler(DESCRIPTION_ELEMENT, myDescriptionXmlHandler);
-		myDescriptionXmlHandler.addEndElementHandler(DESCRIPTION_ELEMENT, this);
+		this.addElementHandler(DESCRIPTION_ELEMENT, myDescriptionXmlHandler);
 
      	myRequirementIdXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, REQUIREMENT_ELEMENT);
-		this.addStartElementHandler(REQUIREMENT_ELEMENT, myRequirementIdXmlHandler);
-		myRequirementIdXmlHandler.addEndElementHandler(REQUIREMENT_ELEMENT, this);
+		this.addElementHandler(REQUIREMENT_ELEMENT, myRequirementIdXmlHandler);
 
     	myPrepareXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
     	                                                      PREPARE_ELEMENT,
 //    	                                                      allowedTypes,
     	                                                      anInterfaceList,
     	                                                      aCheckStepParameter );
-		this.addStartElementHandler(PREPARE_ELEMENT, myPrepareXmlHandler);
-		myPrepareXmlHandler.addEndElementHandler(PREPARE_ELEMENT, this);
+		this.addElementHandler(PREPARE_ELEMENT, myPrepareXmlHandler);
 
 		myTestCaseLinkXmlHandler = new TestCaseLinkXmlHandler(anXmlReader);
-		this.addStartElementHandler(TestCaseLinkXmlHandler.START_ELEMENT, myTestCaseLinkXmlHandler);
-		myTestCaseLinkXmlHandler.addEndElementHandler(TestCaseLinkXmlHandler.START_ELEMENT, this);
+		this.addElementHandler(TestCaseLinkXmlHandler.START_ELEMENT, myTestCaseLinkXmlHandler);
 
 		myTestGroupLinkXmlHandler = new TestGroupLinkXmlHandler(anXmlReader);
-		this.addStartElementHandler(TestGroupLinkXmlHandler.START_ELEMENT, myTestGroupLinkXmlHandler);
-		myTestGroupLinkXmlHandler.addEndElementHandler(TestGroupLinkXmlHandler.START_ELEMENT, this);
+		this.addElementHandler(TestGroupLinkXmlHandler.START_ELEMENT, myTestGroupLinkXmlHandler);
 
 		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
 		                                                      RESTORE_ELEMENT,
 //		                                                      allowedTypes,
 		                                                      anInterfaceList,
 		                                                      aCheckStepParameter );
-		this.addStartElementHandler(RESTORE_ELEMENT, myRestoreXmlHandler);
-		myRestoreXmlHandler.addEndElementHandler(RESTORE_ELEMENT, this);
+		this.addElementHandler(RESTORE_ELEMENT, myRestoreXmlHandler);
 		
 		this.reset();
 	}

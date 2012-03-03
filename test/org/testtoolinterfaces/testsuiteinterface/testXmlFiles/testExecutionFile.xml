@@ -4,9 +4,41 @@
 	  <description>A description of the first action step.</description>
 	  <command interface="ifName">action1</command>
 	  <parameter id="URL" type="string" sequence="1">
-	    <value>http://http://www.google.com/</value>
+	    <value>http://www.google.com/</value>
 	  </parameter>
 	</teststep>
+    <if sequence="2">
+	  <description>A description of the if step.</description>
+	  <command interface="ifName">action1</command>
+	  <parameter id="URL" type="string" sequence="1">
+	    <value>http://www.other.com/</value>
+	  </parameter>
+	  <then>
+	    <teststep sequence="1">
+		  <description>A description of the first action step.</description>
+		  <command interface="ifName">action1</command>
+		  <parameter id="URL" type="string" sequence="1">
+		    <value>http://www.google1.com/</value>
+		  </parameter>
+		</teststep>
+	  </then>
+	  <else>
+	    <teststep sequence="1">
+		  <description>A description of the first action step.</description>
+		  <command interface="ifName">action1</command>
+		  <parameter id="URL" type="string" sequence="1">
+		    <value>http://www.google2.com/</value>
+		  </parameter>
+		</teststep>
+	    <teststep sequence="2">
+		  <description>A description of the second action step.</description>
+		  <command interface="ifName">action1</command>
+		  <parameter id="URL" type="string" sequence="1">
+		    <value>http://www.google3.com/</value>
+		  </parameter>
+		</teststep>
+	  </else>
+	</if>
     <action sequence="5">
 	  <description>A description of the second action step.</description>
 	  <command interface="ifName">action3</command>

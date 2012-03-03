@@ -95,36 +95,31 @@ public class TestCaseXmlHandler extends XmlHandler
 //	    execAllowedTypes.add( TestStep.StepType.set );
 
 	    myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
-		this.addStartElementHandler(DESCRIPTION_ELEMENT, myDescriptionXmlHandler);
-		myDescriptionXmlHandler.addEndElementHandler(DESCRIPTION_ELEMENT, this);
+		this.addElementHandler(DESCRIPTION_ELEMENT, myDescriptionXmlHandler);
 
      	myRequirementIdXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, REQUIREMENT_ELEMENT);
-		this.addStartElementHandler(REQUIREMENT_ELEMENT, myRequirementIdXmlHandler);
-		myRequirementIdXmlHandler.addEndElementHandler(REQUIREMENT_ELEMENT, this);
+		this.addElementHandler(REQUIREMENT_ELEMENT, myRequirementIdXmlHandler);
 
     	myPrepareXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
     	                                                      PREPARE_ELEMENT,
 //    	                                                      prepRestAllowedTypes,
     	                                                      anInterfaceList,
     	                                                      aCheckStepParameter );
-		this.addStartElementHandler(PREPARE_ELEMENT, myPrepareXmlHandler);
-		myPrepareXmlHandler.addEndElementHandler(PREPARE_ELEMENT, this);
+		this.addElementHandler(PREPARE_ELEMENT, myPrepareXmlHandler);
 
 		myExecutionXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
 		                                                        EXECUTE_ELEMENT,
 //		                                                        execAllowedTypes,
 		                                                        anInterfaceList,
 		                                                        aCheckStepParameter );
-		this.addStartElementHandler(EXECUTE_ELEMENT, myExecutionXmlHandler);
-		myExecutionXmlHandler.addEndElementHandler(EXECUTE_ELEMENT, this);
+		this.addElementHandler(EXECUTE_ELEMENT, myExecutionXmlHandler);
 
 		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
 		                                                      RESTORE_ELEMENT,
 //		                                                      prepRestAllowedTypes,
 		                                                      anInterfaceList,
 		                                                      aCheckStepParameter );
-		this.addStartElementHandler(RESTORE_ELEMENT, myRestoreXmlHandler);
-		myRestoreXmlHandler.addEndElementHandler(RESTORE_ELEMENT, this);
+		this.addElementHandler(RESTORE_ELEMENT, myRestoreXmlHandler);
 
 		this.reset();
 	}

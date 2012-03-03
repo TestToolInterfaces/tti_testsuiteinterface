@@ -18,6 +18,12 @@ import org.xml.sax.XMLReader;
  *  </teststep>
  * </[tag]>
  * 
+  * <[tag]>
+ *  <if>
+ *  ...
+ *  </if>
+ * </[tag]>
+ * 
  * @author Arjan Kranenburg 
  * @see http://www.testtoolinterfaces.org
  * 
@@ -57,20 +63,16 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 		Trace.println(Trace.CONSTRUCTOR, "TestStepSequenceXmlHandler( anXmlreader, " + aTag + " )", true);
 
 		myStepXmlHandler = new TestStepXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
-		this.addStartElementHandler(TestStepXmlHandler.START_ELEMENT, myStepXmlHandler);
-		myStepXmlHandler.addEndElementHandler(TestStepXmlHandler.START_ELEMENT, this);
+		this.addElementHandler(TestStepXmlHandler.START_ELEMENT, myStepXmlHandler);
 
 		myIfXmlHandler = new TestStepXmlHandler(anXmlReader, TestStepXmlHandler.IF_ELEMENT, anInterfaceList, aCheckStepParameter);
-		this.addStartElementHandler(TestStepXmlHandler.IF_ELEMENT, myIfXmlHandler);
-		myIfXmlHandler.addEndElementHandler(TestStepXmlHandler.IF_ELEMENT, this);
+		this.addElementHandler(TestStepXmlHandler.IF_ELEMENT, myIfXmlHandler);
 
 		myActionXmlHandler = new TestStepXmlHandler(anXmlReader, TAG_ACTION, anInterfaceList, aCheckStepParameter);
-		this.addStartElementHandler(TAG_ACTION, myActionXmlHandler);
-		myActionXmlHandler.addEndElementHandler(TAG_ACTION, this);
+		this.addElementHandler(TAG_ACTION, myActionXmlHandler);
 
 		myCheckXmlHandler = new TestStepXmlHandler(anXmlReader, TAG_CHECK, anInterfaceList, aCheckStepParameter);
-		this.addStartElementHandler(TAG_CHECK, myCheckXmlHandler);
-		myCheckXmlHandler.addEndElementHandler(TAG_CHECK, this);
+		this.addElementHandler(TAG_CHECK, myCheckXmlHandler);
 
 //		myInterfaceList = anInterfaceList;
 //		myCheckStepParameter = aCheckStepParameter;

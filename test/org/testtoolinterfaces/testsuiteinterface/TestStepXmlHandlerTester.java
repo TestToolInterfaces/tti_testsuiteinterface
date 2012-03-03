@@ -14,14 +14,17 @@ import org.testtoolinterfaces.testsuite.TestInterfaceListHelper;
 import org.testtoolinterfaces.testsuite.TestInterface_stub;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepCommand;
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.xml.sax.XMLReader;
 
 public class TestStepXmlHandlerTester extends TestCase
 {
-	public static final String BASE_PATH = "C:\\Users\\Arjan\\Projects\\Testium\\Eclipses\\java\\workspace\\TestSuiteInterface";
 	TestInterface_stub myTestInterface;
 	TestInterfaceListHelper myTestInterfaceList;
-	
+
+	XMLReader myXmlReader;
+	TestStepXmlHandler myHandler;
+
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -44,11 +47,26 @@ public class TestStepXmlHandlerTester extends TestCase
 		if ( myTestInterfaceList == null )
 		{
 			myTestInterfaceList = new TestInterfaceListHelper();
+			myTestInterfaceList.put(new TestInterface_stub(CommandXmlHandler.DEFAULT_INTERFACE_NAME));
 			myTestInterfaceList.put(myTestInterface);
 			
 		}
 
+        // create a XML Reader
+		if ( myXmlReader == null )
+		{
+			SAXParserFactory spf = SAXParserFactory.newInstance();
+	        spf.setNamespaceAware(false);
 
+	        SAXParser saxParser = spf.newSAXParser();
+			myXmlReader = saxParser.getXMLReader();
+		}
+
+        // create a XML Reader
+		if ( myHandler == null )
+		{
+			myHandler = new TestStepXmlHandler( myXmlReader, myTestInterfaceList, false );
+		}
 	}
 
 	/**
@@ -56,7 +74,53 @@ public class TestStepXmlHandlerTester extends TestCase
 	 */
 	public void testCase_readTestStepCommand_1()
 	{
-		TestStep step = parseFile("testStep_commandNoParameters.xml");
+		parseFile("testStep_commandNoParameters.xml", myHandler);
+		TestStep step = new TestStepCommand( 9, "error", myTestInterface );
+		try
+		{
+			step = myHandler.getStep();
+			myHandler.reset();
+		}
+		catch (TestSuiteException e)
+		{
+			e.printStackTrace();
+			myHandler.reset();
+			fail( "TestStep could not be read" );
+		}
+
+		Assert.assertEquals("Incorrect sequence number", 1, step.getSequenceNr());
+    	Assert.assertEquals("Incorrect stepType", TestStepCommand.class, step.getClass());
+
+    	TestStepCommand stepCommand = (TestStepCommand) step;
+    	Assert.assertEquals("Incorrect Command", "action1", stepCommand.getCommand());
+    	Assert.assertEquals("Incorrect Interface", myTestInterface, stepCommand.getInterface());
+    	Assert.assertEquals("Incorrect Description", "A description of the first action step.", stepCommand.getDescription());
+
+    	ParameterArrayList Parameters = step.getParameters();
+    	Assert.assertEquals("Incorrect number of parameters", 0, Parameters.size());
+	}
+	
+	/**
+	 * Test Cases
+	 */
+	public void testCase_reset()
+	{
+		parseFile("testStep_commandNoParameters.xml", myHandler);
+		myHandler.reset();
+
+		parseFile("testStep_commandNoParameters.xml", myHandler);
+		TestStep step = new TestStepCommand( 9, "error", myTestInterface );
+		try
+		{
+			step = myHandler.getStep();
+			myHandler.reset();
+		}
+		catch (TestSuiteException e)
+		{
+			e.printStackTrace();
+			myHandler.reset();
+			fail( "TestStep could not be read" );
+		}
 
 		Assert.assertEquals("Incorrect sequence number", 1, step.getSequenceNr());
     	Assert.assertEquals("Incorrect stepType", TestStepCommand.class, step.getClass());
@@ -75,9 +139,21 @@ public class TestStepXmlHandlerTester extends TestCase
 	 */
 	public void testCase_readTestStepCommand_2()
 	{
-		TestStep step = parseFile("testStep_command1Parameter.xml");
+		parseFile("testStep_command1Parameter.xml", myHandler);
+		TestStep step = new TestStepCommand( 9, "error", myTestInterface );
+		try
+		{
+			step = myHandler.getStep();
+			myHandler.reset();
+		}
+		catch (TestSuiteException e)
+		{
+			e.printStackTrace();
+			myHandler.reset();
+			fail( "TestStep could not be read" );
+		}
 
-		Assert.assertEquals("Incorrect sequence number", 1, step.getSequenceNr());
+		Assert.assertEquals("Incorrect sequence number", 2, step.getSequenceNr());
     	Assert.assertEquals("Incorrect stepType", TestStepCommand.class, step.getClass());
 
     	TestStepCommand stepCommand = (TestStepCommand) step;
@@ -95,9 +171,21 @@ public class TestStepXmlHandlerTester extends TestCase
 	 */
 	public void testCase_readTestStepCommand_3()
 	{
-		TestStep step = parseFile("testStep_command2Parameters.xml");
+		parseFile("testStep_command2Parameters.xml", myHandler);
+		TestStep step = new TestStepCommand( 9, "error", myTestInterface );
+		try
+		{
+			step = myHandler.getStep();
+			myHandler.reset();
+		}
+		catch (TestSuiteException e)
+		{
+			e.printStackTrace();
+			myHandler.reset();
+			fail( "TestStep could not be read" );
+		}
 
-		Assert.assertEquals("Incorrect sequence number", 1, step.getSequenceNr());
+		Assert.assertEquals("Incorrect sequence number", 3, step.getSequenceNr());
     	Assert.assertEquals("Incorrect stepType", TestStepCommand.class, step.getClass());
 
     	TestStepCommand stepCommand = (TestStepCommand) step;
@@ -111,42 +199,27 @@ public class TestStepXmlHandlerTester extends TestCase
     	Assert.assertEquals("Incorrect parameter index", 3, Parameters.get(1).getIndex());
 	}
 	
-	private TestStep parseFile(String aFileName)
+	private void parseFile(String aFileName, TestStepXmlHandler aHandler)
 	{
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-        spf.setNamespaceAware(false);
-        SAXParser saxParser;
+        // assign the handler to the parser
+        myXmlReader.setContentHandler(aHandler);
+
+		File testXmlFilesDir = new File ( "test" + File.separator +
+		                                  "org" + File.separator +
+		                                  "testtoolinterfaces" + File.separator +
+		                                  "testsuiteinterface" + File.separator +
+		                                  "testXmlFiles" );
+
+		File xmlTestFile = new File ( testXmlFilesDir, aFileName);
+
 		try
 		{
-			saxParser = spf.newSAXParser();
-			XMLReader xmlReader = saxParser.getXMLReader();
-
-			// create a handler
-			TestStepXmlHandler handler = new TestStepXmlHandler( xmlReader,
-			                                                     myTestInterfaceList,
-			                                                     false );
-
-	        // assign the handler to the parser
-	        xmlReader.setContentHandler(handler);
-
-			File testXmlFilesDir = new File ( "test" + File.separator +
-			                                  "org" + File.separator +
-			                                  "testtoolinterfaces" + File.separator +
-			                                  "testsuiteinterface" + File.separator +
-			                                  "testXmlFiles" );
-
-			File xmlTestFile = new File ( testXmlFilesDir, aFileName);
-
 			// parse the document
-			xmlReader.parse(xmlTestFile.getAbsolutePath());
-
-	        return handler.getStep();
+			myXmlReader.parse(xmlTestFile.getAbsolutePath());
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-		
-		return new TestStepCommand( 9, "error", myTestInterface );
 	}
 }

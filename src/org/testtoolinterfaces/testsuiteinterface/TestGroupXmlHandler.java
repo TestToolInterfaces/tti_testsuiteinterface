@@ -88,28 +88,28 @@ public class TestGroupXmlHandler extends XmlHandler
 		Trace.println(Trace.CONSTRUCTOR);
 		
 	    myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
-		this.addElementHandler(DESCRIPTION_ELEMENT, myDescriptionXmlHandler);
+		this.addElementHandler(myDescriptionXmlHandler);
 
      	myRequirementIdXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, REQUIREMENT_ELEMENT);
-		this.addElementHandler(REQUIREMENT_ELEMENT, myRequirementIdXmlHandler);
+		this.addElementHandler(myRequirementIdXmlHandler);
 
     	myPrepareXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
     	                                                      PREPARE_ELEMENT,
     	                                                      anInterfaceList,
     	                                                      aCheckStepParameter );
-		this.addElementHandler(PREPARE_ELEMENT, myPrepareXmlHandler);
+		this.addElementHandler(myPrepareXmlHandler);
 
 		myTestCaseLinkXmlHandler = new TestCaseLinkXmlHandler(anXmlReader);
-		this.addElementHandler(TestCaseLinkXmlHandler.START_ELEMENT, myTestCaseLinkXmlHandler);
+		this.addElementHandler(myTestCaseLinkXmlHandler);
 
 		myTestGroupLinkXmlHandler = new TestGroupLinkXmlHandler(anXmlReader);
-		this.addElementHandler(TestGroupLinkXmlHandler.START_ELEMENT, myTestGroupLinkXmlHandler);
+		this.addElementHandler(myTestGroupLinkXmlHandler);
 
 		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
 		                                                      RESTORE_ELEMENT,
 		                                                      anInterfaceList,
 		                                                      aCheckStepParameter );
-		this.addElementHandler(RESTORE_ELEMENT, myRestoreXmlHandler);
+		this.addElementHandler(myRestoreXmlHandler);
 		
 		this.reset();
 	}

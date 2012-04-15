@@ -4,6 +4,7 @@
 package org.testtoolinterfaces.testsuite;
 
 import java.util.Hashtable;
+import java.util.Iterator;
 
 /**
  * Wrapper for a list of TestInterfaces. A second list is kept as (read-only) reference.
@@ -58,5 +59,11 @@ public class LooseTestInterfaceList implements TestInterfaceList
 		}
 
 		return testInterface;
+	}
+
+	@Override
+	public Iterator<TestInterface> iterator()
+	{
+		return myList.values().iterator();
 	}
 }

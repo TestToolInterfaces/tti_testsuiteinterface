@@ -1,6 +1,7 @@
 package org.testtoolinterfaces.testsuite;
 
 import java.util.Hashtable;
+import java.util.Iterator;
 
 import org.testtoolinterfaces.testsuite.TestInterface;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
@@ -26,6 +27,12 @@ public class TestInterfaceListHelper implements TestInterfaceList
 	public TestInterface getInterface(String anInterfaceName)
 	{
 		return ifaceList.get(anInterfaceName);
+	}
+
+	@Override
+	public Iterator<TestInterface> iterator()
+	{
+		return ifaceList.values().iterator();
 	}
 
 }

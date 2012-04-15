@@ -1,5 +1,9 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import org.testtoolinterfaces.testsuite.TestInterface;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
@@ -30,6 +34,7 @@ import org.xml.sax.XMLReader;
  */
 public class TestStepSequenceXmlHandler extends XmlHandler
 {
+	// These are used for legacy reasons
 	private static final String TAG_ACTION   = "action";
 	private static final String TAG_CHECK    = "check";
 	
@@ -73,9 +78,6 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 
 		myCheckXmlHandler = new TestStepXmlHandler(anXmlReader, TAG_CHECK, anInterfaceList, aCheckStepParameter);
 		this.addElementHandler(TAG_CHECK, myCheckXmlHandler);
-
-//		myInterfaceList = anInterfaceList;
-//		myCheckStepParameter = aCheckStepParameter;
 
 		this.reset();
 	}

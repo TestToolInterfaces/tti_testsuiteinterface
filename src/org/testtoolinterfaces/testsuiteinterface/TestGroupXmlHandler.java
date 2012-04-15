@@ -87,10 +87,6 @@ public class TestGroupXmlHandler extends XmlHandler
 		super(anXmlReader, START_ELEMENT);
 		Trace.println(Trace.CONSTRUCTOR);
 		
-//	    ArrayList<TestStep.StepType> allowedTypes = new ArrayList<TestStep.StepType>();
-//	    allowedTypes.add( TestStep.StepType.action );
-//	    allowedTypes.add( TestStep.StepType.set );
-
 	    myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
 		this.addElementHandler(DESCRIPTION_ELEMENT, myDescriptionXmlHandler);
 
@@ -99,7 +95,6 @@ public class TestGroupXmlHandler extends XmlHandler
 
     	myPrepareXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
     	                                                      PREPARE_ELEMENT,
-//    	                                                      allowedTypes,
     	                                                      anInterfaceList,
     	                                                      aCheckStepParameter );
 		this.addElementHandler(PREPARE_ELEMENT, myPrepareXmlHandler);
@@ -112,7 +107,6 @@ public class TestGroupXmlHandler extends XmlHandler
 
 		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
 		                                                      RESTORE_ELEMENT,
-//		                                                      allowedTypes,
 		                                                      anInterfaceList,
 		                                                      aCheckStepParameter );
 		this.addElementHandler(RESTORE_ELEMENT, myRestoreXmlHandler);

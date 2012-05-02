@@ -145,11 +145,10 @@ public class TestStepSequenceXmlHandlerTester extends TestCase
 
 	private void parseFile_withExc(String aFileName, XmlHandler aHandler) throws Exception
 	{
-		File testXmlFilesDir = new File ( "test" + File.separator +
-		                                  "org" + File.separator +
-		                                  "testtoolinterfaces" + File.separator +
-		                                  "testsuiteinterface" + File.separator +
-		                                  "testXmlFiles" );
+		File testXmlFilesDir = new File ( "src" + File.separator +
+                "test" + File.separator +
+                "resources" + File.separator +
+                "testXmlFiles" );
 
 		File xmlTestFile = new File ( testXmlFilesDir, aFileName);
 

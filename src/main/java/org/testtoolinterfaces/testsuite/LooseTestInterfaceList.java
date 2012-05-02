@@ -39,7 +39,6 @@ public class LooseTestInterfaceList implements TestInterfaceList
 		this( null );
 	}
 
-	@Override
 	public TestInterface getInterface(String anInterfaceName)
 	{
 		TestInterface testInterface = null;
@@ -61,7 +60,6 @@ public class LooseTestInterfaceList implements TestInterfaceList
 		return testInterface;
 	}
 
-	@Override
 	public Iterator<TestInterface> iterator()
 	{
 		return myList.values().iterator();

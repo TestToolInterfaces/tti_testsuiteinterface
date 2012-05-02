@@ -23,13 +23,11 @@ public class TestInterfaceListHelper implements TestInterfaceList
 		ifaceList.put(anInterface.getInterfaceName(), anInterface);
 	}
 
-	@Override
 	public TestInterface getInterface(String anInterfaceName)
 	{
 		return ifaceList.get(anInterfaceName);
 	}
 
-	@Override
 	public Iterator<TestInterface> iterator()
 	{
 		return ifaceList.values().iterator();

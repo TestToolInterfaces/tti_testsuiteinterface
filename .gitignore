@@ -6,3 +6,4 @@
 .project
 bin
 /build
+/target

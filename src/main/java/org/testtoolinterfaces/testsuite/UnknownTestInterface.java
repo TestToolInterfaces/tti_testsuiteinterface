@@ -35,7 +35,6 @@ public class UnknownTestInterface implements TestInterface
 	}
 
 	@Deprecated
-	@Override
 	public ParameterImpl createParameter(String aName, String aType, String aValue)
 					 throws TestSuiteException
 	{
@@ -44,27 +43,23 @@ public class UnknownTestInterface implements TestInterface
 	}
 
 	@Deprecated
-	@Override
 	public ArrayList<String> getCommands()
 	{
 		return new ArrayList<String>();
 	}
 
-	@Override
 	public String getInterfaceName()
 	{
 		return myName;
 	}
 
 	@Deprecated
-	@Override
 	public boolean hasCommand(String aCommand)
 	{
 		return false;
 	}
 
 	@Deprecated
-	@Override
 	public boolean verifyParameters( String aCommand,
 									 ParameterArrayList aParameters )
 				   throws TestSuiteException

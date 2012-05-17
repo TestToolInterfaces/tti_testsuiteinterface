@@ -16,13 +16,11 @@ public class TestInterface_stub implements TestInterface
 		myCommands = new ArrayList<String>();
 	}
 
-	@Override
 	public String getInterfaceName()
 	{
 		return myName;
 	}
 
-	@Override
 	public ArrayList<String> getCommands()
 	{
 		return myCommands;
@@ -33,13 +31,11 @@ public class TestInterface_stub implements TestInterface
 		myCommands.add( aCommand );
 	}
 
-	@Override
 	public boolean hasCommand(String aCommand)
 	{
 		return myCommands.contains(aCommand);
 	}
 
-	@Override
 	public boolean verifyParameters( String aCommand,
 									 ParameterArrayList aParameters )
 			throws TestSuiteException
@@ -47,7 +43,6 @@ public class TestInterface_stub implements TestInterface
 		return true;
 	}
 
-	@Override
 	public ParameterImpl createParameter( String aName,
 	                                  String aType,
 	                                  String aValue ) throws TestSuiteException

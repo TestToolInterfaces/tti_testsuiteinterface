@@ -75,11 +75,10 @@ public class ParameterXmlHandlerTester extends TestCase
 	
 	private void parseFile(String aFileName) throws IOException, SAXException
 	{
-		File testXmlFilesDir = new File ( "test" + File.separator +
-		                                  "org" + File.separator +
-		                                  "testtoolinterfaces" + File.separator +
-		                                  "testsuiteinterface" + File.separator +
-		                                  "testXmlFiles" );
+		File testXmlFilesDir = new File ( "src" + File.separator +
+                "test" + File.separator +
+                "resources" + File.separator +
+                "testXmlFiles" );
 
 		File xmlTestFile = new File ( testXmlFilesDir, aFileName);
 

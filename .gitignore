@@ -6,3 +6,5 @@
 .project
 bin
 /build
+/pom.xml.asc
+/target

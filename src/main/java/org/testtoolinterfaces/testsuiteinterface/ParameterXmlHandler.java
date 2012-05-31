@@ -68,10 +68,10 @@ public class ParameterXmlHandler extends XmlHandler
 		myParameterXmlHandler = null; // Created when needed to prevent loops
 
 		myValueXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, VALUE_ELEMENT);
-		this.addElementHandler(VALUE_ELEMENT, myValueXmlHandler);
+		this.addElementHandler(myValueXmlHandler);
 
 		myVariableXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, VARIABLE_ELEMENT);
-		this.addElementHandler(VARIABLE_ELEMENT, myVariableXmlHandler);
+		this.addElementHandler(myVariableXmlHandler);
 
 		reset();
 	}
@@ -135,7 +135,7 @@ public class ParameterXmlHandler extends XmlHandler
      		// We'll create a ParameterXmlHandler for Sub Parameters only when we need it.
      		// Otherwise it would create an endless loop.
      		myParameterXmlHandler = new ParameterXmlHandler( this.getXmlReader() );
-   			this.addElementHandler(START_ELEMENT, myParameterXmlHandler);
+   			this.addElementHandler(myParameterXmlHandler);
     	}
 	}
 

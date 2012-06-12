@@ -67,4 +67,14 @@ public class UnknownTestInterface implements TestInterface
 		return true;
 	}
 
+	@Override
+	public String toString()
+	{
+		return this.getInterfaceName();
+	}
+
+	public void destroy()
+	{
+		// NOP	
+	}
 }

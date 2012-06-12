@@ -59,4 +59,9 @@ public class TestInterface_stub implements TestInterface
 
 		throw new TestSuiteException("Parameter type " + aType + " is not supported for this interface", aName);
 	}
+
+	public void destroy()
+	{
+		// NOP	
+	}
 }

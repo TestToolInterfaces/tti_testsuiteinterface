@@ -25,9 +25,9 @@ import org.xml.sax.XMLReader;
  *  <prepare>
  *   ...
  *  </prepare>
- *  <execution>
+ *  <execute>
  *   ...
- *  </execution>
+ *  </execute>
  *  <restore>
  *   ...
  *  </restore>

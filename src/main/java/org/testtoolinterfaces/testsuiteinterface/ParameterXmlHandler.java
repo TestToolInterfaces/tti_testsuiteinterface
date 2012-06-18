@@ -222,7 +222,7 @@ public class ParameterXmlHandler extends XmlHandler
 		Trace.println(Trace.SUITE);
 		
 		myParameterId = "";
-		myParameterType = "string";
+		myParameterType = "String";
 		mySequence = Integer.MAX_VALUE;
 	    myAnyAttributes = new Hashtable<String, String>();
 

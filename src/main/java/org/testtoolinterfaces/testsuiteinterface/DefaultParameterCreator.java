@@ -39,9 +39,25 @@ public abstract class DefaultParameterCreator
 			return new ParameterImpl(aName, (String) aValue);
 		}			
 
-		if ( aType.equalsIgnoreCase( "int" ) )
+		if ( aValue.isEmpty() )
+		{
+			// Strings can be empty, so that's handled before.
+			throw new TestSuiteException( "Value of " + aName + " cannot be empty for type " + aType );
+		}
+
+		if ( aType.equalsIgnoreCase( "int" ) || aType.equalsIgnoreCase( "integer" ) )
 		{
 			return new ParameterImpl(aName, new Integer(aValue) );
+		}
+
+		if ( aType.equalsIgnoreCase( "long" ) )
+		{
+			return new ParameterImpl(aName, new Long(aValue) );
+		}
+
+		if ( aType.equalsIgnoreCase( "bool" ) || aType.equalsIgnoreCase( "boolean" ) )
+		{
+			return new ParameterImpl(aName, new Boolean(aValue) );
 		}
 
 		throw new TestSuiteException("Parameter type " + aType + " is not supported for this interface", aName);

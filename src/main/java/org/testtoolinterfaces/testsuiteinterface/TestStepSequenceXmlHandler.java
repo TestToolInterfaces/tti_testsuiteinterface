@@ -1,9 +1,5 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import org.testtoolinterfaces.testsuite.TestInterface;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
@@ -47,8 +43,8 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 	
 //	private ArrayList<StepType> myAllowedStepTypes;
 	
-//	private TestInterfaceList myInterfaceList;
-//	private boolean myCheckStepParameter;
+	private TestInterfaceList myInterfaceList;
+	private boolean myCheckStepParameter;
 
 	/**
 	 * Creates the XML Handler
@@ -68,17 +64,19 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 		Trace.println(Trace.CONSTRUCTOR, "TestStepSequenceXmlHandler( anXmlreader, " + aTag + " )", true);
 
 		myStepXmlHandler = new TestStepXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
-		this.addElementHandler(TestStepXmlHandler.START_ELEMENT, myStepXmlHandler);
+		this.addElementHandler(myStepXmlHandler);
 
-		myIfXmlHandler = new TestStepXmlHandler(anXmlReader, TestStepXmlHandler.IF_ELEMENT, anInterfaceList, aCheckStepParameter);
-		this.addElementHandler(TestStepXmlHandler.IF_ELEMENT, myIfXmlHandler);
-
+		// myIfXmlHandler is created when needed to prevent loops
+		
 		myActionXmlHandler = new TestStepXmlHandler(anXmlReader, TAG_ACTION, anInterfaceList, aCheckStepParameter);
-		this.addElementHandler(TAG_ACTION, myActionXmlHandler);
+		this.addElementHandler(myActionXmlHandler);
 
 		myCheckXmlHandler = new TestStepXmlHandler(anXmlReader, TAG_CHECK, anInterfaceList, aCheckStepParameter);
-		this.addElementHandler(TAG_CHECK, myCheckXmlHandler);
+		this.addElementHandler(myCheckXmlHandler);
 
+		myInterfaceList = anInterfaceList;
+		myCheckStepParameter = aCheckStepParameter;
+		
 		this.reset();
 	}
 
@@ -109,7 +107,13 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 	@Override
 	public void handleGoToChildElement(String aQualifiedName)
 	{
-    	//nop
+     	if ( myIfXmlHandler == null && aQualifiedName.equalsIgnoreCase(TestStepXmlHandler.IF_ELEMENT) )
+    	{
+     		// We'll create a TestStepXmlHandler for if-steps only when we need it.
+     		// Otherwise it would create an endless loop.
+    		myIfXmlHandler = new TestStepXmlHandler(this.getXmlReader(), TestStepXmlHandler.IF_ELEMENT, myInterfaceList, myCheckStepParameter);
+    		this.addElementHandler(myIfXmlHandler);
+    	}
 	}
 
 	@Override

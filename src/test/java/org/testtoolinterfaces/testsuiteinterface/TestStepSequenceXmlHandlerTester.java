@@ -1,6 +1,7 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
 import java.io.File;
+import java.util.Iterator;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -111,9 +112,19 @@ public class TestStepSequenceXmlHandlerTester extends TestCase
     						 steps[3].getDescription() );
 
     	Assert.assertEquals("Incorrect Command", "action1", ((TestStepCommand) steps[0]).getCommand());
-       	Assert.assertEquals("Incorrect Command", TestStepSelection.class, steps[1].getClass() );
+       	Assert.assertEquals("Incorrect TestStep type", TestStepSelection.class, steps[1].getClass() );
+
        	TestStepSelection ifStep = (TestStepSelection) steps[1];
        	Assert.assertEquals("Incorrect Command", "action1",  ((TestStepCommand) ifStep.getIfStep()).getCommand());
+
+       	TestStepSequence thenSteps = ifStep.getThenSteps();
+       	Iterator<TestStep> thenItr = thenSteps.iterator();
+       	Assert.assertEquals("Incorrect Command", "action1",  ((TestStepCommand) thenItr.next()).getCommand());
+       	
+       	TestStepSequence elseSteps = ifStep.getElseSteps();
+       	Iterator<TestStep> elseItr = elseSteps.iterator();
+       	Assert.assertEquals("Incorrect Command", "action1",  ((TestStepCommand) elseItr.next()).getCommand());
+       	
        	Assert.assertEquals("Incorrect Command", "check1",  ((TestStepCommand) steps[2]).getCommand());
        	Assert.assertEquals("Incorrect Command", "action3", ((TestStepCommand) steps[3]).getCommand());
  	}

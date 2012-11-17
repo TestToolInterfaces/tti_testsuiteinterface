@@ -95,31 +95,31 @@ public class TestCaseXmlHandler extends XmlHandler
 //	    execAllowedTypes.add( TestStep.StepType.set );
 
 	    myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
-		this.addElementHandler(DESCRIPTION_ELEMENT, myDescriptionXmlHandler);
+		this.addElementHandler(myDescriptionXmlHandler);
 
      	myRequirementIdXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, REQUIREMENT_ELEMENT);
-		this.addElementHandler(REQUIREMENT_ELEMENT, myRequirementIdXmlHandler);
+		this.addElementHandler(myRequirementIdXmlHandler);
 
     	myPrepareXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
     	                                                      PREPARE_ELEMENT,
 //    	                                                      prepRestAllowedTypes,
     	                                                      anInterfaceList,
     	                                                      aCheckStepParameter );
-		this.addElementHandler(PREPARE_ELEMENT, myPrepareXmlHandler);
+		this.addElementHandler(myPrepareXmlHandler);
 
 		myExecutionXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
 		                                                        EXECUTE_ELEMENT,
 //		                                                        execAllowedTypes,
 		                                                        anInterfaceList,
 		                                                        aCheckStepParameter );
-		this.addElementHandler(EXECUTE_ELEMENT, myExecutionXmlHandler);
+		this.addElementHandler(myExecutionXmlHandler);
 
 		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
 		                                                      RESTORE_ELEMENT,
 //		                                                      prepRestAllowedTypes,
 		                                                      anInterfaceList,
 		                                                      aCheckStepParameter );
-		this.addElementHandler(RESTORE_ELEMENT, myRestoreXmlHandler);
+		this.addElementHandler(myRestoreXmlHandler);
 
 		this.reset();
 	}

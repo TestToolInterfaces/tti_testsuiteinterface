@@ -32,7 +32,7 @@
 		</teststep>
 	    <teststep sequence="2">
 		  <description>A description of the second action step.</description>
-		  <command interface="ifName">action1</command>
+		  <command interface="ifName">action3</command>
 		  <parameter id="URL" type="string" sequence="1">
 		    <value>http://www.google3.com/</value>
 		  </parameter>

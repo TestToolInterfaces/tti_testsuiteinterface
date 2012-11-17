@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<if sequence="4">
+  <description>A description of the if step.</description>
+  <command interface="ifName">action1</command>
+  <parameter id="URL" type="string" sequence="1">
+    <value>http://www.google.com/</value>
+  </parameter>
+  <then>
+	<teststep sequence="2">
+	  <description>A description of the then step.</description>
+	  <command interface="ifName">action1</command>
+	  <parameter id="URL" type="string" sequence="1">
+	    <value>http://www.google.com/</value>
+	  </parameter>
+	</teststep>
+  </then>
+</if>

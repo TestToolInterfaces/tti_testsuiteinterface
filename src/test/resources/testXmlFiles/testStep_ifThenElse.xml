@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<if sequence="4">
+  <description>A description of the if step.</description>
+  <command interface="ifName">action1</command>
+  <parameter id="URL" type="string" sequence="1">
+    <value>http://www.google.com/</value>
+  </parameter>
+  <then>
+	<teststep sequence="2">
+	  <description>A description of the then step.</description>
+	  <command interface="ifName">action1</command>
+	  <parameter id="URL" type="string" sequence="1">
+	    <value>http://www.google.com/</value>
+	  </parameter>
+	</teststep>
+  </then>
+  <else>
+	<teststep sequence="1">
+	  <description>A description of the first else step.</description>
+	  <command interface="ifName">action1</command>
+	  <parameter id="URL" type="string" sequence="1">
+	    <value>http://www.google.com/</value>
+	  </parameter>
+	</teststep>
+	<teststep sequence="2">
+	  <description>A description of the second else step.</description>
+	  <command interface="ifName">action3</command>
+	  <parameter id="URL" type="string" sequence="1">
+	    <value>http://www.google.com/</value>
+	  </parameter>
+	</teststep>
+  </else>
+</if>

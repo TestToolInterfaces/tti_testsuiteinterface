@@ -127,7 +127,7 @@ public abstract class TestLinkXmlHandler extends XmlHandler
 		myLink = "";
 		
 		myId = "";
-		myType = "";
+		myType = TestLink.TYPE_TTI; //default
 		mySequence = 0;
 		myAnyAttributes = new Hashtable<String, String>();
 	}

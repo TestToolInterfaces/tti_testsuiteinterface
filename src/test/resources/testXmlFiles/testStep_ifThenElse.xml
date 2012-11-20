@@ -15,14 +15,14 @@
 	</teststep>
   </then>
   <else>
-	<teststep sequence="1">
+	<teststep>
 	  <description>A description of the first else step.</description>
 	  <command interface="ifName">action1</command>
 	  <parameter id="URL" type="string" sequence="1">
 	    <value>http://www.google.com/</value>
 	  </parameter>
 	</teststep>
-	<teststep sequence="2">
+	<teststep>
 	  <description>A description of the second else step.</description>
 	  <command interface="ifName">action3</command>
 	  <parameter id="URL" type="string" sequence="1">

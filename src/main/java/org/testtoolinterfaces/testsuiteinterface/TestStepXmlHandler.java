@@ -92,7 +92,6 @@ public class TestStepXmlHandler extends XmlHandler
 	private CommandXmlHandler myCommandXmlHandler;
 	private ScriptXmlHandler myScriptXmlHandler;
 	private ParameterXmlHandler myParameterXmlHandler;
-//	private TestStepXmlHandler myIfXmlHandler;
 	private TestStepSequenceXmlHandler myThenXmlHandler;
 	private TestStepSequenceXmlHandler myElseXmlHandler;
 
@@ -113,7 +112,6 @@ public class TestStepXmlHandler extends XmlHandler
 	private String myScriptType;
 
     // In case of a TestStepSelection
-//	private TestStep myIfStep;
 	private TestStepSequence myThenSteps;
 	private TestStepSequence myElseSteps;
 
@@ -230,27 +228,7 @@ public class TestStepXmlHandler extends XmlHandler
 	@Override
 	public void handleGoToChildElement(String aQualifiedName)
 	{
-//     	if ( myIfXmlHandler == null && aQualifiedName.equalsIgnoreCase(IF_ELEMENT) )
-//    	{
-//     		// We'll create a TestStepXmlHandler for if-steps only when we need it.
-//     		// Otherwise it would create an endless loop.
-//    		myIfXmlHandler = new TestStepXmlHandler(this.getXmlReader(), IF_ELEMENT, myInterfaces, myCheckStepParams);
-//    		this.addElementHandler(myIfXmlHandler);
-//    	}
-//     	else if ( myThenXmlHandler == null && aQualifiedName.equalsIgnoreCase(THEN_ELEMENT) )
-//    	{
-//     		// We'll create a TestStepXmlHandler for if-steps only when we need it.
-//     		// Otherwise it would create an endless loop.
-//    		myThenXmlHandler = new TestStepSequenceXmlHandler(this.getXmlReader(), THEN_ELEMENT, myInterfaces, myCheckStepParams);
-//    		this.addElementHandler(myThenXmlHandler);
-//    	}
-//     	else if ( myElseXmlHandler == null && aQualifiedName.equalsIgnoreCase(ELSE_ELEMENT) )
-//    	{
-//     		// We'll create a TestStepXmlHandler for if-steps only when we need it.
-//     		// Otherwise it would create an endless loop.
-//    		myElseXmlHandler = new TestStepSequenceXmlHandler(this.getXmlReader(), ELSE_ELEMENT, myInterfaces, myCheckStepParams);
-//    		this.addElementHandler(myElseXmlHandler);
-//    	}
+		// NOP
 	}
 
 	@Override
@@ -306,19 +284,6 @@ public class TestStepXmlHandler extends XmlHandler
     		myScriptType = myScriptXmlHandler.getType();
     		myScriptXmlHandler.reset();
     	}
-//    	else if (aQualifiedName.equalsIgnoreCase(IF_ELEMENT))
-//    	{
-//			try
-//			{
-//				myIfStep = myIfXmlHandler.getStep();
-//			}
-//			catch (TestSuiteException e)
-//			{
-//				Warning.println("Cannot get if-step: " + e.getMessage());
-//				Trace.print(Trace.SUITE, e);
-//			}
-//			myIfXmlHandler.reset();
-//    	}
     	else if (aQualifiedName.equalsIgnoreCase(THEN_ELEMENT))
     	{
 			myThenSteps = myThenXmlHandler.getSteps();

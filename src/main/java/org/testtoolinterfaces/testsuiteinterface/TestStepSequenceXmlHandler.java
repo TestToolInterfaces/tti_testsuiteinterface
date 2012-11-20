@@ -1,6 +1,7 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
+import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
@@ -45,6 +46,8 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 	
 	private TestInterfaceList myInterfaceList;
 	private boolean myCheckStepParameter;
+	
+	private int myNextSequenceNr = 0;
 
 	/**
 	 * Creates the XML Handler
@@ -121,24 +124,30 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 				throws TestSuiteException
 	{
 		Trace.println(Trace.SUITE);
+
+		TestStep step = null;
     	if (aQualifiedName.equalsIgnoreCase(TestStepXmlHandler.START_ELEMENT))
     	{
-    		mySteps.add( myStepXmlHandler.getStep() );
+    		step = myStepXmlHandler.getStep();
+//    		mySteps.add( myStepXmlHandler.getStep() );
     		myStepXmlHandler.reset();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(TestStepXmlHandler.IF_ELEMENT))
     	{
-    		mySteps.add( myIfXmlHandler.getStep() );
+    		step = myIfXmlHandler.getStep();
+//    		mySteps.add( myIfXmlHandler.getStep() );
     		myIfXmlHandler.reset();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(TAG_CHECK))
     	{
-    		mySteps.add( myCheckXmlHandler.getStep() );
+    		step = myCheckXmlHandler.getStep();
+//    		mySteps.add( myCheckXmlHandler.getStep() );
         	myCheckXmlHandler.reset();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(TAG_ACTION))
     	{
-    		mySteps.add( myActionXmlHandler.getStep() );
+    		step = myActionXmlHandler.getStep();
+//    		mySteps.add( myActionXmlHandler.getStep() );
         	myActionXmlHandler.reset();
     	}
     	else
@@ -146,6 +155,18 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 			throw new Error( "Child XML Handler returned, but not recognized. The handler was probably defined " +
 			                 "in the Constructor but not handled in handleReturnFromChildElement()");
     	}
+
+    	if ( step != null ) {
+    		if (step.getSequenceNr() == 0 ) {
+        		step.setSequenceNr( this.myNextSequenceNr );
+    		} else {
+    			myNextSequenceNr = step.getSequenceNr();
+    		}
+    		mySteps.add( step );
+    		
+    		myNextSequenceNr++;
+    	}
+
 	}
 
 	/**

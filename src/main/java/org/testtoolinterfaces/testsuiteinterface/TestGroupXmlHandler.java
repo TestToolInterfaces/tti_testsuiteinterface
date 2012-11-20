@@ -75,6 +75,7 @@ public class TestGroupXmlHandler extends XmlHandler
 	private TestGroupLinkXmlHandler myTestGroupLinkXmlHandler;
 	private TestStepSequenceXmlHandler myRestoreXmlHandler;
 	
+	private int myNextExecutionSequenceNr = 0;
 	/**
 	 * Creates the XML Handler
 	 * 
@@ -193,12 +194,20 @@ public class TestGroupXmlHandler extends XmlHandler
     	}
     	else if (aQualifiedName.equalsIgnoreCase(TestGroupLinkXmlHandler.START_ELEMENT))
     	{
-			myTestEntries.add((TestEntry) myTestGroupLinkXmlHandler.getTestGroupLink());
-			myTestGroupLinkXmlHandler.reset();
+    		TestEntry testEntry = (TestEntry) myTestGroupLinkXmlHandler.getTestGroupLink();
+//   			myTestEntries.add((TestEntry) myTestGroupLinkXmlHandler.getTestGroupLink());
+    		setSequenceNr(testEntry);
+    		myTestEntries.add( testEntry );
+
+    		myTestGroupLinkXmlHandler.reset();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(TestCaseLinkXmlHandler.START_ELEMENT))
     	{
-			myTestEntries.add((TestEntry) myTestCaseLinkXmlHandler.getTestCaseLink());
+    		TestEntry testEntry = (TestEntry) myTestCaseLinkXmlHandler.getTestCaseLink();
+//    		myTestEntries.add((TestEntry) myTestCaseLinkXmlHandler.getTestCaseLink());
+    		setSequenceNr(testEntry);
+    		myTestEntries.add( testEntry );
+
 			myTestCaseLinkXmlHandler.reset();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(RESTORE_ELEMENT))
@@ -211,6 +220,19 @@ public class TestGroupXmlHandler extends XmlHandler
 			throw new Error( "Child XML Handler returned, but not recognized. The handler was probably defined " +
 			                 "in the Constructor but not handled in handleReturnFromChildElement()");
     	}
+	}
+
+	/**
+	 * @param testEntry
+	 */
+	private void setSequenceNr(TestEntry testEntry) {
+		if (testEntry.getSequenceNr() == 0 ) {
+			testEntry.setSequenceNr( this.myNextExecutionSequenceNr );
+		} else {
+			myNextExecutionSequenceNr = testEntry.getSequenceNr();
+		}
+		
+		myNextExecutionSequenceNr++;
 	}
 
 	@Override

@@ -7,7 +7,7 @@
 	    <value>http://www.google.com/</value>
 	  </parameter>
 	</teststep>
-    <if sequence="2">
+    <if>
 	  <description>A description of the if step.</description>
 	  <command interface="ifName">action1</command>
 	  <parameter id="URL" type="string" sequence="1">

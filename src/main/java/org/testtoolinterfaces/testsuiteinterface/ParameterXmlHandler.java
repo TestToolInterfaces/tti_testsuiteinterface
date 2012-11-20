@@ -44,14 +44,14 @@ public class ParameterXmlHandler extends XmlHandler
 
 	private String myParameterId;
 	private String myParameterType;
-	private int mySequence;
+	private int mySequence = 0;
 	private Hashtable<String, String> myAnyAttributes;
 
 	private String myValue;
 	private ParameterArrayList mySubParameters;	
     private String myVariableName;
-	private Hashtable<String, String> myAnyElements;
-	private String myCurrentAnyValue;
+//	private Hashtable<String, String> myAnyElements;
+//	private String myCurrentAnyValue;
 
     private TestInterface myCurrentInterface;
     
@@ -212,6 +212,7 @@ public class ParameterXmlHandler extends XmlHandler
 			throw new TestSuiteException("Unknown Value, Variable, or Sub-Parameter");
 		}
 		parameter.setIndex(mySequence);
+		mySequence++;
 
 		return parameter;
 	}
@@ -223,15 +224,15 @@ public class ParameterXmlHandler extends XmlHandler
 		
 		myParameterId = "";
 		myParameterType = "String";
-		mySequence = Integer.MAX_VALUE;
+//		mySequence = Integer.MAX_VALUE;
 	    myAnyAttributes = new Hashtable<String, String>();
 
 		myValue = null;
 	    mySubParameters = new ParameterArrayList();
 	    myVariableName = "";
 
-		myAnyElements = new Hashtable<String, String>();
-	    myCurrentAnyValue = "";
+//		myAnyElements = new Hashtable<String, String>();
+//	    myCurrentAnyValue = "";
 	}
 
 	/**

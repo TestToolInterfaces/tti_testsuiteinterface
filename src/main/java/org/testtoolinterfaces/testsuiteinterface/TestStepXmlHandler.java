@@ -42,7 +42,7 @@ import org.xml.sax.XMLReader;
  *  ...
  * </teststep>
  * 
- * <if sequence=...>
+ * <if [not="true"] sequence=...>
  *  <description>
  *    ...
  *  </description>
@@ -55,7 +55,7 @@ import org.xml.sax.XMLReader;
  *  ...
  * </if>
  * 
- * <if sequence=...>
+ * <if [not] sequence=...>
  *  <description>
  *    ...
  *  </description>
@@ -81,6 +81,7 @@ public class TestStepXmlHandler extends XmlHandler
 	private static final String ELSE_ELEMENT = "else";
 
 	private static final String ATTRIBUTE_SEQUENCE = "sequence";
+	private static final String ATTRIBUTE_NOT = "not";
 
 	private static final String DESCRIPTION_ELEMENT = "description";
 
@@ -97,6 +98,7 @@ public class TestStepXmlHandler extends XmlHandler
 
 	// Needed to create the TestStep
 	private int mySequence;
+	private boolean myNot=false;
 	private String myDescription;
     private ParameterArrayList myParameters;
 	private Hashtable<String, String> myAnyAttributes;
@@ -193,6 +195,12 @@ public class TestStepXmlHandler extends XmlHandler
 		    	{
 		    		mySequence = Integer.valueOf( att.getValue(i) ).intValue();
 		    		Trace.println( Trace.ALL, "        mySequence -> " + mySequence);
+    	    	}
+		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_NOT))
+		    	{
+		    		myNot = true;
+		    		// The value, if any, is ignored
+		    		Trace.println( Trace.ALL, "        myNot -> true");
     	    	}
 		    	else
 		    	{
@@ -397,6 +405,7 @@ public class TestStepXmlHandler extends XmlHandler
 		return new TestStepSelection( mySequence,
 		                              myDescription,
 		                              ifStep,
+		                              myNot,
 		                              myThenSteps,
 		                              myElseSteps,
 		                              myAnyAttributes,

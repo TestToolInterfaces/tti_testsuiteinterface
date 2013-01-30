@@ -32,6 +32,9 @@ import org.xml.sax.XMLReader;
  *  <testcaselink>
  *   ...
  *  </testcaselink>
+ *  <foreach>
+ *   ...
+ *  </foreach>
  *  <restore>
  *   ...
  *  </restore>
@@ -73,6 +76,7 @@ public class TestGroupXmlHandler extends XmlHandler
 	private TestStepSequenceXmlHandler myPrepareXmlHandler;
 	private TestCaseLinkXmlHandler myTestCaseLinkXmlHandler;
 	private TestGroupLinkXmlHandler myTestGroupLinkXmlHandler;
+	private ForeachXmlHandler myForeachXmlHandler;
 	private TestStepSequenceXmlHandler myRestoreXmlHandler;
 	
 	private int myNextExecutionSequenceNr = 0;
@@ -105,6 +109,9 @@ public class TestGroupXmlHandler extends XmlHandler
 
 		myTestGroupLinkXmlHandler = new TestGroupLinkXmlHandler(anXmlReader);
 		this.addElementHandler(myTestGroupLinkXmlHandler);
+
+		myForeachXmlHandler = new ForeachXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
+		this.addElementHandler(myForeachXmlHandler);
 
 		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
 		                                                      RESTORE_ELEMENT,
@@ -195,7 +202,6 @@ public class TestGroupXmlHandler extends XmlHandler
     	else if (aQualifiedName.equalsIgnoreCase(TestGroupLinkXmlHandler.START_ELEMENT))
     	{
     		TestEntry testEntry = (TestEntry) myTestGroupLinkXmlHandler.getTestGroupLink();
-//   			myTestEntries.add((TestEntry) myTestGroupLinkXmlHandler.getTestGroupLink());
     		setSequenceNr(testEntry);
     		myTestEntries.add( testEntry );
 
@@ -204,7 +210,14 @@ public class TestGroupXmlHandler extends XmlHandler
     	else if (aQualifiedName.equalsIgnoreCase(TestCaseLinkXmlHandler.START_ELEMENT))
     	{
     		TestEntry testEntry = (TestEntry) myTestCaseLinkXmlHandler.getTestCaseLink();
-//    		myTestEntries.add((TestEntry) myTestCaseLinkXmlHandler.getTestCaseLink());
+    		setSequenceNr(testEntry);
+    		myTestEntries.add( testEntry );
+
+			myTestCaseLinkXmlHandler.reset();
+    	}
+    	else if (aQualifiedName.equalsIgnoreCase(ForeachXmlHandler.START_ELEMENT))
+    	{
+    		TestEntry testEntry = (TestEntry) myForeachXmlHandler.getTestEntryIteration();
     		setSequenceNr(testEntry);
     		myTestEntries.add( testEntry );
 
@@ -268,15 +281,15 @@ public class TestGroupXmlHandler extends XmlHandler
 			throw new TestSuiteException( "Unknown TestGroup ID" );
 		}
 
-      	TestGroup testGroup = (TestGroup) new TestGroupImpl( myTestGroupId,
+		TestGroupImpl testGroup = new TestGroupImpl( myTestGroupId,
       	                                                     myDescription,
            	       										  	 mySequenceNr,
       	                                                     myRequirementIds,
       	                                                     myPrepareSteps,
       	                                                     myTestEntries,
-      	                                                     myRestoreSteps,
-      	                                                     myAnyAttributes,
-      	                                                     myAnyElements );
+      	                                                     myRestoreSteps);
+      	testGroup.setAnyAttributes( myAnyAttributes );
+      	testGroup.setAnyElements( myAnyElements );
 
 		return testGroup;
 	}

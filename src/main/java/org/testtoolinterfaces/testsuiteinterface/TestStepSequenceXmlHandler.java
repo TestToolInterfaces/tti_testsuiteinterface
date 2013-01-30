@@ -23,6 +23,9 @@ import org.xml.sax.XMLReader;
  *  <if>
  *  ...
  *  </if>
+ *  <foreach>
+ *   ...
+ *  </foreach>
  * </[tag]>
  * 
  * @author Arjan Kranenburg 
@@ -41,6 +44,7 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 	private TestStepXmlHandler myIfXmlHandler;
 	private TestStepXmlHandler myActionXmlHandler;
 	private TestStepXmlHandler myCheckXmlHandler;
+//	private ForeachXmlHandler myForeachXmlHandler;
 	
 //	private ArrayList<StepType> myAllowedStepTypes;
 	
@@ -76,6 +80,9 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 
 		myCheckXmlHandler = new TestStepXmlHandler(anXmlReader, TAG_CHECK, anInterfaceList, aCheckStepParameter);
 		this.addElementHandler(myCheckXmlHandler);
+
+//		myForeachXmlHandler = new ForeachXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
+//		this.addElementHandler(myForeachXmlHandler);
 
 		myInterfaceList = anInterfaceList;
 		myCheckStepParameter = aCheckStepParameter;
@@ -129,27 +136,30 @@ public class TestStepSequenceXmlHandler extends XmlHandler
     	if (aQualifiedName.equalsIgnoreCase(TestStepXmlHandler.START_ELEMENT))
     	{
     		step = myStepXmlHandler.getStep();
-//    		mySteps.add( myStepXmlHandler.getStep() );
     		myStepXmlHandler.reset();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(TestStepXmlHandler.IF_ELEMENT))
     	{
     		step = myIfXmlHandler.getStep();
-//    		mySteps.add( myIfXmlHandler.getStep() );
     		myIfXmlHandler.reset();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(TAG_CHECK))
     	{
     		step = myCheckXmlHandler.getStep();
-//    		mySteps.add( myCheckXmlHandler.getStep() );
         	myCheckXmlHandler.reset();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(TAG_ACTION))
     	{
     		step = myActionXmlHandler.getStep();
-//    		mySteps.add( myActionXmlHandler.getStep() );
         	myActionXmlHandler.reset();
     	}
+//    	else if (aQualifiedName.equalsIgnoreCase(ForeachXmlHandler.START_ELEMENT))
+//    	{
+//    		step = myForeachXmlHandler.getTestEntryIteration();
+//    		myTestEntries.add( testEntry );
+//
+//			myTestCaseLinkXmlHandler.reset();
+//    	}
     	else
     	{ // Programming fault
 			throw new Error( "Child XML Handler returned, but not recognized. The handler was probably defined " +

@@ -1,7 +1,5 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
-import java.util.Hashtable;
-
 import org.testtoolinterfaces.testsuite.TestCaseLink;
 import org.testtoolinterfaces.testsuite.TestLink;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
@@ -58,9 +56,9 @@ public class TestCaseLinkXmlHandler extends TestLinkXmlHandler
 
 		TestCaseLink testCaseLink = new TestCaseLink( id,
 		                                              this.getSequence(),
-		                                              link,
-		                                              this.getAnyAttributes(),
-		                                              new Hashtable<String, String>() );
+		                                              link );
+
+		testCaseLink.setAnyAttributes( this.getAnyAttributes() );
 
 		return testCaseLink;
 	}

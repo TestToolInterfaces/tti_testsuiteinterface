@@ -13,7 +13,6 @@ import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
-//import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
 /**
@@ -236,15 +235,10 @@ public class TestCaseXmlHandler extends XmlHandler
 			throw new TestSuiteException("No Execution Steps found", myTestCaseId);
 		}
 
-       	TestCase testCase = (TestCase) new TestCaseImpl( myTestCaseId,
-       	       										  	 myDescription,
-       	       										  	 mySequenceNr,
-       	       										  	 myRequirementIds,
-       	       										  	 myPrepareSteps,
-       	       										  	 myExecutionSteps,
-       	       										  	 myRestoreSteps,
-       	                                                 myAnyAttributes,
-       	       										  	 myAnyElements );
+		TestCaseImpl testCase = new TestCaseImpl( myTestCaseId, myDescription, mySequenceNr,
+       	       	myRequirementIds, myPrepareSteps, myExecutionSteps, myRestoreSteps );
+       	testCase.setAnyAttributes(myAnyAttributes);
+       	testCase.setAnyElements(myAnyElements);
 
 		return testCase;
     }

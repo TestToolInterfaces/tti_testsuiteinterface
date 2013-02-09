@@ -4,6 +4,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.testtoolinterfaces.testsuite.*;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
+import org.testtoolinterfaces.utils.TTIException;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
@@ -27,27 +28,32 @@ import org.xml.sax.XMLReader;
  * @see http://www.testtoolinterfaces.org
  * 
  */
-public class ForeachXmlHandler extends XmlHandler
+abstract public class ForeachXmlHandler<E extends TestEntry> extends XmlHandler
 {
+	/**
+	 * @return the TestEntryIteration
+	 * @throws TTIException 
+	 */
+	abstract public TestEntryIteration<E> getTestEntryIteration() throws TTIException;
+
+
 	public static final String START_ELEMENT = "foreach";
 	private static final String ATTRIBUTE_SEQUENCE = "sequence";
 
 	private static final String DESCRIPTION_ELEMENT = "description";
-	private static final String ITEM_ELEMENT   = "item";
-	private static final String LIST_ELEMENT   = "list";
-	private static final String DO_ELEMENT     = "do";
+	protected static final String ITEM_ELEMENT   = "item";
+	protected static final String LIST_ELEMENT   = "list";
+	protected static final String DO_ELEMENT     = "do";
 	
 	private int mySequenceNr;
 
 	private String myDescription;
     private String itemName;
     private String listName;
-    private TestEntrySequence myDoEntries;
 
 	private GenericTagAndStringXmlHandler myDescriptionXmlHandler;
 	private GenericTagAndStringXmlHandler myItemNameXmlHandler;
 	private GenericTagAndStringXmlHandler myListNameXmlHandler;
-	private TestEntrySequenceXmlHandler myDoEntriesXmlHandler;
 	
 	/**
 	 * Creates the XML Handler
@@ -69,9 +75,6 @@ public class ForeachXmlHandler extends XmlHandler
 
 		myListNameXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, LIST_ELEMENT);
 		this.addElementHandler(myListNameXmlHandler);
-
-		myDoEntriesXmlHandler = new TestEntrySequenceXmlHandler(anXmlReader, DO_ELEMENT, anInterfaceList, aCheckStepParameter);
-		this.addElementHandler(myDoEntriesXmlHandler);
 
 		this.reset();
 	}
@@ -151,11 +154,6 @@ public class ForeachXmlHandler extends XmlHandler
     		this.listName = myListNameXmlHandler.getValue();
     		myListNameXmlHandler.reset();
     	}
-    	else if (aQualifiedName.equalsIgnoreCase(DO_ELEMENT))
-    	{
-    		myDoEntries = myDoEntriesXmlHandler.getEntries();
-    		myDoEntriesXmlHandler.reset();
-    	}
     	else
     	{ // Programming fault
 			throw new Error( "Child XML Handler returned, but not recognized. The handler was probably defined " +
@@ -164,22 +162,41 @@ public class ForeachXmlHandler extends XmlHandler
 	}
 
 	/**
-	 * @return the TestEntryIteration
+	 * @return the sequenceNr
 	 */
-	public TestEntryIteration getTestEntryIteration()
-//	public TestEntryIteration<TestEntry> getTestEntryIteration()
-	{
-		Trace.println(Trace.GETTER);
-		
-		return new TestEntryIteration( myDescription, mySequenceNr,
-//		return new TestEntryIteration<TestEntry>( myDescription, mySequenceNr,
-				this.itemName, this.listName, myDoEntries );
+	protected int getSequenceNr() {
+		return mySequenceNr;
+	}
+
+	/**
+	 * @return the description
+	 */
+	protected String getDescription() {
+		return myDescription;
+	}
+
+	/**
+	 * @return the itemName
+	 */
+	protected String getItemName() {
+		return itemName;
+	}
+
+	/**
+	 * @return the listName
+	 */
+	protected String getListName() {
+		return listName;
 	}
 
 	@Override
 	public void reset()
 	{
 		Trace.println(Trace.SUITE);
-		myDoEntries = new TestEntrySequence();
+		mySequenceNr = 0;
+		myDescription = "";
+		this.itemName = "";
+		this.listName = "";
+		// NOP
 	}
 }

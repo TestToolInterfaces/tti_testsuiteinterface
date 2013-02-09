@@ -4,6 +4,7 @@ import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.utils.TTIException;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
@@ -44,7 +45,7 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 	private TestStepXmlHandler myIfXmlHandler;
 	private TestStepXmlHandler myActionXmlHandler;
 	private TestStepXmlHandler myCheckXmlHandler;
-//	private ForeachXmlHandler myForeachXmlHandler;
+	private ForeachStepXmlHandler myForeachXmlHandler;
 	
 //	private ArrayList<StepType> myAllowedStepTypes;
 	
@@ -81,8 +82,7 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 		myCheckXmlHandler = new TestStepXmlHandler(anXmlReader, TAG_CHECK, anInterfaceList, aCheckStepParameter);
 		this.addElementHandler(myCheckXmlHandler);
 
-//		myForeachXmlHandler = new ForeachXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
-//		this.addElementHandler(myForeachXmlHandler);
+		// myForeachXmlHandler is created when needed to prevent loops
 
 		myInterfaceList = anInterfaceList;
 		myCheckStepParameter = aCheckStepParameter;
@@ -124,6 +124,13 @@ public class TestStepSequenceXmlHandler extends XmlHandler
     		myIfXmlHandler = new TestStepXmlHandler(this.getXmlReader(), TestStepXmlHandler.IF_ELEMENT, myInterfaceList, myCheckStepParameter);
     		this.addElementHandler(myIfXmlHandler);
     	}
+     	else if ( myForeachXmlHandler == null && aQualifiedName.equalsIgnoreCase(ForeachStepXmlHandler.START_ELEMENT) )
+    	{
+     		// We'll create a TestStepXmlHandler for foreach entries only when we need it.
+     		// Otherwise it would create an endless loop.
+    		myForeachXmlHandler = new ForeachStepXmlHandler(this.getXmlReader(), myInterfaceList, myCheckStepParameter);
+    		this.addElementHandler(myForeachXmlHandler);
+    	}
 	}
 
 	@Override
@@ -153,13 +160,16 @@ public class TestStepSequenceXmlHandler extends XmlHandler
     		step = myActionXmlHandler.getStep();
         	myActionXmlHandler.reset();
     	}
-//    	else if (aQualifiedName.equalsIgnoreCase(ForeachXmlHandler.START_ELEMENT))
-//    	{
-//    		step = myForeachXmlHandler.getTestEntryIteration();
-//    		myTestEntries.add( testEntry );
-//
-//			myTestCaseLinkXmlHandler.reset();
-//    	}
+    	else if (aQualifiedName.equalsIgnoreCase(ForeachXmlHandler.START_ELEMENT))
+    	{
+    		try {
+				step = myForeachXmlHandler.getTestEntryIteration();
+			} catch (TTIException e) {
+				Trace.print(Trace.SUITE, e);
+				throw new TestSuiteException( "Cannot add an iteration of TestStepEntries", e );
+			}
+    		myForeachXmlHandler.reset();
+    	}
     	else
     	{ // Programming fault
 			throw new Error( "Child XML Handler returned, but not recognized. The handler was probably defined " +

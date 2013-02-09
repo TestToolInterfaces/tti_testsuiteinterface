@@ -8,8 +8,8 @@ import java.util.Iterator;
 
 import org.testtoolinterfaces.testsuite.LooseTestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestCaseLink;
-import org.testtoolinterfaces.testsuite.TestEntry;
-import org.testtoolinterfaces.testsuite.TestEntrySequence;
+import org.testtoolinterfaces.testsuite.TestGroupEntry;
+import org.testtoolinterfaces.testsuite.TestGroupEntrySequence;
 import org.testtoolinterfaces.testsuite.TestGroup;
 import org.testtoolinterfaces.testsuite.TestGroupLink;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
@@ -79,11 +79,11 @@ public class TestGroupPrinter
 		}
 
 		System.out.println( anIndent + "=================== Execution =======================" );
-		TestEntrySequence executes = aTestGroup.getExecutionEntries();
-		Iterator<TestEntry> itr2 = executes.iterator();
+		TestGroupEntrySequence executes = aTestGroup.getExecutionEntries();
+		Iterator<TestGroupEntry> itr2 = executes.iterator();
 		while(itr2.hasNext() )
 		{
-			TestEntry entry = itr2.next();
+			TestGroupEntry entry = itr2.next();
 			if ( entry.getType() == TYPE.Group )
 			{
 				printTestGroup( (TestGroup) entry, aBaseDir, anIndent + "  " );

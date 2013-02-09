@@ -1,7 +1,5 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
-import java.util.Hashtable;
-
 import org.testtoolinterfaces.testsuite.TestGroupLink;
 import org.testtoolinterfaces.testsuite.TestLink;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
@@ -58,9 +56,9 @@ public class TestGroupLinkXmlHandler extends TestLinkXmlHandler
 
 		TestGroupLink testGrouplink = new TestGroupLink( id,
 			                                             this.getSequence(),
-			                                             link,
-			                                             this.getAnyAttributes(),
-			                                             new Hashtable<String, String>());
+			                                             link );
+		
+		testGrouplink.setAnyAttributes( this.getAnyAttributes() );
 
 		return testGrouplink;
 	}

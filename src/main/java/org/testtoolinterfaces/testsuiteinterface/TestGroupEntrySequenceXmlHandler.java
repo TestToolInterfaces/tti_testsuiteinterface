@@ -1,7 +1,7 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
-import org.testtoolinterfaces.testsuite.TestEntry;
-import org.testtoolinterfaces.testsuite.TestEntrySequence;
+import org.testtoolinterfaces.testsuite.TestGroupEntry;
+import org.testtoolinterfaces.testsuite.TestGroupEntrySequence;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
@@ -11,33 +11,25 @@ import org.xml.sax.XMLReader;
 
 
 /**
- * XmlHandler to read a sequence of testentries from a TTI-XML file.
+ * XmlHandler to read a sequence of TestGroupEntries from a TTI-XML file.
  * 
  * <[tag]>
- *  <teststep>
- *  ...
- *  </teststep>
  *  <testcaselink>
  *  ...
  *  </testcaselink>
  *  <testgrouplink>
  *  ...
  *  </testgrouplink>
- *  <if>
- *  ...
- *  </if>
  * </[tag]>
  * 
  * @author Arjan Kranenburg 
  * @see http://www.testtoolinterfaces.org
  * 
  */
-public class TestEntrySequenceXmlHandler extends XmlHandler
+public class TestGroupEntrySequenceXmlHandler extends XmlHandler
 {
-    private TestEntrySequence myEntries;
+    private TestGroupEntrySequence myEntries;
 
-	private TestStepXmlHandler myStepXmlHandler;
-	private TestStepXmlHandler myIfXmlHandler;
 	private TestCaseLinkXmlHandler myTestCaseLinkXmlHandler;
 	private TestGroupLinkXmlHandler myTestGroupLinkXmlHandler;
 	
@@ -51,7 +43,7 @@ public class TestEntrySequenceXmlHandler extends XmlHandler
 	 * @param anInterfaceList		a list of interfaces
 	 * @param aCheckStepParameter	flag to indicate if specified parameters of a step must be verified in the interface
 	 */
-	public TestEntrySequenceXmlHandler( XMLReader anXmlReader,
+	public TestGroupEntrySequenceXmlHandler( XMLReader anXmlReader,
 	                                   String aTag,
 	                                   TestInterfaceList anInterfaceList,
 	                                   boolean aCheckStepParameter )
@@ -59,12 +51,6 @@ public class TestEntrySequenceXmlHandler extends XmlHandler
 		super(anXmlReader, aTag);
 		Trace.println(Trace.CONSTRUCTOR, "TestStepSequenceXmlHandler( anXmlreader, " + aTag + " )", true);
 
-		myStepXmlHandler = new TestStepXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
-		this.addElementHandler(myStepXmlHandler);
-
-		myIfXmlHandler = new TestStepXmlHandler(this.getXmlReader(), TestStepXmlHandler.IF_ELEMENT, anInterfaceList, aCheckStepParameter);
-		this.addElementHandler(myIfXmlHandler);
-		
 		myTestCaseLinkXmlHandler = new TestCaseLinkXmlHandler(anXmlReader);
 		this.addElementHandler(myTestCaseLinkXmlHandler);
 
@@ -110,18 +96,8 @@ public class TestEntrySequenceXmlHandler extends XmlHandler
 	{
 		Trace.println(Trace.SUITE);
 
-		TestEntry entry = null;
-    	if (aQualifiedName.equalsIgnoreCase(TestStepXmlHandler.START_ELEMENT))
-    	{
-    		entry = myStepXmlHandler.getStep();
-    		myStepXmlHandler.reset();
-    	}
-    	else if (aQualifiedName.equalsIgnoreCase(TestStepXmlHandler.IF_ELEMENT))
-    	{
-    		entry = myIfXmlHandler.getStep();
-    		myIfXmlHandler.reset();
-    	}
-    	else if (aQualifiedName.equalsIgnoreCase(TestCaseLinkXmlHandler.START_ELEMENT))
+		TestGroupEntry entry = null;
+    	if (aQualifiedName.equalsIgnoreCase(TestCaseLinkXmlHandler.START_ELEMENT))
     	{
     		entry = myTestCaseLinkXmlHandler.getTestCaseLink();
     		myTestCaseLinkXmlHandler.reset();
@@ -153,7 +129,7 @@ public class TestEntrySequenceXmlHandler extends XmlHandler
 	/**
 	 * @return the TestStepSequence
 	 */
-	public TestEntrySequence getEntries()
+	public TestGroupEntrySequence getEntries()
 	{
 		Trace.println(Trace.GETTER);
 		return myEntries;
@@ -163,7 +139,7 @@ public class TestEntrySequenceXmlHandler extends XmlHandler
 	public void reset()
 	{
 		Trace.println(Trace.SUITE);
-		myEntries = new TestEntrySequence();
+		myEntries = new TestGroupEntrySequence();
 		myNextSequenceNr = 0;
 	}
 }

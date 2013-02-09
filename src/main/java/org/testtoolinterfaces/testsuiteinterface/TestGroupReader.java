@@ -5,7 +5,7 @@ import java.io.IOError;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import org.testtoolinterfaces.testsuite.TestEntrySequence;
+import org.testtoolinterfaces.testsuite.TestGroupEntrySequence;
 import org.testtoolinterfaces.testsuite.TestGroup;
 import org.testtoolinterfaces.testsuite.TestGroupImpl;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
@@ -97,7 +97,7 @@ public class TestGroupReader
 			                               0,
 			                               new ArrayList<String>(),
 			                               new TestStepSequence(),
-			                               new TestEntrySequence(),
+			                               new TestGroupEntrySequence(),
 			                               new TestStepSequence(),
 			                               new Hashtable<String, String>(),
 			                               new Hashtable<String, String>() );

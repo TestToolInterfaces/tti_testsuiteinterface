@@ -366,13 +366,16 @@ public class TestStepXmlHandler extends XmlHandler
 			myInterface.verifyParameters(myCommand, myParameters);
 		}
 
-		return new TestStepCommand( mySequence,
+		TestStepCommand tsCommand = new TestStepCommand( mySequence,
 		                            myDescription,
 		                            myCommand,
 		                            myInterface,
-		                            myParameters,
-		                            myAnyAttributes,
-		                            myAnyElements );
+		                            myParameters );
+		
+		tsCommand.setAnyAttributes(myAnyAttributes);
+		tsCommand.setAnyElements(myAnyElements);
+		
+		return tsCommand;
 	}
 
 	/**
@@ -381,13 +384,16 @@ public class TestStepXmlHandler extends XmlHandler
 	 */
 	private TestStepScript createTestStepScript()
 	{
-		return new TestStepScript( mySequence,
+		TestStepScript tsScript = new TestStepScript( mySequence,
 		                           myDescription,
 		                           myScript,
 		                           myScriptType,
-		                           myParameters,
-		                           myAnyAttributes,
-		                           myAnyElements );
+		                           myParameters );
+
+		tsScript.setAnyAttributes(myAnyAttributes);
+		tsScript.setAnyElements(myAnyElements);
+		
+		return tsScript;
 	}
 
 	/**
@@ -402,14 +408,17 @@ public class TestStepXmlHandler extends XmlHandler
 			throw new TestSuiteException( "No then-step defined for selection" );
 		}
 
-		return new TestStepSelection( mySequence,
+		TestStepSelection tsScript = new TestStepSelection( mySequence,
 		                              myDescription,
 		                              ifStep,
 		                              myNot,
 		                              myThenSteps,
-		                              myElseSteps,
-		                              myAnyAttributes,
-		                              myAnyElements );
+		                              myElseSteps );
+
+		tsScript.setAnyAttributes(myAnyAttributes);
+		tsScript.setAnyElements(myAnyElements);
+		                      		
+		return tsScript;
 	}
 
 	@Override

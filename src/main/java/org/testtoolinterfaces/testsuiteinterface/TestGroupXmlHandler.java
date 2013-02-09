@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import org.testtoolinterfaces.testsuite.TestEntry;
-import org.testtoolinterfaces.testsuite.TestEntrySequence;
+import org.testtoolinterfaces.testsuite.TestGroupEntry;
+import org.testtoolinterfaces.testsuite.TestGroupEntrySequence;
 import org.testtoolinterfaces.testsuite.TestGroup;
 import org.testtoolinterfaces.testsuite.TestGroupImpl;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
+import org.testtoolinterfaces.utils.TTIException;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
@@ -66,7 +68,7 @@ public class TestGroupXmlHandler extends XmlHandler
 	private String myDescription;
     private ArrayList<String> myRequirementIds;
     private TestStepSequence myPrepareSteps;
-    private TestEntrySequence myTestEntries;
+    private TestGroupEntrySequence myTestEntries;
     private TestStepSequence myRestoreSteps;
 	private Hashtable<String, String> myAnyElements;
 	private String myCurrentAnyValue;
@@ -76,7 +78,7 @@ public class TestGroupXmlHandler extends XmlHandler
 	private TestStepSequenceXmlHandler myPrepareXmlHandler;
 	private TestCaseLinkXmlHandler myTestCaseLinkXmlHandler;
 	private TestGroupLinkXmlHandler myTestGroupLinkXmlHandler;
-	private ForeachXmlHandler myForeachXmlHandler;
+	private ForeachEntryXmlHandler myForeachXmlHandler;
 	private TestStepSequenceXmlHandler myRestoreXmlHandler;
 	
 	private int myNextExecutionSequenceNr = 0;
@@ -110,7 +112,7 @@ public class TestGroupXmlHandler extends XmlHandler
 		myTestGroupLinkXmlHandler = new TestGroupLinkXmlHandler(anXmlReader);
 		this.addElementHandler(myTestGroupLinkXmlHandler);
 
-		myForeachXmlHandler = new ForeachXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
+		myForeachXmlHandler = new ForeachEntryXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
 		this.addElementHandler(myForeachXmlHandler);
 
 		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
@@ -201,7 +203,7 @@ public class TestGroupXmlHandler extends XmlHandler
     	}
     	else if (aQualifiedName.equalsIgnoreCase(TestGroupLinkXmlHandler.START_ELEMENT))
     	{
-    		TestEntry testEntry = (TestEntry) myTestGroupLinkXmlHandler.getTestGroupLink();
+    		TestGroupEntry testEntry = (TestGroupEntry) myTestGroupLinkXmlHandler.getTestGroupLink();
     		setSequenceNr(testEntry);
     		myTestEntries.add( testEntry );
 
@@ -209,7 +211,7 @@ public class TestGroupXmlHandler extends XmlHandler
     	}
     	else if (aQualifiedName.equalsIgnoreCase(TestCaseLinkXmlHandler.START_ELEMENT))
     	{
-    		TestEntry testEntry = (TestEntry) myTestCaseLinkXmlHandler.getTestCaseLink();
+    		TestGroupEntry testEntry = (TestGroupEntry) myTestCaseLinkXmlHandler.getTestCaseLink();
     		setSequenceNr(testEntry);
     		myTestEntries.add( testEntry );
 
@@ -217,7 +219,13 @@ public class TestGroupXmlHandler extends XmlHandler
     	}
     	else if (aQualifiedName.equalsIgnoreCase(ForeachXmlHandler.START_ELEMENT))
     	{
-    		TestEntry testEntry = (TestEntry) myForeachXmlHandler.getTestEntryIteration();
+    		TestGroupEntry testEntry;
+			try {
+				testEntry = (TestGroupEntry) myForeachXmlHandler.getTestEntryIteration();
+			} catch (TTIException e) {
+				Trace.print(Trace.SUITE, e);
+				throw new TestSuiteException( "Cannot add an iteration of TestGroupEntries", e );
+			}
     		setSequenceNr(testEntry);
     		myTestEntries.add( testEntry );
 
@@ -260,7 +268,7 @@ public class TestGroupXmlHandler extends XmlHandler
 	    myDescription = "";
 	    myRequirementIds = new ArrayList<String>();
 	    myPrepareSteps = new TestStepSequence();
-		myTestEntries = new TestEntrySequence();
+		myTestEntries = new TestGroupEntrySequence();
 	    myRestoreSteps = new TestStepSequence();
 		myAnyElements = new Hashtable<String, String>();
 	    myCurrentAnyValue = "";

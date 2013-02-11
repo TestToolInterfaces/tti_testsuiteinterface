@@ -76,7 +76,7 @@ public class TestGroupXmlHandler extends TestExecItemXmlHandler
 		myForeachXmlHandler = new ForeachEntryXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
 		this.addElementHandler(myForeachXmlHandler);
 
-		this.reset();
+		this.resetGroupHandler();
 	}
 
 	@Override
@@ -161,10 +161,15 @@ public class TestGroupXmlHandler extends TestExecItemXmlHandler
 	@Override
 	public void reset()
 	{
+		this.resetGroupHandler();
+	}
+
+	public final void resetGroupHandler()
+	{
 		Trace.println(Trace.SUITE);
 
 		myTestEntries = new TestGroupEntrySequence();
 		
-		super.reset();
+		super.resetExecItemHandler();
 	}
 }

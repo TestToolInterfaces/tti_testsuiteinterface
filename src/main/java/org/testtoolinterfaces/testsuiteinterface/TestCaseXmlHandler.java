@@ -70,7 +70,7 @@ public class TestCaseXmlHandler extends TestExecItemXmlHandler
 		                                                        aCheckStepParameter );
 		this.addElementHandler(myExecutionXmlHandler);
 
-		this.reset();
+		this.resetCaseHandler();
 	}
 	
 	@Override
@@ -120,9 +120,14 @@ public class TestCaseXmlHandler extends TestExecItemXmlHandler
 	@Override
 	public void reset()
 	{
+		this.resetCaseHandler();
+	}
+
+	public final void resetCaseHandler()
+	{
 		Trace.println(Trace.SUITE);
 		myExecutionSteps = new TestStepSequence();
 
-		super.reset();
+		super.resetExecItemHandler();
 	}
 }

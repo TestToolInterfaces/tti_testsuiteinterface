@@ -41,7 +41,7 @@ public abstract class TestExecItemLinkXmlHandler extends TestGroupEntryXmlHandle
 		super(anXmlReader, aStartElement);
 		Trace.println(Trace.CONSTRUCTOR);
 		
-		this.reset();
+		this.resetExecItemLinkHandler();
 	}
 
 	@Override
@@ -84,22 +84,27 @@ public abstract class TestExecItemLinkXmlHandler extends TestGroupEntryXmlHandle
 		super.processElementAttributes(aQualifiedName, leftAttributes);
     }
 
-	@Override
-	public void reset()
-	{
-		Trace.println(Trace.SUITE);
-
-		myLink = "";
-		myType = TestLink.TYPE_TTI; //default
-		
-		super.reset();
-	}
-
 	/**
 	 * @return the link
 	 */
 	protected TestLink getLink()
 	{
 		return new TestLinkImpl( myLink, myType );
+	}
+
+	@Override
+	public void reset()
+	{
+		this.resetExecItemLinkHandler();
+	}
+	
+	public final void resetExecItemLinkHandler()
+	{
+		Trace.println(Trace.SUITE);
+
+		myLink = "";
+		myType = TestLink.TYPE_TTI; //default
+		
+		super.resetGroupEntryHandler();
 	}
 }

@@ -54,7 +54,7 @@ public abstract class TestEntryXmlHandler extends XmlHandler
 	    myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
 		this.addElementHandler(myDescriptionXmlHandler);
 
-		this.reset();
+		this.resetEntryHandler();
 	}
 
 	@Override
@@ -153,6 +153,11 @@ public abstract class TestEntryXmlHandler extends XmlHandler
 
 	@Override
 	public void reset()
+	{
+		this.resetEntryHandler();
+	}
+	
+	public final void resetEntryHandler()
 	{
 		Trace.println(Trace.SUITE);
 

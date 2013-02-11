@@ -150,8 +150,7 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 		myInterfaces = anInterfaceList;
 		myCheckStepParams = aCheckStepParameter;
 
-		reset();
-
+		this.resetStepHandler();
 	}
 
 	/**
@@ -365,6 +364,11 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 	@Override
 	public void reset()
 	{
+		this.resetStepHandler();
+	}
+
+	public final void resetStepHandler()
+	{
 		Trace.println(Trace.SUITE);
 
 		myParameters = new ParameterArrayList();
@@ -379,6 +383,6 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
         myThenSteps = new TestStepSequence();
         myElseSteps = new TestStepSequence();
         
-        super.reset();
+        super.resetEntryHandler();
 	}
 }

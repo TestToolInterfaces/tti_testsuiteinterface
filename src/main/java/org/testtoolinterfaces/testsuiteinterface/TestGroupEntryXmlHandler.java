@@ -33,7 +33,7 @@ public abstract class TestGroupEntryXmlHandler extends TestEntryXmlHandler
 		super(anXmlReader, aStartElement);
 		Trace.println(Trace.CONSTRUCTOR);
 		
-		this.reset();
+		this.resetGroupEntryHandler();
 	}
 
 	@Override
@@ -64,20 +64,25 @@ public abstract class TestGroupEntryXmlHandler extends TestEntryXmlHandler
 		super.processElementAttributes(aQualifiedName, leftAttributes);
     }
 
-	@Override
-	public void reset()
-	{
-		Trace.println(Trace.SUITE);
-		myId = "";
-		
-		super.reset();
-	}
-
 	/**
 	 * @return the id
 	 */
 	protected String getId()
 	{
 		return myId;
+	}
+
+	@Override
+	public void reset()
+	{
+		this.resetGroupEntryHandler();
+	}
+
+	public final void resetGroupEntryHandler()
+	{
+		Trace.println(Trace.SUITE);
+		myId = "";
+		
+		super.resetEntryHandler();
 	}
 }

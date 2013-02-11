@@ -78,7 +78,7 @@ public class TestExecItemXmlHandler extends TestGroupEntryXmlHandler
 		                                                      aCheckStepParameter );
 		this.addElementHandler(myRestoreXmlHandler);
 
-		this.reset();
+		this.resetExecItemHandler();
 	}
 	
 	@Override
@@ -130,11 +130,16 @@ public class TestExecItemXmlHandler extends TestGroupEntryXmlHandler
 	@Override
 	public void reset()
 	{
+		this.resetExecItemHandler();
+	}
+	
+	public final void resetExecItemHandler()
+	{
 		Trace.println(Trace.SUITE);
 	    myRequirementIds = new ArrayList<String>();
 		myPrepareSteps = new TestStepSequence();
 		myRestoreSteps = new TestStepSequence();
 
-		super.reset();
+		super.resetGroupEntryHandler();
 	}
 }

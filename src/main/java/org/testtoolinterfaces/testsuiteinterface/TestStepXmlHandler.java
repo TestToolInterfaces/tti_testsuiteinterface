@@ -379,7 +379,8 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 
 		myScript = null;
 		myScriptType = "";
-		
+
+		myNot=false;
         myThenSteps = new TestStepSequence();
         myElseSteps = new TestStepSequence();
         

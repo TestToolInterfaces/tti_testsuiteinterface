@@ -1,21 +1,15 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-
 import org.testtoolinterfaces.testsuite.TestEntry;
+import org.testtoolinterfaces.testsuite.TestGroup;
 import org.testtoolinterfaces.testsuite.TestGroupEntry;
 import org.testtoolinterfaces.testsuite.TestGroupEntrySequence;
-import org.testtoolinterfaces.testsuite.TestGroup;
 import org.testtoolinterfaces.testsuite.TestGroupImpl;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
-import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
-import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.TTIException;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
-import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 
 
@@ -49,39 +43,18 @@ import org.xml.sax.XMLReader;
  * @see http://www.testtoolinterfaces.org
  * 
  */
-public class TestGroupXmlHandler extends XmlHandler
+public class TestGroupXmlHandler extends TestExecItemXmlHandler
 {
 	public static final String START_ELEMENT = "testgroup";
-	private static final String ATTRIBUTE_ID = "id";
-	private static final String ATTRIBUTE_SEQUENCE = "sequence";
-	
-	private static final String DESCRIPTION_ELEMENT = "description";
-	private static final String REQUIREMENT_ELEMENT = "requirementid";
 
-	private static final String PREPARE_ELEMENT = "prepare";
-	private static final String RESTORE_ELEMENT = "restore";
-
-	private String myTestGroupId;
-	private Hashtable<String, String> myAnyAttributes;
-	private int mySequenceNr;
-
-	private String myDescription;
-    private ArrayList<String> myRequirementIds;
-    private TestStepSequence myPrepareSteps;
     private TestGroupEntrySequence myTestEntries;
-    private TestStepSequence myRestoreSteps;
-	private Hashtable<String, String> myAnyElements;
-	private String myCurrentAnyValue;
 
-	private GenericTagAndStringXmlHandler myDescriptionXmlHandler;
-	private GenericTagAndStringXmlHandler myRequirementIdXmlHandler;
-	private TestStepSequenceXmlHandler myPrepareXmlHandler;
-	private TestCaseLinkXmlHandler myTestCaseLinkXmlHandler;
+    private TestCaseLinkXmlHandler myTestCaseLinkXmlHandler;
 	private TestGroupLinkXmlHandler myTestGroupLinkXmlHandler;
 	private ForeachEntryXmlHandler myForeachXmlHandler;
-	private TestStepSequenceXmlHandler myRestoreXmlHandler;
 	
 	private int myNextExecutionSequenceNr = 0;
+
 	/**
 	 * Creates the XML Handler
 	 * 
@@ -91,20 +64,8 @@ public class TestGroupXmlHandler extends XmlHandler
 	 */
 	public TestGroupXmlHandler( XMLReader anXmlReader, TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{
-		super(anXmlReader, START_ELEMENT);
+		super(anXmlReader, START_ELEMENT, anInterfaceList, aCheckStepParameter);
 		Trace.println(Trace.CONSTRUCTOR);
-		
-	    myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
-		this.addElementHandler(myDescriptionXmlHandler);
-
-     	myRequirementIdXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, REQUIREMENT_ELEMENT);
-		this.addElementHandler(myRequirementIdXmlHandler);
-
-    	myPrepareXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
-    	                                                      PREPARE_ELEMENT,
-    	                                                      anInterfaceList,
-    	                                                      aCheckStepParameter );
-		this.addElementHandler(myPrepareXmlHandler);
 
 		myTestCaseLinkXmlHandler = new TestCaseLinkXmlHandler(anXmlReader);
 		this.addElementHandler(myTestCaseLinkXmlHandler);
@@ -115,69 +76,7 @@ public class TestGroupXmlHandler extends XmlHandler
 		myForeachXmlHandler = new ForeachEntryXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
 		this.addElementHandler(myForeachXmlHandler);
 
-		myRestoreXmlHandler = new TestStepSequenceXmlHandler( anXmlReader,
-		                                                      RESTORE_ELEMENT,
-		                                                      anInterfaceList,
-		                                                      aCheckStepParameter );
-		this.addElementHandler(myRestoreXmlHandler);
-		
 		this.reset();
-	}
-
-	@Override
-	public void handleStartElement(String aQualifiedName)
-	{
-   		//nop;
-    }
-
-	@Override
-	public void handleCharacters(String aValue)
-	{
-		myCurrentAnyValue = myCurrentAnyValue + aValue;
-    }
-    
-	@Override
-	public void handleEndElement(String aQualifiedName)
-	{
-		if ( ! aQualifiedName.equalsIgnoreCase(START_ELEMENT) )
-    	{
-			// TODO This will overwrite previous occurrences of the same elements. But that is possible in XML.
-			myAnyElements.put(aQualifiedName, myCurrentAnyValue);
-			myCurrentAnyValue = "";
-    	}
-    }
-
-	@Override
-    public void processElementAttributes(String aQualifiedName, Attributes anAtt)
-    {
-		Trace.print(Trace.SUITE, "processElementAttributes( " 
-	            + aQualifiedName, true );
-     	if (aQualifiedName.equalsIgnoreCase(START_ELEMENT))
-    	{
-		    for (int i = 0; i < anAtt.getLength(); i++)
-		    {
-	    		Trace.append( Trace.SUITE, ", " + anAtt.getQName(i) + "=" + anAtt.getValue(i) );
-		    	if (anAtt.getQName(i).equalsIgnoreCase(ATTRIBUTE_ID))
-		    	{
-		        	myTestGroupId = anAtt.getValue(i);
-		    	}
-		    	else if (anAtt.getQName(i).equalsIgnoreCase(ATTRIBUTE_SEQUENCE))
-		    	{
-		        	mySequenceNr = Integer.valueOf( anAtt.getValue(i) ).intValue();
-		    	}
-		    	else
-		    	{
-		    		myAnyAttributes.put(anAtt.getQName(i), anAtt.getValue(i));
-		    	}
-		    }
-    	}
-		Trace.append( Trace.SUITE, " )\n" );
-    }
-
-	@Override
-	public void handleGoToChildElement(String aQualifiedName)
-	{
-		//nop
 	}
 
 	@Override
@@ -186,22 +85,7 @@ public class TestGroupXmlHandler extends XmlHandler
 	{
 		Trace.println(Trace.SUITE, "handleReturnFromChildElement( " + aQualifiedName + " )", true);
 
-		if (aQualifiedName.equalsIgnoreCase(DESCRIPTION_ELEMENT))
-    	{
-    		myDescription = myDescriptionXmlHandler.getValue();
-    		myDescriptionXmlHandler.reset();
-    	}
-    	else if (aQualifiedName.equalsIgnoreCase(REQUIREMENT_ELEMENT))
-    	{
-    		myRequirementIds.add( myRequirementIdXmlHandler.getValue() );
-    		myRequirementIdXmlHandler.reset();
-    	}
-    	else if (aQualifiedName.equalsIgnoreCase(PREPARE_ELEMENT))
-    	{
-    		myPrepareSteps = myPrepareXmlHandler.getSteps();
-    		myPrepareXmlHandler.reset();
-    	}
-    	else if (aQualifiedName.equalsIgnoreCase(TestGroupLinkXmlHandler.START_ELEMENT))
+		if (aQualifiedName.equalsIgnoreCase(TestGroupLinkXmlHandler.START_ELEMENT))
     	{
     		TestGroupEntry testEntry = (TestGroupEntry) myTestGroupLinkXmlHandler.getTestGroupLink();
     		setSequenceNr(testEntry);
@@ -229,17 +113,10 @@ public class TestGroupXmlHandler extends XmlHandler
     		setSequenceNr(testEntry);
     		myTestEntries.add( testEntry );
 
-			myTestCaseLinkXmlHandler.reset();
+    		myForeachXmlHandler.reset();
     	}
-    	else if (aQualifiedName.equalsIgnoreCase(RESTORE_ELEMENT))
-    	{
-    		myRestoreSteps = myRestoreXmlHandler.getSteps();
-    		myRestoreXmlHandler.reset();
-    	}
-    	else
-    	{ // Programming fault
-			throw new Error( "Child XML Handler returned, but not recognized. The handler was probably defined " +
-			                 "in the Constructor but not handled in handleReturnFromChildElement()");
+    	else {
+			super.handleReturnFromChildElement(aQualifiedName, aChildXmlHandler);
     	}
 	}
 
@@ -256,24 +133,6 @@ public class TestGroupXmlHandler extends XmlHandler
 		myNextExecutionSequenceNr++;
 	}
 
-	@Override
-	public void reset()
-	{
-		Trace.println(Trace.SUITE);
-
-		myTestGroupId = "";
-	    mySequenceNr = 0;
-	    myAnyAttributes = new Hashtable<String, String>();
-
-	    myDescription = "";
-	    myRequirementIds = new ArrayList<String>();
-	    myPrepareSteps = new TestStepSequence();
-		myTestEntries = new TestGroupEntrySequence();
-	    myRestoreSteps = new TestStepSequence();
-		myAnyElements = new Hashtable<String, String>();
-	    myCurrentAnyValue = "";
-	}
-
     /**
      * Creates and returns the TestGroup
      * 
@@ -284,21 +143,28 @@ public class TestGroupXmlHandler extends XmlHandler
 	{
 		Trace.println(Trace.SUITE);
 
-		if ( myTestGroupId.isEmpty() )
+		String id = this.getId();
+		if ( id.isEmpty() )
 		{
 			throw new TestSuiteException( "Unknown TestGroup ID" );
 		}
 
-		TestGroupImpl testGroup = new TestGroupImpl( myTestGroupId,
-      	                                                     myDescription,
-           	       										  	 mySequenceNr,
-      	                                                     myRequirementIds,
-      	                                                     myPrepareSteps,
-      	                                                     myTestEntries,
-      	                                                     myRestoreSteps);
-      	testGroup.setAnyAttributes( myAnyAttributes );
-      	testGroup.setAnyElements( myAnyElements );
+		TestGroupImpl testGroup = new TestGroupImpl( id, this.getDescription(), this.getSequenceNr(),
+				this.getRequirementIds(), this.getPrepareSteps(), myTestEntries, this.getRestoreSteps() );
+
+      	testGroup.setAnyAttributes( this.getAnyAttributes() );
+      	testGroup.setAnyElements( this.getAnyElements() );
 
 		return testGroup;
+	}
+
+	@Override
+	public void reset()
+	{
+		Trace.println(Trace.SUITE);
+
+		myTestEntries = new TestGroupEntrySequence();
+		
+		super.reset();
 	}
 }

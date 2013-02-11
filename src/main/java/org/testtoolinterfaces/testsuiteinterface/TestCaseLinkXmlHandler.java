@@ -16,7 +16,7 @@ import org.xml.sax.XMLReader;
  * @see http://www.testtoolinterfaces.org
  *
  */
-public class TestCaseLinkXmlHandler extends TestLinkXmlHandler
+public class TestCaseLinkXmlHandler extends TestExecItemLinkXmlHandler
 {
 	public static final String START_ELEMENT = "testcaselink";
 
@@ -51,11 +51,11 @@ public class TestCaseLinkXmlHandler extends TestLinkXmlHandler
 
 		if ( link == null )
 		{
-			throw new TestSuiteException( "Link to TestCase not specified", id, this.getSequence() );
+			throw new TestSuiteException( "Link to TestCase not specified", id, this.getSequenceNr() );
 		}
 
 		TestCaseLink testCaseLink = new TestCaseLink( id,
-		                                              this.getSequence(),
+		                                              this.getSequenceNr(),
 		                                              link );
 
 		testCaseLink.setAnyAttributes( this.getAnyAttributes() );

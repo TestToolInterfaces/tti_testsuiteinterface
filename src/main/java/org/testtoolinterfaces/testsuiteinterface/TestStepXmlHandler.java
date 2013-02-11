@@ -1,7 +1,5 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
-import java.util.Hashtable;
-
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.TestInterface;
@@ -12,12 +10,12 @@ import org.testtoolinterfaces.testsuite.TestStepScript;
 import org.testtoolinterfaces.testsuite.TestStepSelection;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
-import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.Warning;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * <teststep sequence=...>
@@ -73,23 +71,19 @@ import org.xml.sax.XMLReader;
  * @see http://www.testtoolinterfaces.org
  * 
  */
-public class TestStepXmlHandler extends XmlHandler
+public class TestStepXmlHandler extends TestEntryXmlHandler
 {
 	public static final String START_ELEMENT = "teststep";
 	public static final String IF_ELEMENT = "if";
 	private static final String THEN_ELEMENT = "then";
 	private static final String ELSE_ELEMENT = "else";
 
-	private static final String ATTRIBUTE_SEQUENCE = "sequence";
 	private static final String ATTRIBUTE_NOT = "not";
-
-	private static final String DESCRIPTION_ELEMENT = "description";
 
     private TestInterfaceList myInterfaces;
 	private boolean myCheckStepParams = false;
 
 	// The sub-handlers
-    private GenericTagAndStringXmlHandler myDescriptionXmlHandler;
 	private CommandXmlHandler myCommandXmlHandler;
 	private ScriptXmlHandler myScriptXmlHandler;
 	private ParameterXmlHandler myParameterXmlHandler;
@@ -97,13 +91,8 @@ public class TestStepXmlHandler extends XmlHandler
 	private TestStepSequenceXmlHandler myElseXmlHandler;
 
 	// Needed to create the TestStep
-	private int mySequence;
 	private boolean myNot=false;
-	private String myDescription;
     private ParameterArrayList myParameters;
-	private Hashtable<String, String> myAnyAttributes;
-	private Hashtable<String, String> myAnyElements;
-	private String myAnyValue;
 	
     // In case of a TestStepCommand
 	private String myCommand;
@@ -132,9 +121,6 @@ public class TestStepXmlHandler extends XmlHandler
 	{
 		super(anXmlReader, aTag);
 		Trace.println(Trace.CONSTRUCTOR, "TestStepXmlHandler( anXmlreader )", true);
-
-		myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
-		this.addElementHandler(myDescriptionXmlHandler);
 
 		myParameterXmlHandler = new ParameterXmlHandler(anXmlReader);
 		this.addElementHandler(myParameterXmlHandler);
@@ -183,72 +169,41 @@ public class TestStepXmlHandler extends XmlHandler
 	}
 
 	@Override
-    public void processElementAttributes(String aQualifiedName, Attributes att) throws TestSuiteException
+    public void processElementAttributes(String aQualifiedName, Attributes att)
     {
-		Trace.println(Trace.SUITE, "processElementAttributes( "
+		Trace.print(Trace.SUITE, "processElementAttributes( "
 				+ aQualifiedName + " )", true );
+ 		Attributes leftAttributes = new AttributesImpl();
+
     	if (aQualifiedName.equalsIgnoreCase(this.getStartElement()))
     	{
 		    for (int i = 0; i < att.getLength(); i++)
 		    {
-		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_SEQUENCE))
-		    	{
-		    		mySequence = Integer.valueOf( att.getValue(i) ).intValue();
-		    		Trace.println( Trace.ALL, "        mySequence -> " + mySequence);
-    	    	}
+	    		Trace.append( Trace.SUITE, ", " + att.getQName(i) + "=" + att.getValue(i) );
 		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_NOT))
 		    	{
 		    		myNot = true;
 		    		// The value, if any, is ignored
 		    		Trace.println( Trace.ALL, "        myNot -> true");
-    	    	}
-		    	else
-		    	{
-		    		myAnyAttributes.put(att.getQName(i), att.getValue(i));
+		    	} else {
+		    		((AttributesImpl) leftAttributes).addAttribute( att.getURI(i), att.getLocalName(i),
+		    				att.getQName(i), att.getType(i), att.getValue(i));
 		    	}
 		    }
+    	} else {
+    		leftAttributes = att;
     	}
+		Trace.append( Trace.SUITE, " )\n" );
+		
+		super.processElementAttributes(aQualifiedName, leftAttributes);
     }
 
 	@Override
-	public void handleStartElement(String aQualifiedName)
-	{
-    	//nop
-	}
-
-	@Override
-	public void handleCharacters(String aValue)
-	{
-		myAnyValue += aValue;
-	}
-
-	@Override
-	public void handleEndElement(String aQualifiedName)
-	{
-		if ( ! aQualifiedName.equalsIgnoreCase(this.getStartElement()) )
-    	{
-			// TODO This will overwrite previous occurrences of the same elements. But that is possible in XML.
-			myAnyElements.put(aQualifiedName, myAnyValue);
-			myAnyValue = "";
-    	}
-	}
-	
-	@Override
-	public void handleGoToChildElement(String aQualifiedName)
-	{
-		// NOP
-	}
-
-	@Override
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
+			throws TestSuiteException
 	{
 		Trace.println(Trace.SUITE);
-    	if (aQualifiedName.equalsIgnoreCase(DESCRIPTION_ELEMENT))
-    	{
-    		myDescription  = myDescriptionXmlHandler.getValue();
-        	myDescriptionXmlHandler.reset();
-    	}
-    	else if (aQualifiedName.equalsIgnoreCase(ParameterXmlHandler.START_ELEMENT))
+    	if (aQualifiedName.equalsIgnoreCase(ParameterXmlHandler.START_ELEMENT))
     	{
 			try
 			{
@@ -302,7 +257,9 @@ public class TestStepXmlHandler extends XmlHandler
 			myElseSteps = myElseXmlHandler.getSteps();
 			myElseXmlHandler.reset();
     	}
-		// else nothing (ignored)
+    	else {
+			super.handleReturnFromChildElement(aQualifiedName, aChildXmlHandler);
+    	}
 	}
 
 	/**
@@ -331,6 +288,9 @@ public class TestStepXmlHandler extends XmlHandler
 		{
 			testStep = createTestStepSelection( testStep );
 		}
+		
+		testStep.setAnyAttributes( this.getAnyAttributes() );
+		testStep.setAnyElements( this.getAnyElements() );
 		
 		return testStep;
 	}
@@ -366,14 +326,8 @@ public class TestStepXmlHandler extends XmlHandler
 			myInterface.verifyParameters(myCommand, myParameters);
 		}
 
-		TestStepCommand tsCommand = new TestStepCommand( mySequence,
-		                            myDescription,
-		                            myCommand,
-		                            myInterface,
-		                            myParameters );
-		
-		tsCommand.setAnyAttributes(myAnyAttributes);
-		tsCommand.setAnyElements(myAnyElements);
+		TestStepCommand tsCommand = new TestStepCommand( this.getSequenceNr(), this.getDescription(),
+		                            myCommand, myInterface, myParameters );
 		
 		return tsCommand;
 	}
@@ -384,15 +338,9 @@ public class TestStepXmlHandler extends XmlHandler
 	 */
 	private TestStepScript createTestStepScript()
 	{
-		TestStepScript tsScript = new TestStepScript( mySequence,
-		                           myDescription,
-		                           myScript,
-		                           myScriptType,
-		                           myParameters );
+		TestStepScript tsScript = new TestStepScript( this.getSequenceNr(), this.getDescription(),
+		                           myScript, myScriptType, myParameters );
 
-		tsScript.setAnyAttributes(myAnyAttributes);
-		tsScript.setAnyElements(myAnyElements);
-		
 		return tsScript;
 	}
 
@@ -408,16 +356,9 @@ public class TestStepXmlHandler extends XmlHandler
 			throw new TestSuiteException( "No then-step defined for selection" );
 		}
 
-		TestStepSelection tsScript = new TestStepSelection( mySequence,
-		                              myDescription,
-		                              ifStep,
-		                              myNot,
-		                              myThenSteps,
-		                              myElseSteps );
+		TestStepSelection tsScript = new TestStepSelection( this.getSequenceNr(), this.getDescription(),
+		                              ifStep, myNot, myThenSteps, myElseSteps );
 
-		tsScript.setAnyAttributes(myAnyAttributes);
-		tsScript.setAnyElements(myAnyElements);
-		                      		
 		return tsScript;
 	}
 
@@ -426,12 +367,7 @@ public class TestStepXmlHandler extends XmlHandler
 	{
 		Trace.println(Trace.SUITE);
 
-		mySequence = 0;
-		myDescription = "";
 		myParameters = new ParameterArrayList();
-		myAnyAttributes = new Hashtable<String, String>();
-		myAnyElements = new Hashtable<String, String>();
-	    myAnyValue = "";
 	
 		myCommand = null;
 		myInterface = myInterfaces.getInterface( CommandXmlHandler.DEFAULT_INTERFACE_NAME );
@@ -442,5 +378,7 @@ public class TestStepXmlHandler extends XmlHandler
 		
         myThenSteps = new TestStepSequence();
         myElseSteps = new TestStepSequence();
+        
+        super.reset();
 	}
 }

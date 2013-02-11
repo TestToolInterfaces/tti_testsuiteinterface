@@ -26,7 +26,6 @@ public class CommandXmlHandler extends GenericTagAndStringXmlHandler
 	
 	private static final String ATTRIBUTE_INTERFACE = "interface";
 
-//	private String myCommand;
 	private TestInterface myInterface;
     
     private TestInterfaceList myInterfaces;
@@ -79,18 +78,6 @@ public class CommandXmlHandler extends GenericTagAndStringXmlHandler
     	}
     }
 
-//	@Override
-//	public void handleCharacters(String aValue)
-//	{
-//		Trace.print(Trace.SUITE, "handleCharacters( " 
-//		            + aValue + " )", true );
-//		String command = aValue.trim();
-//		if ( ! command.isEmpty() )
-//		{
-//			myCommand += command;
-//		}
-//	}
-
 	/**
 	 * @Deprecated use getCommand() and getInterface()
 	 */
@@ -126,7 +113,8 @@ public class CommandXmlHandler extends GenericTagAndStringXmlHandler
 	public void reset()
 	{
 		Trace.println(Trace.SUITE);
-		super.reset();
 		myInterface = myInterfaces.getInterface( DEFAULT_INTERFACE_NAME );
+
+		super.reset();
 	}
 }

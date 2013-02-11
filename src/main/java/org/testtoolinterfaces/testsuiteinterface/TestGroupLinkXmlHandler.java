@@ -16,7 +16,7 @@ import org.xml.sax.XMLReader;
  * @see http://www.testtoolinterfaces.org
  * 
  */
-public class TestGroupLinkXmlHandler extends TestLinkXmlHandler
+public class TestGroupLinkXmlHandler extends TestExecItemLinkXmlHandler
 {
 	public static final String START_ELEMENT = "testgrouplink";
 
@@ -51,11 +51,11 @@ public class TestGroupLinkXmlHandler extends TestLinkXmlHandler
 
 		if ( link == null )
 		{
-			throw new TestSuiteException( "Link to TestGroup not specified", id, this.getSequence() );
+			throw new TestSuiteException( "Link to TestGroup not specified", id, this.getSequenceNr() );
 		}
 
 		TestGroupLink testGrouplink = new TestGroupLink( id,
-			                                             this.getSequence(),
+			                                             this.getSequenceNr(),
 			                                             link );
 		
 		testGrouplink.setAnyAttributes( this.getAnyAttributes() );

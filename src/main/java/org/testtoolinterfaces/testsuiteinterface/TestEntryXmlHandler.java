@@ -108,7 +108,7 @@ public abstract class TestEntryXmlHandler extends XmlHandler
 
 	@Override
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
-				throws TestSuiteException
+			throws TestSuiteException
 	{
 		Trace.println(Trace.SUITE, "handleReturnFromChildElement( " + aQualifiedName + " )", true);
 

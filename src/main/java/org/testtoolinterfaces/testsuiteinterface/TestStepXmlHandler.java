@@ -91,7 +91,6 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 	private TestStepSequenceXmlHandler myElseXmlHandler;
 
 	// Needed to create the TestStep
-	private boolean myNot=false;
     private ParameterArrayList myParameters;
 	
     // In case of a TestStepCommand
@@ -103,6 +102,7 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 	private String myScriptType;
 
     // In case of a TestStepSelection
+	private boolean myNot=false;
 	private TestStepSequence myThenSteps;
 	private TestStepSequence myElseSteps;
 
@@ -272,11 +272,13 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 		TestStep testStep = null;
 		if ( myCommand != null )
 		{
-			testStep = createTestStepCommand();
+			testStep = createTestStepCommand( myInterface, myCommand, myParameters,
+					myCheckStepParams, this.getDescription(), this.getSequenceNr() );
 		}
 		else if ( myScript != null )
 		{
-			testStep = createTestStepScript();
+			testStep = createTestStepScript( myScript, myScriptType, myParameters,
+					this.getDescription(), this.getSequenceNr() );
 		}
 		else
 		{
@@ -295,22 +297,26 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 	}
 
 	/**
-	 * @return the TestStep as TestStepCommand
+	 * Creates a TestStep command.
+	 * 
+	 * @return the TestStepCommand
 	 * 
 	 * @throws TestSuiteException	When the interface does not support the command
 	 * 								or when the parameters are not correct defined for the command.
 	 * @throws Error				When the interface is null -> programming error.
 	 */
-	private TestStepCommand createTestStepCommand() throws Error, TestSuiteException
+	public static TestStepCommand createTestStepCommand( TestInterface anInterface, String aCommand,
+			ParameterArrayList aParameters, boolean aCheckParameters,
+			String aDescription, int aSequenceNr ) throws Error, TestSuiteException
 	{
-		if( myInterface == null )
+		if( anInterface == null )
 		{
 			throw new Error( "Interface cannot be null" );
 		}
 
-		if( ! myInterface.hasCommand(myCommand) )
+		if( ! anInterface.hasCommand(aCommand) )
 		{
-			throw new TestSuiteException( "Command " + myCommand + " not known for interface " + myInterface.getInterfaceName() );
+			throw new TestSuiteException( "Command " + aCommand + " not known for interface " + anInterface.getInterfaceName() );
 		}
 
 		/*
@@ -320,13 +326,13 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 		 * How to solve?
 		 * 
 		 */
-		if( myCheckStepParams )
+		if( aCheckParameters )
 		{
-			myInterface.verifyParameters(myCommand, myParameters);
+			anInterface.verifyParameters(aCommand, aParameters);
 		}
 
-		TestStepCommand tsCommand = new TestStepCommand( this.getSequenceNr(), this.getDescription(),
-		                            myCommand, myInterface, myParameters );
+		TestStepCommand tsCommand = new TestStepCommand( aSequenceNr, aDescription,
+				aCommand, anInterface, aParameters );
 		
 		return tsCommand;
 	}
@@ -335,10 +341,11 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 	 * @return the TestStep as TestStepScript
 	 * 
 	 */
-	private TestStepScript createTestStepScript()
+	public static TestStepScript createTestStepScript( String aScript, String aScriptType,
+			ParameterArrayList aParameters,	String aDescription, int aSequenceNr )
 	{
-		TestStepScript tsScript = new TestStepScript( this.getSequenceNr(), this.getDescription(),
-		                           myScript, myScriptType, myParameters );
+		TestStepScript tsScript = new TestStepScript( aSequenceNr, aDescription,
+				aScript, aScriptType, aParameters );
 
 		return tsScript;
 	}

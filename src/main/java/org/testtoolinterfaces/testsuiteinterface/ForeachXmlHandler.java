@@ -62,8 +62,7 @@ abstract public class ForeachXmlHandler<E extends TestEntry> extends XmlHandler
 	 * @throws SAXException 
 	 * @throws ParserConfigurationException 
 	 */
-	public ForeachXmlHandler( XMLReader anXmlReader,
-			TestInterfaceList anInterfaceList, boolean aCheckStepParameter ) {
+	public ForeachXmlHandler( XMLReader anXmlReader ) {
 		super( anXmlReader, START_ELEMENT );
 		Trace.println(Trace.CONSTRUCTOR, "TestStepSequenceXmlHandler( anXmlreader )", true);
 

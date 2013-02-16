@@ -10,14 +10,12 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.junit.Before;
-import org.testtoolinterfaces.testsuite.TestEntry;
 import org.testtoolinterfaces.testsuite.TestInterfaceListHelper;
 import org.testtoolinterfaces.testsuite.TestInterface_stub;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepCommand;
 import org.testtoolinterfaces.testsuite.TestStepSelection;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
-import org.testtoolinterfaces.testsuiteinterface.TestStepSequenceXmlHandler;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.XMLReader;
 
@@ -83,30 +81,30 @@ public class TestStepSequenceXmlHandlerTester extends TestCase
     	Assert.assertEquals("Incorrect sequence Nr", 3, steps[2].getSequenceNr());
     	Assert.assertEquals("Incorrect sequence Nr", 5, steps[3].getSequenceNr());
 
-    	Assert.assertEquals( "Incorrect TestStep",
-    						 TestEntry.TYPE.Step,
-    						 steps[0].getType() );
+//    	Assert.assertEquals( "Incorrect TestStep",
+//    						 TestEntry.TYPE.Step,
+//    						 steps[0].getType() );
     	Assert.assertEquals( "Incorrect TestStep description",
     						 "A description of the first action step.",
     						 steps[0].getDescription() );
 
-    	Assert.assertEquals( "Incorrect TestStep",
-    						 TestEntry.TYPE.Step,
-    						 steps[1].getType() );
+//    	Assert.assertEquals( "Incorrect TestStep",
+//    						 TestEntry.TYPE.Step,
+//    						 steps[1].getType() );
     	Assert.assertEquals( "Incorrect TestStep description",
 				 			 "A description of the if step.",
 				 			 steps[1].getDescription() );
 
-    	Assert.assertEquals( "Incorrect TestStep",
-    						 TestEntry.TYPE.Step,
-    						 steps[2].getType() );
+//    	Assert.assertEquals( "Incorrect TestStep",
+//    						 TestEntry.TYPE.Step,
+//    						 steps[2].getType() );
     	Assert.assertEquals( "Incorrect TestStep description",
 				 			 "A description of the check step.",
 				 			 steps[2].getDescription() );
 
-    	Assert.assertEquals( "Incorrect TestStep",
-    						 TestEntry.TYPE.Step,
-    						 steps[3].getType() );
+//    	Assert.assertEquals( "Incorrect TestStep",
+//    						 TestEntry.TYPE.Step,
+//    						 steps[3].getType() );
     	Assert.assertEquals( "Incorrect TestStep description",
     						 "A description of the second action step.",
     						 steps[3].getDescription() );

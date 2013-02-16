@@ -2,7 +2,6 @@ package org.testtoolinterfaces.testsuiteinterface;
 
 import org.testtoolinterfaces.testsuite.TestGroupEntry;
 import org.testtoolinterfaces.testsuite.TestGroupEntrySequence;
-import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
@@ -40,13 +39,9 @@ public class TestGroupEntrySequenceXmlHandler extends XmlHandler
 	 * 
 	 * @param anXmlReader 			the xmlReader
 	 * @param aTag					the start-element for this XML Handler
-	 * @param anInterfaceList		a list of interfaces
-	 * @param aCheckStepParameter	flag to indicate if specified parameters of a step must be verified in the interface
 	 */
 	public TestGroupEntrySequenceXmlHandler( XMLReader anXmlReader,
-	                                   String aTag,
-	                                   TestInterfaceList anInterfaceList,
-	                                   boolean aCheckStepParameter )
+	                                   String aTag )
 	{
 		super(anXmlReader, aTag);
 		Trace.println(Trace.CONSTRUCTOR, "TestStepSequenceXmlHandler( anXmlreader, " + aTag + " )", true);

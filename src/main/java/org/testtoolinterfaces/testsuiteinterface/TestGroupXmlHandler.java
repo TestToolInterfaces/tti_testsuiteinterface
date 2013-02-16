@@ -31,6 +31,9 @@ import org.xml.sax.XMLReader;
  *  <foreach>
  *   ...
  *  </foreach>
+ *  <if>
+ *   ...
+ *  </if>
  *  <restore>
  *   ...
  *  </restore>
@@ -52,8 +55,12 @@ public class TestGroupXmlHandler extends TestExecItemXmlHandler
     private TestCaseLinkXmlHandler myTestCaseLinkXmlHandler;
 	private TestGroupLinkXmlHandler myTestGroupLinkXmlHandler;
 	private ForeachEntryXmlHandler myForeachXmlHandler;
+	private IfExecItemLinkXmlHandler myIfXmlHandler;
 	
 	private int myNextExecutionSequenceNr = 0;
+
+	private TestInterfaceList myInterfaceList;
+	private boolean myCheckStepParameter;
 
 	/**
 	 * Creates the XML Handler
@@ -73,10 +80,27 @@ public class TestGroupXmlHandler extends TestExecItemXmlHandler
 		myTestGroupLinkXmlHandler = new TestGroupLinkXmlHandler(anXmlReader);
 		this.addElementHandler(myTestGroupLinkXmlHandler);
 
-		myForeachXmlHandler = new ForeachEntryXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
+		myForeachXmlHandler = new ForeachEntryXmlHandler(anXmlReader);
 		this.addElementHandler(myForeachXmlHandler);
 
+		// myIfXmlHandler is created when needed to prevent loops
+
+		myInterfaceList = anInterfaceList;
+		myCheckStepParameter = aCheckStepParameter;
+		
 		this.resetGroupHandler();
+	}
+
+	@Override
+	public void handleGoToChildElement(String aQualifiedName)
+	{
+     	if ( myIfXmlHandler == null && aQualifiedName.equalsIgnoreCase(TestStepXmlHandler.IF_ELEMENT) )
+    	{
+     		// We'll create a TestStepXmlHandler for if-steps only when we need it.
+     		// Otherwise it would create an endless loop.
+    		myIfXmlHandler = new IfExecItemLinkXmlHandler(this.getXmlReader(), myInterfaceList, myCheckStepParameter);
+    		this.addElementHandler(myIfXmlHandler);
+    	}
 	}
 
 	@Override
@@ -85,39 +109,37 @@ public class TestGroupXmlHandler extends TestExecItemXmlHandler
 	{
 		Trace.println(Trace.SUITE, "handleReturnFromChildElement( " + aQualifiedName + " )", true);
 
+		TestGroupEntry testEntry = null;
 		if (aQualifiedName.equalsIgnoreCase(TestGroupLinkXmlHandler.START_ELEMENT))
     	{
-    		TestGroupEntry testEntry = (TestGroupEntry) myTestGroupLinkXmlHandler.getTestGroupLink();
-    		setSequenceNr(testEntry);
-    		myTestEntries.add( testEntry );
-
-    		myTestGroupLinkXmlHandler.reset();
+    		testEntry = myTestGroupLinkXmlHandler.getTestGroupLink();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(TestCaseLinkXmlHandler.START_ELEMENT))
     	{
-    		TestGroupEntry testEntry = (TestGroupEntry) myTestCaseLinkXmlHandler.getTestCaseLink();
-    		setSequenceNr(testEntry);
-    		myTestEntries.add( testEntry );
-
-			myTestCaseLinkXmlHandler.reset();
+    		testEntry = myTestCaseLinkXmlHandler.getTestCaseLink();
     	}
     	else if (aQualifiedName.equalsIgnoreCase(ForeachXmlHandler.START_ELEMENT))
     	{
-    		TestGroupEntry testEntry;
 			try {
-				testEntry = (TestGroupEntry) myForeachXmlHandler.getTestEntryIteration();
+				testEntry = myForeachXmlHandler.getTestEntryIteration();
 			} catch (TTIException e) {
 				Trace.print(Trace.SUITE, e);
 				throw new TestSuiteException( "Cannot add an iteration of TestGroupEntries", e );
 			}
-    		setSequenceNr(testEntry);
-    		myTestEntries.add( testEntry );
-
-    		myForeachXmlHandler.reset();
+    	}
+    	else if (aQualifiedName.equalsIgnoreCase(IfExecItemLinkXmlHandler.START_ELEMENT))
+    	{
+    		testEntry = myIfXmlHandler.getIf();
     	}
     	else {
 			super.handleReturnFromChildElement(aQualifiedName, aChildXmlHandler);
     	}
+		if ( testEntry != null ) {
+			setSequenceNr(testEntry);
+			myTestEntries.add( testEntry );
+		}
+
+		aChildXmlHandler.reset();
 	}
 
 	/**

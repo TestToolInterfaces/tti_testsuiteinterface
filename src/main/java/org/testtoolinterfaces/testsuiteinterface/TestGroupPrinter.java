@@ -8,14 +8,13 @@ import java.util.Iterator;
 
 import org.testtoolinterfaces.testsuite.LooseTestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestCaseLink;
+import org.testtoolinterfaces.testsuite.TestGroup;
 import org.testtoolinterfaces.testsuite.TestGroupEntry;
 import org.testtoolinterfaces.testsuite.TestGroupEntrySequence;
-import org.testtoolinterfaces.testsuite.TestGroup;
 import org.testtoolinterfaces.testsuite.TestGroupLink;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
-import org.testtoolinterfaces.testsuite.TestEntry.TYPE;
 import org.testtoolinterfaces.utils.Trace;
 
 /**
@@ -75,7 +74,7 @@ public class TestGroupPrinter
 		while(itr1.hasNext() )
 		{
 			TestStep step = itr1.next();
-			System.out.println( anIndent + step.getSequenceNr() + " - " + step.getType() );
+			System.out.println( anIndent + step.getSequenceNr() + " - " + step.getDisplayName() );
 		}
 
 		System.out.println( anIndent + "=================== Execution =======================" );
@@ -84,11 +83,11 @@ public class TestGroupPrinter
 		while(itr2.hasNext() )
 		{
 			TestGroupEntry entry = itr2.next();
-			if ( entry.getType() == TYPE.Group )
+			if ( entry instanceof TestGroup )
 			{
 				printTestGroup( (TestGroup) entry, aBaseDir, anIndent + "  " );
 			}
-			else if ( entry.getType() == TYPE.GroupLink )
+			else if ( entry instanceof TestGroupLink )
 			{
 				TestGroupLink tgLink = (TestGroupLink) entry;
 				File tgFile = new File( aBaseDir, tgLink.getLink().getPath() );
@@ -100,7 +99,7 @@ public class TestGroupPrinter
 			else
 			{
 				System.out.println( anIndent + entry.getSequenceNr() + " - " + entry.getId() );
-				if ( entry.getType() == TYPE.CaseLink )
+				if ( entry instanceof TestCaseLink )
 				{
 					TestCaseLink tcLink = (TestCaseLink) entry;
 					File tcFile = new File( aBaseDir, tcLink.getLink().getPath() );
@@ -115,7 +114,7 @@ public class TestGroupPrinter
 		while(itr3.hasNext() )
 		{
 			TestStep step = itr3.next();
-			System.out.println( anIndent + step.getSequenceNr() + " - " + step.getType() );
+			System.out.println( anIndent + step.getSequenceNr() + " - " + step.getDisplayName() );
 		}
 
 		System.out.println( anIndent + "=====================================================" );

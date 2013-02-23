@@ -2,7 +2,9 @@ package org.testtoolinterfaces.testsuiteinterface;
 
 import org.testtoolinterfaces.testsuite.TestGroupEntry;
 import org.testtoolinterfaces.testsuite.TestGroupEntrySequence;
+import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.utils.TTIException;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
@@ -19,6 +21,12 @@ import org.xml.sax.XMLReader;
  *  <testgrouplink>
  *  ...
  *  </testgrouplink>
+ *  <if>
+ *  ...
+ *  </if
+ *  <foreach>
+ *  ...
+ *  </foreach>
  * </[tag]>
  * 
  * @author Arjan Kranenburg 
@@ -32,6 +40,12 @@ public class TestGroupEntrySequenceXmlHandler extends XmlHandler
 	private TestCaseLinkXmlHandler myTestCaseLinkXmlHandler;
 	private TestGroupLinkXmlHandler myTestGroupLinkXmlHandler;
 	
+	private ForeachEntryXmlHandler myForeachXmlHandler;
+	private IfExecItemLinkXmlHandler myIfXmlHandler;
+
+    private TestInterfaceList myInterfaceList;
+	private boolean myCheckStepParameter = false;
+
 	private int myNextSequenceNr = 0;
 
 	/**
@@ -41,7 +55,7 @@ public class TestGroupEntrySequenceXmlHandler extends XmlHandler
 	 * @param aTag					the start-element for this XML Handler
 	 */
 	public TestGroupEntrySequenceXmlHandler( XMLReader anXmlReader,
-	                                   String aTag )
+			String aTag, TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{
 		super(anXmlReader, aTag);
 		Trace.println(Trace.CONSTRUCTOR, "TestStepSequenceXmlHandler( anXmlreader, " + aTag + " )", true);
@@ -52,7 +66,33 @@ public class TestGroupEntrySequenceXmlHandler extends XmlHandler
 		myTestGroupLinkXmlHandler = new TestGroupLinkXmlHandler(anXmlReader);
 		this.addElementHandler(myTestGroupLinkXmlHandler);
 
+		// myForeachXmlHandler is created when needed to prevent loops
+
+		// myIfXmlHandler is created when needed to prevent loops
+
+		myInterfaceList = anInterfaceList;
+		myCheckStepParameter = aCheckStepParameter;
+
 		this.reset();
+	}
+
+	@Override
+	public void handleGoToChildElement(String aQualifiedName)
+	{
+     	if ( myIfXmlHandler == null && aQualifiedName.equalsIgnoreCase(TestStepXmlHandler.IF_ELEMENT) )
+    	{
+     		// We'll create a XmlHandler for if-steps only when we need it.
+     		// Otherwise it would create an endless loop.
+    		myIfXmlHandler = new IfExecItemLinkXmlHandler(this.getXmlReader(), myInterfaceList, myCheckStepParameter);
+    		this.addElementHandler(myIfXmlHandler);
+    	}
+     	else if ( myForeachXmlHandler == null && aQualifiedName.equalsIgnoreCase(ForeachEntryXmlHandler.START_ELEMENT) )
+    	{
+     		// We'll create a XmlHandler for foreach-steps only when we need it.
+     		// Otherwise it would create an endless loop.
+    		myForeachXmlHandler = new ForeachEntryXmlHandler(this.getXmlReader(), myInterfaceList, myCheckStepParameter);
+    		this.addElementHandler(myForeachXmlHandler);
+    	}
 	}
 
 	@Override
@@ -80,12 +120,6 @@ public class TestGroupEntrySequenceXmlHandler extends XmlHandler
 	}
 	
 	@Override
-	public void handleGoToChildElement(String aQualifiedName)
-	{
-    	//nop
-	}
-
-	@Override
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 				throws TestSuiteException
 	{
@@ -101,6 +135,19 @@ public class TestGroupEntrySequenceXmlHandler extends XmlHandler
     	{
     		entry = myTestGroupLinkXmlHandler.getTestGroupLink();
     		myTestGroupLinkXmlHandler.reset();
+    	}
+    	else if (aQualifiedName.equalsIgnoreCase(ForeachXmlHandler.START_ELEMENT))
+    	{
+			try {
+				entry = myForeachXmlHandler.getTestEntryIteration();
+			} catch (TTIException e) {
+				Trace.print(Trace.SUITE, e);
+				throw new TestSuiteException( "Cannot add an iteration of TestGroupEntries", e );
+			}
+    	}
+    	else if (aQualifiedName.equalsIgnoreCase(IfExecItemLinkXmlHandler.START_ELEMENT))
+    	{
+    		entry = myIfXmlHandler.getIf();
     	}
     	else
     	{ // Programming fault

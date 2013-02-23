@@ -17,26 +17,26 @@ import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * <if [not="true"] sequence=...>
+ *  <command> ... </command>]
  *  <description>
  *    ...
  *  </description>
  *  <parameter>
  *    ...
  *  </parameter>
- *  <command> ... </command>]
  *  <then>...</then>
  *  <else>...</else>
  *  ...
  * </if>
  * 
  * <if [not] sequence=...>
+ *  <script> ... </script>
  *  <description>
  *    ...
  *  </description>
  *  <parameter>
  *    ...
  *  </parameter>
- *  <script> ... </script>
  *  <then>...</then>
  *  <else>...</else>
  *  ...
@@ -112,10 +112,12 @@ public class IfExecItemLinkXmlHandler extends TestGroupEntryXmlHandler
 		myScriptXmlHandler = new ScriptXmlHandler(anXmlReader);
 		this.addElementHandler(myScriptXmlHandler);
 
-		myThenXmlHandler = new TestGroupEntrySequenceXmlHandler(this.getXmlReader(), THEN_ELEMENT);
+		myThenXmlHandler = new TestGroupEntrySequenceXmlHandler(this.getXmlReader(),
+				THEN_ELEMENT, myInterfaces, myCheckStepParams);
 		this.addElementHandler(myThenXmlHandler);
 
-		myElseXmlHandler = new TestGroupEntrySequenceXmlHandler(this.getXmlReader(), ELSE_ELEMENT);
+		myElseXmlHandler = new TestGroupEntrySequenceXmlHandler(this.getXmlReader(),
+				ELSE_ELEMENT, myInterfaces, myCheckStepParams);
 		this.addElementHandler(myElseXmlHandler);
 
 		myInterfaces = anInterfaceList;

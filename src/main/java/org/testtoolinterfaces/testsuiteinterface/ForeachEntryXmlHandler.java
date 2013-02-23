@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.testtoolinterfaces.testsuite.TestGroupEntry;
 import org.testtoolinterfaces.testsuite.TestGroupEntryIteration;
+import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.TTIException;
 import org.testtoolinterfaces.utils.Trace;
@@ -31,15 +32,16 @@ import org.xml.sax.XMLReader;
  */
 public class ForeachEntryXmlHandler extends ForeachXmlHandler<TestGroupEntry>
 {
-
     private Collection<TestGroupEntry> myDoEntries;
 
 	private TestGroupEntrySequenceXmlHandler myDoEntriesXmlHandler;
 
-	public ForeachEntryXmlHandler(XMLReader anXmlReader) {
+	public ForeachEntryXmlHandler(XMLReader anXmlReader,
+			TestInterfaceList anInterfaceList, boolean aCheckStepParameter) {
 		super(anXmlReader);
 
-		myDoEntriesXmlHandler = new TestGroupEntrySequenceXmlHandler(anXmlReader, DO_ELEMENT);
+		myDoEntriesXmlHandler = new TestGroupEntrySequenceXmlHandler(anXmlReader,
+				DO_ELEMENT, anInterfaceList, aCheckStepParameter);
 		this.addElementHandler(myDoEntriesXmlHandler);
 
 		this.reset();

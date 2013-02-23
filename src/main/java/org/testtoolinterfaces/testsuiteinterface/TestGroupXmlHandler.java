@@ -80,7 +80,7 @@ public class TestGroupXmlHandler extends TestExecItemXmlHandler
 		myTestGroupLinkXmlHandler = new TestGroupLinkXmlHandler(anXmlReader);
 		this.addElementHandler(myTestGroupLinkXmlHandler);
 
-		myForeachXmlHandler = new ForeachEntryXmlHandler(anXmlReader);
+		myForeachXmlHandler = new ForeachEntryXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
 		this.addElementHandler(myForeachXmlHandler);
 
 		// myIfXmlHandler is created when needed to prevent loops
@@ -96,7 +96,7 @@ public class TestGroupXmlHandler extends TestExecItemXmlHandler
 	{
      	if ( myIfXmlHandler == null && aQualifiedName.equalsIgnoreCase(TestStepXmlHandler.IF_ELEMENT) )
     	{
-     		// We'll create a TestStepXmlHandler for if-steps only when we need it.
+     		// We'll create a XmlHandler for if-steps only when we need it.
      		// Otherwise it would create an endless loop.
     		myIfXmlHandler = new IfExecItemLinkXmlHandler(this.getXmlReader(), myInterfaceList, myCheckStepParameter);
     		this.addElementHandler(myIfXmlHandler);

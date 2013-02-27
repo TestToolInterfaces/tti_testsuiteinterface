@@ -39,7 +39,7 @@ public class ForeachStepXmlHandler extends ForeachXmlHandler<TestStep>
 
 	public ForeachStepXmlHandler(XMLReader anXmlReader,
 			TestInterfaceList anInterfaceList, boolean aCheckStepParameter) {
-		super(anXmlReader);
+		super(anXmlReader, anInterfaceList, aCheckStepParameter);
 
 		myDoEntriesXmlHandler = new TestStepSequenceXmlHandler(anXmlReader, DO_ELEMENT, anInterfaceList, aCheckStepParameter);
 		this.addElementHandler(myDoEntriesXmlHandler);
@@ -82,7 +82,7 @@ public class ForeachStepXmlHandler extends ForeachXmlHandler<TestStep>
 		}
 		
 		return new TestStepIteration( description, sequenceNr, itemName, listName,
-				this.myDoEntries );
+				this.myDoEntries, this.getUntilStep() );
 	}
 
 	@Override

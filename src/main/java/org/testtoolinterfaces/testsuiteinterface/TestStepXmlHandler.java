@@ -18,18 +18,18 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * <teststep sequence=...>
+ * <teststep [sequence=...]>
  *  <description>
  *    ...
  *  </description>
  *  <parameter>
  *    ...
  *  </parameter>
- *  <command> ... </command>]
+ *  <command> ... </command>
  *  ...
  * </teststep>
  * 
- * <teststep sequence=...>
+ * <teststep [sequence=...]>
  *  <description>
  *    ...
  *  </description>
@@ -40,7 +40,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *  ...
  * </teststep>
  * 
- * <if [not="true"] sequence=...>
+ * <if [not="true"] [sequence=...]>
  *  <description>
  *    ...
  *  </description>
@@ -53,7 +53,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *  ...
  * </if>
  * 
- * <if [not] sequence=...>
+ * <if [not="true"] [sequence=...]>
  *  <description>
  *    ...
  *  </description>
@@ -66,6 +66,27 @@ import org.xml.sax.helpers.AttributesImpl;
  *  ...
  * </if>
  * 
+ * <{tag} [not="true"] [sequence=...]>
+ *  <description>
+ *    ...
+ *  </description>
+ *  <command> ... </command>]
+ *  <parameter>
+ *    ...
+ *  </parameter>
+ *  ...
+ * </{tag}>
+ * 
+ * <{tag} [not="true"] [sequence=...]>
+ *  <description>
+ *    ...
+ *  </description>
+ *  <script> ... </script>
+ *  <parameter>
+ *    ...
+ *  </parameter>
+ *  ...
+ * </{tag}>
  * 
  * @author Arjan Kranenburg 
  * @see http://www.testtoolinterfaces.org

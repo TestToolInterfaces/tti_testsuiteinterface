@@ -21,6 +21,7 @@ import org.xml.sax.XMLReader;
  *  <do>
  *  ...
  *  </do>
+ *  <until></until>
  * </foreach>
  * 
  * 
@@ -41,19 +42,22 @@ abstract public class ForeachXmlHandler<E extends TestEntry> extends XmlHandler
 	private static final String ATTRIBUTE_SEQUENCE = "sequence";
 
 	private static final String DESCRIPTION_ELEMENT = "description";
-	protected static final String ITEM_ELEMENT   = "item";
-	protected static final String LIST_ELEMENT   = "list";
-	protected static final String DO_ELEMENT     = "do";
+	protected static final String ITEM_ELEMENT      = "item";
+	protected static final String LIST_ELEMENT      = "list";
+	protected static final String DO_ELEMENT        = "do";
+	protected static final String UNTIL_ELEMENT     = "until";
 	
 	private int mySequenceNr;
 
 	private String myDescription;
     private String itemName;
     private String listName;
+    private TestStep untilStep;
 
 	private GenericTagAndStringXmlHandler myDescriptionXmlHandler;
 	private GenericTagAndStringXmlHandler myItemNameXmlHandler;
 	private GenericTagAndStringXmlHandler myListNameXmlHandler;
+	private TestStepXmlHandler myUntilXmlHandler;
 	
 	/**
 	 * Creates the XML Handler
@@ -62,7 +66,8 @@ abstract public class ForeachXmlHandler<E extends TestEntry> extends XmlHandler
 	 * @throws SAXException 
 	 * @throws ParserConfigurationException 
 	 */
-	public ForeachXmlHandler( XMLReader anXmlReader ) {
+	public ForeachXmlHandler( XMLReader anXmlReader,
+			TestInterfaceList anInterfaceList, boolean aCheckStepParameter ) {
 		super( anXmlReader, START_ELEMENT );
 		Trace.println(Trace.CONSTRUCTOR, "TestStepSequenceXmlHandler( anXmlreader )", true);
 
@@ -74,6 +79,9 @@ abstract public class ForeachXmlHandler<E extends TestEntry> extends XmlHandler
 
 		myListNameXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, LIST_ELEMENT);
 		this.addElementHandler(myListNameXmlHandler);
+
+		myUntilXmlHandler = new TestStepXmlHandler(anXmlReader, UNTIL_ELEMENT, anInterfaceList, aCheckStepParameter);
+		this.addElementHandler(myUntilXmlHandler);
 
 		this.reset();
 	}
@@ -153,6 +161,11 @@ abstract public class ForeachXmlHandler<E extends TestEntry> extends XmlHandler
     		this.listName = myListNameXmlHandler.getValue();
     		myListNameXmlHandler.reset();
     	}
+    	else if (aQualifiedName.equalsIgnoreCase(UNTIL_ELEMENT))
+    	{
+    		this.untilStep = myUntilXmlHandler.getStep();
+    		myUntilXmlHandler.reset();
+    	}
     	else
     	{ // Programming fault
 			throw new Error( "Child XML Handler returned, but not recognized. The handler was probably defined " +
@@ -188,6 +201,13 @@ abstract public class ForeachXmlHandler<E extends TestEntry> extends XmlHandler
 		return listName;
 	}
 
+	/**
+	 * @return the untilStep
+	 */
+	protected TestStep getUntilStep() {
+		return untilStep;
+	}
+
 	@Override
 	public void reset()
 	{
@@ -196,6 +216,7 @@ abstract public class ForeachXmlHandler<E extends TestEntry> extends XmlHandler
 		myDescription = "";
 		this.itemName = "";
 		this.listName = "";
+		this.untilStep = null;
 		// NOP
 	}
 }

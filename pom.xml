@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.testtoolinterfaces</groupId>
   <artifactId>testsuiteinterface</artifactId>
-  <version>0.3.11</version>
+  <version>0.3.12-SNAPSHOT</version>
   <name>Test Tool Interfaces - Test Suite Interface</name>
   <description>Test Suite Interface for Test Tool Interfaces</description>
   <url>http://www.testtoolinterfaces.org/</url>

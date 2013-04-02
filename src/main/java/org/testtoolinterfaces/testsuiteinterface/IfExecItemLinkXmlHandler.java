@@ -113,11 +113,11 @@ public class IfExecItemLinkXmlHandler extends TestGroupEntryXmlHandler
 		this.addElementHandler(myScriptXmlHandler);
 
 		myThenXmlHandler = new TestGroupEntrySequenceXmlHandler(this.getXmlReader(),
-				THEN_ELEMENT, myInterfaces, myCheckStepParams);
+				THEN_ELEMENT, anInterfaceList, aCheckStepParameter);
 		this.addElementHandler(myThenXmlHandler);
 
 		myElseXmlHandler = new TestGroupEntrySequenceXmlHandler(this.getXmlReader(),
-				ELSE_ELEMENT, myInterfaces, myCheckStepParams);
+				ELSE_ELEMENT, anInterfaceList, aCheckStepParameter);
 		this.addElementHandler(myElseXmlHandler);
 
 		myInterfaces = anInterfaceList;

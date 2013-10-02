@@ -18,9 +18,6 @@ import org.xml.sax.XMLReader;
  *  <teststep>
  *  ...
  *  </teststep>
- * </[tag]>
- * 
-  * <[tag]>
  *  <if>
  *  ...
  *  </if>

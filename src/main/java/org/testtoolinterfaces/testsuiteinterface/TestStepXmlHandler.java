@@ -66,7 +66,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *  ...
  * </if>
  * 
- * <{tag} [not="true"] [sequence=...]>
+ * <{tag} [sequence=...]>
  *  <description>
  *    ...
  *  </description>
@@ -77,7 +77,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *  ...
  * </{tag}>
  * 
- * <{tag} [not="true"] [sequence=...]>
+ * <{tag} [sequence=...]>
  *  <description>
  *    ...
  *  </description>

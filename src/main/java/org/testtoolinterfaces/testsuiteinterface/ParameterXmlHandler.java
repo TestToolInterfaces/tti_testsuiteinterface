@@ -10,7 +10,6 @@ import org.testtoolinterfaces.testsuite.ParameterHash;
 import org.testtoolinterfaces.testsuite.ParameterVariable;
 import org.testtoolinterfaces.testsuite.TestInterface;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
-import org.testtoolinterfaces.testsuite.impl.TestCaseImpl;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.XmlHandler;
@@ -34,7 +33,7 @@ import org.xml.sax.XMLReader;
  */
 public class ParameterXmlHandler extends XmlHandler
 {
-    private static final Logger LOG = LoggerFactory.getLogger(TestCaseImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ParameterXmlHandler.class);
 
     public static final String START_ELEMENT = "parameter";
 	private static final String ATTRIBUTE_ID = "id";

@@ -2,11 +2,13 @@ package org.testtoolinterfaces.testsuiteinterface;
 
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
-import org.testtoolinterfaces.utils.Trace;
+import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.XMLReader;
 
@@ -30,6 +32,7 @@ import org.xml.sax.XMLReader;
 
 public class TestExecItemXmlHandler extends TestGroupEntryXmlHandler
 {
+    private static final Logger LOG = LoggerFactory.getLogger(TestExecItemXmlHandler.class);
 	
 	private static final String REQUIREMENT_ELEMENT = "requirementid";
 	
@@ -55,7 +58,8 @@ public class TestExecItemXmlHandler extends TestGroupEntryXmlHandler
 			TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{
 		super(anXmlReader, aStartElement);
-		Trace.println(Trace.CONSTRUCTOR);
+		LOG.trace(Mark.CONSTRUCTOR, "{}, {}, {}, {}", 
+				anXmlReader, aStartElement, anInterfaceList, aCheckStepParameter);
 
 //	    ArrayList<TestStep.StepType> prepRestAllowedTypes = new ArrayList<TestStep.StepType>();
 //	    prepRestAllowedTypes.add( TestStep.StepType.action );
@@ -85,7 +89,7 @@ public class TestExecItemXmlHandler extends TestGroupEntryXmlHandler
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 			throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.CONSTRUCTOR, "{}, {}", aQualifiedName, aChildXmlHandler);
     	if (aQualifiedName.equalsIgnoreCase(REQUIREMENT_ELEMENT))
     	{
     		myRequirementIds.add(myRequirementIdXmlHandler.getValue());
@@ -135,7 +139,7 @@ public class TestExecItemXmlHandler extends TestGroupEntryXmlHandler
 	
 	public final void resetExecItemHandler()
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 	    myRequirementIds = new ArrayList<String>();
 		myPrepareSteps = new TestStepSequence();
 		myRestoreSteps = new TestStepSequence();

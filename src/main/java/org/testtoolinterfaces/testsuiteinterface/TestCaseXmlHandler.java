@@ -1,12 +1,14 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testtoolinterfaces.testsuite.TestCase;
-import org.testtoolinterfaces.testsuite.TestCaseImpl;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestLink;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
-import org.testtoolinterfaces.utils.Trace;
+import org.testtoolinterfaces.testsuite.impl.TestCaseImpl;
+import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.XMLReader;
 
@@ -37,7 +39,9 @@ import org.xml.sax.XMLReader;
 
 public class TestCaseXmlHandler extends TestExecItemXmlHandler
 {
-	public static final String START_ELEMENT = "testcase";
+    private static final Logger LOG = LoggerFactory.getLogger(TestCaseXmlHandler.class);
+
+    public static final String START_ELEMENT = "testcase";
 
 	private static final String EXECUTE_ELEMENT = "execute";
 
@@ -56,7 +60,7 @@ public class TestCaseXmlHandler extends TestExecItemXmlHandler
 	public TestCaseXmlHandler( XMLReader anXmlReader, TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{
 		super(anXmlReader, START_ELEMENT, anInterfaceList, aCheckStepParameter);
-		Trace.println(Trace.CONSTRUCTOR);
+		LOG.trace(Mark.CONSTRUCTOR, "{}, {}", anXmlReader, anInterfaceList);
 
 //	    ArrayList<TestStep.StepType> execAllowedTypes = new ArrayList<TestStep.StepType>();
 //	    execAllowedTypes.add( TestStep.StepType.action );
@@ -77,7 +81,7 @@ public class TestCaseXmlHandler extends TestExecItemXmlHandler
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 			throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, aChildXmlHandler);
     	if (aQualifiedName.equalsIgnoreCase(EXECUTE_ELEMENT))
     	{
     		myExecutionSteps = myExecutionXmlHandler.getSteps();
@@ -96,7 +100,7 @@ public class TestCaseXmlHandler extends TestExecItemXmlHandler
      */
     public TestCase getTestCase() throws TestSuiteException
     {
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 
 		String id = this.getId();
 		if ( id.isEmpty() )
@@ -125,7 +129,7 @@ public class TestCaseXmlHandler extends TestExecItemXmlHandler
 
 	public final void resetCaseHandler()
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 		myExecutionSteps = new TestStepSequence();
 
 		super.resetExecItemHandler();

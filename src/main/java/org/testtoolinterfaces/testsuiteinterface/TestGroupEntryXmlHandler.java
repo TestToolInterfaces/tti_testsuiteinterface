@@ -1,6 +1,8 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
-import org.testtoolinterfaces.utils.Trace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testtoolinterfaces.utils.Mark;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.AttributesImpl;
@@ -18,7 +20,9 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public abstract class TestGroupEntryXmlHandler extends TestEntryXmlHandler
 {
-	private static final String ELEMENT_ID = "id";
+    private static final Logger LOG = LoggerFactory.getLogger(TestGroupEntryXmlHandler.class);
+
+    private static final String ELEMENT_ID = "id";
 
 	private String myId;
 
@@ -31,7 +35,7 @@ public abstract class TestGroupEntryXmlHandler extends TestEntryXmlHandler
 	public TestGroupEntryXmlHandler( XMLReader anXmlReader, String aStartElement )
 	{
 		super(anXmlReader, aStartElement);
-		Trace.println(Trace.CONSTRUCTOR);
+		LOG.trace(Mark.CONSTRUCTOR, "{}, {}", anXmlReader, aStartElement);
 		
 		this.resetGroupEntryHandler();
 	}
@@ -39,15 +43,14 @@ public abstract class TestGroupEntryXmlHandler extends TestEntryXmlHandler
 	@Override
     public void processElementAttributes(String aQualifiedName, Attributes att)
     {
-		Trace.print(Trace.SUITE, "processElementAttributes( " 
-	            + aQualifiedName, true );
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, att);
  		Attributes leftAttributes = new AttributesImpl();
 
  		if (aQualifiedName.equalsIgnoreCase(this.getStartElement()))
     	{
 		    for (int i = 0; i < att.getLength(); i++)
 		    {
-	    		Trace.append( Trace.SUITE, ", " + att.getQName(i) + "=" + att.getValue(i) );
+				LOG.trace(Mark.SUITE, "{} = {}", att.getQName(i), att.getValue(i) );
 		    	if (att.getQName(i).equalsIgnoreCase(ELEMENT_ID))
 		    	{
 		        	myId = att.getValue(i);
@@ -59,7 +62,6 @@ public abstract class TestGroupEntryXmlHandler extends TestEntryXmlHandler
     	} else {
     		leftAttributes = att;
     	}
-		Trace.append( Trace.SUITE, " )\n" );
 		
 		super.processElementAttributes(aQualifiedName, leftAttributes);
     }
@@ -80,7 +82,7 @@ public abstract class TestGroupEntryXmlHandler extends TestEntryXmlHandler
 
 	public final void resetGroupEntryHandler()
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 		myId = "";
 		
 		super.resetEntryHandler();

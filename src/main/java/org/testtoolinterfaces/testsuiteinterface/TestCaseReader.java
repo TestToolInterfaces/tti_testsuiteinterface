@@ -3,11 +3,13 @@ package org.testtoolinterfaces.testsuiteinterface;
 import java.io.File;
 import java.io.IOError;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testtoolinterfaces.testsuite.TestCase;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.TTIException;
-import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.XMLReader;
 
@@ -20,7 +22,9 @@ import org.xml.sax.XMLReader;
  */
 public class TestCaseReader
 {
-	private TestInterfaceList myInterfaceList;
+    private static final Logger LOG = LoggerFactory.getLogger(TestCaseReader.class);
+
+    private TestInterfaceList myInterfaceList;
 	private boolean myCheckStepParameter;
 
 	/**
@@ -31,7 +35,7 @@ public class TestCaseReader
 	 */
 	public TestCaseReader( TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{
-		Trace.println(Trace.CONSTRUCTOR);
+		LOG.trace(Mark.CONSTRUCTOR, "{}, {}", anInterfaceList, aCheckStepParameter );
 
 		myInterfaceList = anInterfaceList;
 		myCheckStepParameter = aCheckStepParameter;
@@ -58,7 +62,7 @@ public class TestCaseReader
 	 */
 	public TestCase readTcFile( File aTestCaseFile ) throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE, "readTcFile( " + aTestCaseFile.getName() + " )", true);
+		LOG.trace(Mark.SUITE, "{}", aTestCaseFile);
 
 		TestCase testCase;
 		try {
@@ -73,51 +77,4 @@ public class TestCaseReader
 		
 		return testCase;
 	}
-	
-//	public TestCase readTcFile( File aTestCaseFile ) throws TestSuiteException
-//	{
-//		Trace.println(Trace.SUITE, "readTcFile( " + aTestCaseFile.getName() + " )", true);
-//
-//		// create a parser
-//        SAXParserFactory spf = SAXParserFactory.newInstance();
-//        spf.setNamespaceAware(false);
-//		TestCase testCase;
-//		try
-//		{
-//			SAXParser saxParser = spf.newSAXParser();
-//			XMLReader xmlReader = saxParser.getXMLReader();
-//
-//	        // create a handler
-//			TestCaseXmlHandler handler = new TestCaseXmlHandler(xmlReader, myInterfaceList, myCheckStepParameter);
-//
-//	        // assign the handler to the parser
-//	        xmlReader.setContentHandler(handler);
-//
-//	        // parse the document
-//	        xmlReader.parse(aTestCaseFile.getAbsolutePath());
-//	        
-//	        testCase = handler.getTestCase();
-//		}
-//		catch (SAXException e)
-//		{
-//			// Any SAX exception, possibly wrapping another exception.
-//			Trace.print(Trace.SUITE, e);
-//			throw new TestSuiteException( e.getMessage() );
-//		}
-//		catch (ParserConfigurationException e)
-//		{
-//			// If a parser cannot be created which satisfies the requested configuration.
-//			Trace.print(Trace.SUITE, e);
-//			throw new Error( e );
-//		}
-//		catch (IOException e)
-//		{
-//			// An IO exception from the parser, possibly from a byte stream or character stream supplied by the application.
-//			// E.g. when the file cannot be read because it doesn't exist or does not have read permissions.
-//			Trace.print(Trace.SUITE, e);
-//			throw new TestSuiteException( e.getMessage() );
-//		}
-//
-//		return testCase;
-//	}
 }

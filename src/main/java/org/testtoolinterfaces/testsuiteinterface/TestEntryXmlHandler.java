@@ -2,9 +2,11 @@ package org.testtoolinterfaces.testsuiteinterface;
 
 import java.util.Hashtable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
-import org.testtoolinterfaces.utils.Trace;
+import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
@@ -26,7 +28,9 @@ import org.xml.sax.XMLReader;
  */
 public abstract class TestEntryXmlHandler extends XmlHandler
 {
-	private static final String ATTRIBUTE_SEQUENCE = "sequence";
+    private static final Logger LOG = LoggerFactory.getLogger(TestEntryXmlHandler.class);
+
+    private static final String ATTRIBUTE_SEQUENCE = "sequence";
 	
 	private static final String DESCRIPTION_ELEMENT = "description";
 
@@ -49,7 +53,7 @@ public abstract class TestEntryXmlHandler extends XmlHandler
 	public TestEntryXmlHandler( XMLReader anXmlReader, String aTag )
 	{
 		super(anXmlReader, aTag);
-		Trace.println(Trace.CONSTRUCTOR);
+		LOG.trace(Mark.CONSTRUCTOR, "{}, {}", anXmlReader, aTag);
 		
 	    myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
 		this.addElementHandler(myDescriptionXmlHandler);
@@ -83,13 +87,12 @@ public abstract class TestEntryXmlHandler extends XmlHandler
 	@Override
     public void processElementAttributes(String aQualifiedName, Attributes anAtt)
     {
-		Trace.print(Trace.SUITE, "processElementAttributes( " 
-	            + aQualifiedName, true );
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, anAtt);
      	if (aQualifiedName.equalsIgnoreCase(this.getStartElement()))
     	{
 		    for (int i = 0; i < anAtt.getLength(); i++)
 		    {
-	    		Trace.append( Trace.SUITE, ", " + anAtt.getQName(i) + "=" + anAtt.getValue(i) );
+				LOG.trace(Mark.SUITE, "{} = {}", anAtt.getQName(i), anAtt.getValue(i) );
 		    	if (anAtt.getQName(i).equalsIgnoreCase(ATTRIBUTE_SEQUENCE))	{
 		        	mySequenceNr = Integer.valueOf( anAtt.getValue(i) ).intValue();
 		    	} else {
@@ -97,7 +100,6 @@ public abstract class TestEntryXmlHandler extends XmlHandler
 		    	}
 		    }
     	}
-		Trace.append( Trace.SUITE, " )\n" );
     }
 
 	@Override
@@ -110,7 +112,7 @@ public abstract class TestEntryXmlHandler extends XmlHandler
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 			throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE, "handleReturnFromChildElement( " + aQualifiedName + " )", true);
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, aChildXmlHandler);
 
 		if (aQualifiedName.equalsIgnoreCase(DESCRIPTION_ELEMENT)) {
     		myDescription = myDescriptionXmlHandler.getValue();
@@ -159,7 +161,7 @@ public abstract class TestEntryXmlHandler extends XmlHandler
 	
 	public final void resetEntryHandler()
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 
 	    mySequenceNr = 0;
 	    myAnyAttributes = new Hashtable<String, String>();

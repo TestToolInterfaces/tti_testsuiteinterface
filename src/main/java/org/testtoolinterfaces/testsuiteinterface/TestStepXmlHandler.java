@@ -1,16 +1,18 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.TestInterface;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStep;
-import org.testtoolinterfaces.testsuite.TestStepCommand;
-import org.testtoolinterfaces.testsuite.TestStepScript;
-import org.testtoolinterfaces.testsuite.TestStepSelection;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
-import org.testtoolinterfaces.utils.Trace;
+import org.testtoolinterfaces.testsuite.impl.TestStepCommand;
+import org.testtoolinterfaces.testsuite.impl.TestStepScript;
+import org.testtoolinterfaces.testsuite.impl.TestStepSelection;
+import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.Warning;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
@@ -94,7 +96,9 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class TestStepXmlHandler extends TestEntryXmlHandler
 {
-	public static final String START_ELEMENT = "teststep";
+    private static final Logger LOG = LoggerFactory.getLogger(TestStepXmlHandler.class);
+
+    public static final String START_ELEMENT = "teststep";
 	public static final String IF_ELEMENT = "if";
 	private static final String THEN_ELEMENT = "then";
 	private static final String ELSE_ELEMENT = "else";
@@ -141,7 +145,8 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 	                           boolean aCheckStepParameter )
 	{
 		super(anXmlReader, aTag);
-		Trace.println(Trace.CONSTRUCTOR, "TestStepXmlHandler( anXmlreader )", true);
+		LOG.trace(Mark.CONSTRUCTOR, "{}, {}, {}, {}", 
+				anXmlReader, aTag, anInterfaceList, aCheckStepParameter);
 
 		myParameterXmlHandler = new ParameterXmlHandler(anXmlReader);
 		this.addElementHandler(myParameterXmlHandler);
@@ -191,20 +196,19 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 	@Override
     public void processElementAttributes(String aQualifiedName, Attributes att)
     {
-		Trace.print(Trace.SUITE, "processElementAttributes( "
-				+ aQualifiedName + " )", true );
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, att);
  		Attributes leftAttributes = new AttributesImpl();
 
     	if (aQualifiedName.equalsIgnoreCase(this.getStartElement()))
     	{
 		    for (int i = 0; i < att.getLength(); i++)
 		    {
-	    		Trace.append( Trace.SUITE, ", " + att.getQName(i) + "=" + att.getValue(i) );
+				LOG.trace(Mark.SUITE, "{} = {}", att.getQName(i), att.getValue(i) );
 		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_NOT))
 		    	{
 		    		myNot = true;
 		    		// The value, if any, is ignored
-		    		Trace.println( Trace.ALL, "        myNot -> true");
+		    		LOG.trace(Mark.SUITE, "myNot -> true");
 		    	} else {
 		    		((AttributesImpl) leftAttributes).addAttribute( att.getURI(i), att.getLocalName(i),
 		    				att.getQName(i), att.getType(i), att.getValue(i));
@@ -213,7 +217,6 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
     	} else {
     		leftAttributes = att;
     	}
-		Trace.append( Trace.SUITE, " )\n" );
 		
 		super.processElementAttributes(aQualifiedName, leftAttributes);
     }
@@ -222,7 +225,7 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 			throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, aChildXmlHandler);
     	if (aQualifiedName.equalsIgnoreCase(ParameterXmlHandler.START_ELEMENT))
     	{
 			try
@@ -233,7 +236,7 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 			catch (TestSuiteException e)
 			{
 				Warning.println("Cannot add Parameter: " + e.getMessage());
-				Trace.print(Trace.SUITE, e);
+				LOG.trace(Mark.SUITE, "", e);
 			}
     		
     		myParameterXmlHandler.reset();
@@ -288,7 +291,7 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 	 */
 	public TestStep getStep() throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 
 		TestStep testStep = null;
 		if ( myCommand != null )
@@ -397,7 +400,7 @@ public class TestStepXmlHandler extends TestEntryXmlHandler
 
 	public final void resetStepHandler()
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 
 		myParameters = new ParameterArrayList();
 	

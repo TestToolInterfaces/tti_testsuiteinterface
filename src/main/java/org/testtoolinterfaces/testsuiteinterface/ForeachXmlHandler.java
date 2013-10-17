@@ -2,10 +2,16 @@ package org.testtoolinterfaces.testsuiteinterface;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.testtoolinterfaces.testsuite.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testtoolinterfaces.testsuite.TestEntry;
+import org.testtoolinterfaces.testsuite.TestEntryIteration;
+import org.testtoolinterfaces.testsuite.TestInterfaceList;
+import org.testtoolinterfaces.testsuite.TestStep;
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
+import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.TTIException;
-import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -31,7 +37,9 @@ import org.xml.sax.XMLReader;
  */
 abstract public class ForeachXmlHandler<E extends TestEntry> extends XmlHandler
 {
-	/**
+    private static final Logger LOG = LoggerFactory.getLogger(ForeachXmlHandler.class);
+
+    /**
 	 * @return the TestEntryIteration
 	 * @throws TTIException 
 	 */
@@ -69,7 +77,7 @@ abstract public class ForeachXmlHandler<E extends TestEntry> extends XmlHandler
 	public ForeachXmlHandler( XMLReader anXmlReader,
 			TestInterfaceList anInterfaceList, boolean aCheckStepParameter ) {
 		super( anXmlReader, START_ELEMENT );
-		Trace.println(Trace.CONSTRUCTOR, "TestStepSequenceXmlHandler( anXmlreader )", true);
+		LOG.trace(Mark.CONSTRUCTOR, "{}, {}", anXmlReader, anInterfaceList);
 
 	    myDescriptionXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DESCRIPTION_ELEMENT);
 		this.addElementHandler(myDescriptionXmlHandler);
@@ -89,13 +97,12 @@ abstract public class ForeachXmlHandler<E extends TestEntry> extends XmlHandler
 	@Override
     public void processElementAttributes(String aQualifiedName, Attributes anAtt)
     {
-		Trace.print(Trace.SUITE, "processElementAttributes( " 
-	            + aQualifiedName, true );
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, anAtt);
      	if (aQualifiedName.equalsIgnoreCase(START_ELEMENT))
     	{
 		    for (int i = 0; i < anAtt.getLength(); i++)
 		    {
-	    		Trace.append( Trace.SUITE, ", " + anAtt.getQName(i) + "=" + anAtt.getValue(i) );
+	    		LOG.trace(Mark.SUITE, "{}, {}", anAtt.getQName(i), anAtt.getValue(i));
 	    		if (anAtt.getQName(i).equalsIgnoreCase(ATTRIBUTE_SEQUENCE))
 		    	{
 		        	mySequenceNr = Integer.valueOf( anAtt.getValue(i) ).intValue();
@@ -107,7 +114,6 @@ abstract public class ForeachXmlHandler<E extends TestEntry> extends XmlHandler
 //		    	}
 		    }
     	}
-		Trace.append( Trace.SUITE, " )\n" );
     }
 
 	@Override
@@ -144,7 +150,7 @@ abstract public class ForeachXmlHandler<E extends TestEntry> extends XmlHandler
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 				throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 
 		if (aQualifiedName.equalsIgnoreCase(DESCRIPTION_ELEMENT))
     	{
@@ -211,7 +217,7 @@ abstract public class ForeachXmlHandler<E extends TestEntry> extends XmlHandler
 	@Override
 	public void reset()
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 		mySequenceNr = 0;
 		myDescription = "";
 		this.itemName = "";

@@ -1,14 +1,16 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testtoolinterfaces.testsuite.TestEntry;
 import org.testtoolinterfaces.testsuite.TestGroup;
 import org.testtoolinterfaces.testsuite.TestGroupEntry;
 import org.testtoolinterfaces.testsuite.TestGroupEntrySequence;
-import org.testtoolinterfaces.testsuite.TestGroupImpl;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.testsuite.impl.TestGroupImpl;
+import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.TTIException;
-import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.XMLReader;
 
@@ -48,7 +50,9 @@ import org.xml.sax.XMLReader;
  */
 public class TestGroupXmlHandler extends TestExecItemXmlHandler
 {
-	public static final String START_ELEMENT = "testgroup";
+    private static final Logger LOG = LoggerFactory.getLogger(TestGroupXmlHandler.class);
+
+    public static final String START_ELEMENT = "testgroup";
 
     private TestGroupEntrySequence myTestEntries;
 
@@ -72,7 +76,7 @@ public class TestGroupXmlHandler extends TestExecItemXmlHandler
 	public TestGroupXmlHandler( XMLReader anXmlReader, TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{
 		super(anXmlReader, START_ELEMENT, anInterfaceList, aCheckStepParameter);
-		Trace.println(Trace.CONSTRUCTOR);
+		LOG.trace(Mark.CONSTRUCTOR, "{}, {}, {}", anXmlReader, anInterfaceList, aCheckStepParameter);
 
 		myTestCaseLinkXmlHandler = new TestCaseLinkXmlHandler(anXmlReader);
 		this.addElementHandler(myTestCaseLinkXmlHandler);
@@ -107,7 +111,7 @@ public class TestGroupXmlHandler extends TestExecItemXmlHandler
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 				throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE, "handleReturnFromChildElement( " + aQualifiedName + " )", true);
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, aChildXmlHandler);
 
 		TestGroupEntry testEntry = null;
 		if (aQualifiedName.equalsIgnoreCase(TestGroupLinkXmlHandler.START_ELEMENT))
@@ -123,7 +127,7 @@ public class TestGroupXmlHandler extends TestExecItemXmlHandler
 			try {
 				testEntry = myForeachXmlHandler.getTestEntryIteration();
 			} catch (TTIException e) {
-				Trace.print(Trace.SUITE, e);
+				LOG.trace(Mark.SUITE, "", e);
 				throw new TestSuiteException( "Cannot add an iteration of TestGroupEntries", e );
 			}
     	}
@@ -163,7 +167,7 @@ public class TestGroupXmlHandler extends TestExecItemXmlHandler
      */
 	public TestGroup getTestGroup() throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 
 		String id = this.getId();
 		if ( id.isEmpty() )
@@ -188,7 +192,7 @@ public class TestGroupXmlHandler extends TestExecItemXmlHandler
 
 	public final void resetGroupHandler()
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 
 		myTestEntries = new TestGroupEntrySequence();
 		

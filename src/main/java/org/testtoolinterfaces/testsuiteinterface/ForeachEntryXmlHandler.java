@@ -3,12 +3,14 @@ package org.testtoolinterfaces.testsuiteinterface;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testtoolinterfaces.testsuite.TestGroupEntry;
 import org.testtoolinterfaces.testsuite.TestGroupEntryIteration;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.TTIException;
-import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.XMLReader;
 
@@ -32,6 +34,7 @@ import org.xml.sax.XMLReader;
  */
 public class ForeachEntryXmlHandler extends ForeachXmlHandler<TestGroupEntry>
 {
+    private static final Logger LOG = LoggerFactory.getLogger(ForeachEntryXmlHandler.class);
     private Collection<TestGroupEntry> myDoEntries;
 
 	private TestGroupEntrySequenceXmlHandler myDoEntriesXmlHandler;
@@ -51,7 +54,7 @@ public class ForeachEntryXmlHandler extends ForeachXmlHandler<TestGroupEntry>
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 				throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, aChildXmlHandler);
 
 		if (aQualifiedName.equalsIgnoreCase(DO_ELEMENT))
     	{
@@ -66,7 +69,7 @@ public class ForeachEntryXmlHandler extends ForeachXmlHandler<TestGroupEntry>
 
 	@Override
 	public TestGroupEntryIteration getTestEntryIteration() throws TTIException {
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 		
 		int sequenceNr = this.getSequenceNr();
 		String description = this.getDescription();
@@ -88,7 +91,7 @@ public class ForeachEntryXmlHandler extends ForeachXmlHandler<TestGroupEntry>
 	@Override
 	public void reset()
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 		myDoEntries = new ArrayList<TestGroupEntry>();
 		
 		super.reset();

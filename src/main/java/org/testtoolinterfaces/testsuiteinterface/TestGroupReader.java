@@ -3,16 +3,17 @@ package org.testtoolinterfaces.testsuiteinterface;
 import java.io.File;
 import java.io.IOError;
 import java.util.ArrayList;
-import java.util.Hashtable;
 
-import org.testtoolinterfaces.testsuite.TestGroupEntrySequence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testtoolinterfaces.testsuite.TestGroup;
-import org.testtoolinterfaces.testsuite.TestGroupImpl;
+import org.testtoolinterfaces.testsuite.TestGroupEntrySequence;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.testsuite.impl.TestGroupImpl;
+import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.TTIException;
-import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.XMLReader;
 
@@ -25,7 +26,9 @@ import org.xml.sax.XMLReader;
  */
 public class TestGroupReader
 {
-	private TestInterfaceList myInterfaceList;
+    private static final Logger LOG = LoggerFactory.getLogger(TestGroupReader.class);
+
+    private TestInterfaceList myInterfaceList;
 	private boolean myCheckStepParameter;
 	
 	/**
@@ -36,7 +39,7 @@ public class TestGroupReader
 	 */
 	public TestGroupReader( TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{
-		Trace.println(Trace.CONSTRUCTOR);
+		LOG.trace(Mark.CONSTRUCTOR, "{}, {}", anInterfaceList, aCheckStepParameter);
 		
 		myInterfaceList = anInterfaceList;
 		myCheckStepParameter = aCheckStepParameter;
@@ -63,7 +66,7 @@ public class TestGroupReader
 	 */
 	public TestGroup readTgFile( File aTestGroupFile )
 	{
-		Trace.println(Trace.SUITE, "readTgFile( " + aTestGroupFile.getName() + " )", true);
+		LOG.trace(Mark.SUITE, "{}", aTestGroupFile);
 
 		TestGroup testGroup;
 		try {
@@ -74,7 +77,7 @@ public class TestGroupReader
 			testGroup = handler.getTestGroup();
 
 		} catch (TTIException e) {
-			Trace.print(Trace.SUITE, e);
+			LOG.trace(Mark.SUITE, "", e);
 
 			Throwable cause = e.getCause();
 			if ( ! (e instanceof TestSuiteException) || ( cause instanceof TestSuiteException ) )
@@ -98,9 +101,7 @@ public class TestGroupReader
 			                               new ArrayList<String>(),
 			                               new TestStepSequence(),
 			                               new TestGroupEntrySequence(),
-			                               new TestStepSequence(),
-			                               new Hashtable<String, String>(),
-			                               new Hashtable<String, String>() );
+			                               new TestStepSequence() );
 		}
 		
 		return testGroup;

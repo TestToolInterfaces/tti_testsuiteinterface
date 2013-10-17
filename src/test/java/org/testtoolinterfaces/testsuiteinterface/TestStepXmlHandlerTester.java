@@ -14,10 +14,10 @@ import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.TestInterfaceListHelper;
 import org.testtoolinterfaces.testsuite.TestInterface_stub;
 import org.testtoolinterfaces.testsuite.TestStep;
-import org.testtoolinterfaces.testsuite.TestStepCommand;
-import org.testtoolinterfaces.testsuite.TestStepSelection;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.testsuite.impl.TestStepCommand;
+import org.testtoolinterfaces.testsuite.impl.TestStepSelection;
 import org.xml.sax.XMLReader;
 
 public class TestStepXmlHandlerTester extends TestCase

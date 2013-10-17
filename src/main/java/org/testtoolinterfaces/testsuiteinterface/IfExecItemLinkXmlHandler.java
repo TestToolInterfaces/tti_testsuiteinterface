@@ -1,5 +1,7 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.TestGroupEntrySelection;
@@ -8,7 +10,7 @@ import org.testtoolinterfaces.testsuite.TestInterface;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
-import org.testtoolinterfaces.utils.Trace;
+import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.Warning;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
@@ -49,7 +51,9 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class IfExecItemLinkXmlHandler extends TestGroupEntryXmlHandler
 {
-	public static final String START_ELEMENT = "if";
+    private static final Logger LOG = LoggerFactory.getLogger(IfExecItemLinkXmlHandler.class);
+
+    public static final String START_ELEMENT = "if";
 	private static final String THEN_ELEMENT = "then";
 	private static final String ELSE_ELEMENT = "else";
 
@@ -93,7 +97,7 @@ public class IfExecItemLinkXmlHandler extends TestGroupEntryXmlHandler
 	                           boolean aCheckStepParameter )
 	{
 		super(anXmlReader, START_ELEMENT);
-		Trace.println(Trace.CONSTRUCTOR, "IfExecItemLinkXmlHandler( anXmlreader )", true);
+		LOG.trace(Mark.CONSTRUCTOR, "{}, {}", anXmlReader, anInterfaceList);
 
 		myParameterXmlHandler = new ParameterXmlHandler(anXmlReader);
 		this.addElementHandler(myParameterXmlHandler);
@@ -129,20 +133,19 @@ public class IfExecItemLinkXmlHandler extends TestGroupEntryXmlHandler
 	@Override
     public void processElementAttributes(String aQualifiedName, Attributes att)
     {
-		Trace.print(Trace.SUITE, "processElementAttributes( "
-				+ aQualifiedName + " )", true );
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, att);
  		Attributes leftAttributes = new AttributesImpl();
 
     	if (aQualifiedName.equalsIgnoreCase(this.getStartElement()))
     	{
 		    for (int i = 0; i < att.getLength(); i++)
 		    {
-	    		Trace.append( Trace.SUITE, ", " + att.getQName(i) + "=" + att.getValue(i) );
+	    		LOG.trace(Mark.SUITE, "{} = {}", att.getQName(i), att.getValue(i));
 		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_NOT))
 		    	{
 		    		myNot = true;
 		    		// The value, if any, is ignored
-		    		Trace.println( Trace.ALL, "        myNot -> true");
+		    		LOG.trace(Mark.SUITE, "myNot -> true");
 		    	} else {
 		    		((AttributesImpl) leftAttributes).addAttribute( att.getURI(i), att.getLocalName(i),
 		    				att.getQName(i), att.getType(i), att.getValue(i));
@@ -151,7 +154,6 @@ public class IfExecItemLinkXmlHandler extends TestGroupEntryXmlHandler
     	} else {
     		leftAttributes = att;
     	}
-		Trace.append( Trace.SUITE, " )\n" );
 		
 		super.processElementAttributes(aQualifiedName, leftAttributes);
     }
@@ -160,7 +162,7 @@ public class IfExecItemLinkXmlHandler extends TestGroupEntryXmlHandler
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 			throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
     	if (aQualifiedName.equalsIgnoreCase(ParameterXmlHandler.START_ELEMENT))
     	{
 			try
@@ -171,7 +173,7 @@ public class IfExecItemLinkXmlHandler extends TestGroupEntryXmlHandler
 			catch (TestSuiteException e)
 			{
 				Warning.println("Cannot add Parameter: " + e.getMessage());
-				Trace.print(Trace.SUITE, e);
+				LOG.trace(Mark.SUITE, "", e);
 			}
     		
     		myParameterXmlHandler.reset();
@@ -226,7 +228,7 @@ public class IfExecItemLinkXmlHandler extends TestGroupEntryXmlHandler
 	 */
 	public TestGroupEntrySelection getIf() throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 
 		TestStep testStep = null;
 		if ( myCommand != null )
@@ -284,7 +286,7 @@ public class IfExecItemLinkXmlHandler extends TestGroupEntryXmlHandler
 
 	public final void resetStepHandler()
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 
 		myParameters = new ParameterArrayList();
 	

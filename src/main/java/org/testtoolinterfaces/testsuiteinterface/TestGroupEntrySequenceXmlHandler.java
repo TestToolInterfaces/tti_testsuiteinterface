@@ -1,11 +1,13 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testtoolinterfaces.testsuite.TestGroupEntry;
 import org.testtoolinterfaces.testsuite.TestGroupEntrySequence;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.TTIException;
-import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
@@ -35,6 +37,8 @@ import org.xml.sax.XMLReader;
  */
 public class TestGroupEntrySequenceXmlHandler extends XmlHandler
 {
+    private static final Logger LOG = LoggerFactory.getLogger(TestGroupEntrySequenceXmlHandler.class);
+
     private TestGroupEntrySequence myEntries;
 
 	private TestCaseLinkXmlHandler myTestCaseLinkXmlHandler;
@@ -58,7 +62,8 @@ public class TestGroupEntrySequenceXmlHandler extends XmlHandler
 			String aTag, TestInterfaceList anInterfaceList, boolean aCheckStepParameter )
 	{
 		super(anXmlReader, aTag);
-		Trace.println(Trace.CONSTRUCTOR, "TestStepSequenceXmlHandler( anXmlreader, " + aTag + " )", true);
+		LOG.trace(Mark.CONSTRUCTOR, "{}, {}, {}, {}", 
+				anXmlReader, aTag, anInterfaceList, aCheckStepParameter);
 
 		myTestCaseLinkXmlHandler = new TestCaseLinkXmlHandler(anXmlReader);
 		this.addElementHandler(myTestCaseLinkXmlHandler);
@@ -123,7 +128,7 @@ public class TestGroupEntrySequenceXmlHandler extends XmlHandler
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 				throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, aChildXmlHandler);
 
 		TestGroupEntry entry = null;
     	if (aQualifiedName.equalsIgnoreCase(TestCaseLinkXmlHandler.START_ELEMENT))
@@ -141,7 +146,7 @@ public class TestGroupEntrySequenceXmlHandler extends XmlHandler
 			try {
 				entry = myForeachXmlHandler.getTestEntryIteration();
 			} catch (TTIException e) {
-				Trace.print(Trace.SUITE, e);
+				LOG.trace(Mark.SUITE, "", e);
 				throw new TestSuiteException( "Cannot add an iteration of TestGroupEntries", e );
 			}
     	}
@@ -173,14 +178,14 @@ public class TestGroupEntrySequenceXmlHandler extends XmlHandler
 	 */
 	public TestGroupEntrySequence getEntries()
 	{
-		Trace.println(Trace.GETTER);
+		LOG.trace(Mark.GETTER, "");
 		return myEntries;
 	}
 
 	@Override
 	public void reset()
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 		myEntries = new TestGroupEntrySequence();
 		myNextSequenceNr = 0;
 	}

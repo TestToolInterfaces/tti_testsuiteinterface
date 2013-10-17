@@ -15,7 +15,6 @@ import org.testtoolinterfaces.testsuite.TestGroupLink;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
-import org.testtoolinterfaces.utils.Trace;
 
 /**
  * Simple tool to print the Test Group File
@@ -27,7 +26,8 @@ import org.testtoolinterfaces.utils.Trace;
  */
 public class TestGroupPrinter
 {
-	/**
+
+    /**
 	 * Main
 	 * 
 	 * @param args - first argument is the Test Group File, others are ignored.
@@ -35,8 +35,6 @@ public class TestGroupPrinter
 	 */
 	public static void main(String[] args)
 	{
-		Trace.getInstance().addBaseClass("org.testtoolinterfaces");
-
 		if ( args.length == 0 )
 		{
 			System.out.println("Usage: java -jar tgPrinter.jar <Test Group File>");

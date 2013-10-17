@@ -1,11 +1,13 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestStepSequence;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.TTIException;
-import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
@@ -32,7 +34,9 @@ import org.xml.sax.XMLReader;
  */
 public class TestStepSequenceXmlHandler extends XmlHandler
 {
-	// These are used for legacy reasons
+    private static final Logger LOG = LoggerFactory.getLogger(TestStepSequenceXmlHandler.class);
+
+    // These are used for legacy reasons
 	private static final String TAG_ACTION   = "action";
 	private static final String TAG_CHECK    = "check";
 	
@@ -66,7 +70,8 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 	                                   boolean aCheckStepParameter )
 	{
 		super(anXmlReader, aTag);
-		Trace.println(Trace.CONSTRUCTOR, "TestStepSequenceXmlHandler( anXmlreader, " + aTag + " )", true);
+		LOG.trace(Mark.CONSTRUCTOR, "{}, {}, {}, {}",
+				anXmlReader, aTag, anInterfaceList, aCheckStepParameter);
 
 		myStepXmlHandler = new TestStepXmlHandler(anXmlReader, anInterfaceList, aCheckStepParameter);
 		this.addElementHandler(myStepXmlHandler);
@@ -134,7 +139,7 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 				throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, aChildXmlHandler);
 
 		TestStep step = null;
     	if (aQualifiedName.equalsIgnoreCase(TestStepXmlHandler.START_ELEMENT))
@@ -162,7 +167,7 @@ public class TestStepSequenceXmlHandler extends XmlHandler
     		try {
 				step = myForeachXmlHandler.getTestEntryIteration();
 			} catch (TTIException e) {
-				Trace.print(Trace.SUITE, e);
+				LOG.trace(Mark.SUITE, "", e);
 				throw new TestSuiteException( "Cannot add an iteration of TestStepEntries", e );
 			}
     		myForeachXmlHandler.reset();
@@ -191,14 +196,14 @@ public class TestStepSequenceXmlHandler extends XmlHandler
 	 */
 	public TestStepSequence getSteps()
 	{
-		Trace.println(Trace.GETTER);
+		LOG.trace(Mark.GETTER, "");
 		return mySteps;
 	}
 
 	@Override
 	public void reset()
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 		mySteps = new TestStepSequence();
 	}
 }

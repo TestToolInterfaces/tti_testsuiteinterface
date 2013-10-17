@@ -1,6 +1,8 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
-import org.testtoolinterfaces.utils.Trace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
@@ -18,6 +20,7 @@ import org.xml.sax.XMLReader;
  */
 public class ScriptXmlHandler extends XmlHandler
 {
+    private static final Logger LOG = LoggerFactory.getLogger(ScriptXmlHandler.class);
 	public static final String ELEMENT_START = "script";
 
 	private static final String ATTRIBUTE_TYPE = "type";
@@ -33,7 +36,7 @@ public class ScriptXmlHandler extends XmlHandler
 	public ScriptXmlHandler( XMLReader anXmlReader )
 	{
 		super(anXmlReader, ELEMENT_START);
-		Trace.println(Trace.CONSTRUCTOR);
+		LOG.trace(Mark.CONSTRUCTOR, "{}", anXmlReader);
 		
 		this.reset();
 	}
@@ -47,8 +50,7 @@ public class ScriptXmlHandler extends XmlHandler
 	@Override
 	public void handleCharacters(String aValue)
 	{
-		Trace.print(Trace.SUITE, "handleCharacters( " 
-		            + aValue, true );
+		LOG.trace(Mark.SUITE, "{}", aValue);
 		myScript = aValue.trim();
     }
     
@@ -61,20 +63,18 @@ public class ScriptXmlHandler extends XmlHandler
 	@Override
     public void processElementAttributes(String aQualifiedName, Attributes att)
     {
-		Trace.print(Trace.SUITE, "processElementAttributes( " 
-	            + aQualifiedName, true );
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, att);
      	if (aQualifiedName.equalsIgnoreCase(super.getStartElement()))
     	{
 		    for (int i = 0; i < att.getLength(); i++)
 		    {
-	    		Trace.append( Trace.SUITE, ", " + att.getQName(i) + "=" + att.getValue(i) );
+	    		LOG.trace(Mark.SUITE, "{} = {}", att.getQName(i), att.getValue(i));
 		    	if (att.getQName(i).equalsIgnoreCase(ATTRIBUTE_TYPE))
 		    	{
 		        	myType = att.getValue(i);
 		    	}
 		    }
     	}
-		Trace.append( Trace.SUITE, " )\n" );
     }
 
 	@Override
@@ -92,7 +92,7 @@ public class ScriptXmlHandler extends XmlHandler
 	@Override
 	public void reset()
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 
 		myScript = "";
 		myType = "";

@@ -2,14 +2,17 @@ package org.testtoolinterfaces.testsuiteinterface;
 
 import java.util.Hashtable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.ParameterHash;
 import org.testtoolinterfaces.testsuite.ParameterVariable;
 import org.testtoolinterfaces.testsuite.TestInterface;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.testsuite.impl.TestCaseImpl;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
-import org.testtoolinterfaces.utils.Trace;
+import org.testtoolinterfaces.utils.Mark;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
@@ -31,7 +34,9 @@ import org.xml.sax.XMLReader;
  */
 public class ParameterXmlHandler extends XmlHandler
 {
-	public static final String START_ELEMENT = "parameter";
+    private static final Logger LOG = LoggerFactory.getLogger(TestCaseImpl.class);
+
+    public static final String START_ELEMENT = "parameter";
 	private static final String ATTRIBUTE_ID = "id";
 	private static final String ATTRIBUTE_TYPE = "type";
 	private static final String ATTRIBUTE_SEQUENCE = "sequence";
@@ -63,7 +68,7 @@ public class ParameterXmlHandler extends XmlHandler
 	public ParameterXmlHandler( XMLReader anXmlReader )
 	{
 		super(anXmlReader, START_ELEMENT);
-		Trace.println(Trace.CONSTRUCTOR);
+		LOG.trace(Mark.CONSTRUCTOR, "{}", anXmlReader);
 
 		myParameterXmlHandler = null; // Created when needed to prevent loops
 
@@ -79,15 +84,14 @@ public class ParameterXmlHandler extends XmlHandler
 	@Override
 	public void processElementAttributes(String aQualifiedName, Attributes anAtt)
     {
-		Trace.print(Trace.SUITE, "processElementAttributes( "
-	            + aQualifiedName, true );
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, anAtt);
     	if (aQualifiedName.equalsIgnoreCase(ParameterXmlHandler.START_ELEMENT))
     	{
 		    for (int i = 0; i < anAtt.getLength(); i++)
 		    {
 		    	String attName =  anAtt.getQName(i);
 		    	String attValue = anAtt.getValue(i);
-				Trace.append( Trace.SUITE, ", " + attName + "=" + attValue );
+				LOG.trace(Mark.SUITE, "{} = {}", attName, attValue);
 		    	if (attName.equalsIgnoreCase(ATTRIBUTE_ID))
 		    	{
 		        	myParameterId = attValue;
@@ -106,7 +110,6 @@ public class ParameterXmlHandler extends XmlHandler
 		    	}
 		    }
     	}
-		Trace.append( Trace.SUITE, " )\n");
     }
 
 	@Override
@@ -142,7 +145,7 @@ public class ParameterXmlHandler extends XmlHandler
 	@Override
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
     	if (aQualifiedName.equalsIgnoreCase( START_ELEMENT ))
     	{
 			try
@@ -181,7 +184,7 @@ public class ParameterXmlHandler extends XmlHandler
 	 */
 	public Parameter getParameter() throws TestSuiteException
 	{
-		Trace.println(Trace.GETTER, "getParameter()", true);
+		LOG.trace(Mark.GETTER, "");
 		if ( myParameterId.isEmpty() )
 		{
 			throw new TestSuiteException("Unknown Parameter ID");
@@ -220,7 +223,7 @@ public class ParameterXmlHandler extends XmlHandler
 	@Override
 	public void reset()
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 		
 		myParameterId = "";
 		myParameterType = "String";

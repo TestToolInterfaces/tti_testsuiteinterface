@@ -1,11 +1,12 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testtoolinterfaces.testsuite.TestInterface;
 import org.testtoolinterfaces.testsuite.TestInterfaceList;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
-import org.testtoolinterfaces.utils.Trace;
-//import org.testtoolinterfaces.utils.XmlHandler;
+import org.testtoolinterfaces.utils.Mark;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 
@@ -21,7 +22,9 @@ import org.xml.sax.XMLReader;
  */
 public class CommandXmlHandler extends GenericTagAndStringXmlHandler
 {
-	public static final String START_ELEMENT = "command";
+    private static final Logger LOG = LoggerFactory.getLogger(CommandXmlHandler.class);
+
+    public static final String START_ELEMENT = "command";
 	public static final String DEFAULT_INTERFACE_NAME = "Default";
 	
 	private static final String ATTRIBUTE_INTERFACE = "interface";
@@ -41,7 +44,7 @@ public class CommandXmlHandler extends GenericTagAndStringXmlHandler
 	                          TestInterfaceList anInterfaceList ) throws TestSuiteException
 	{
 		super(anXmlReader, START_ELEMENT);
-		Trace.println(Trace.CONSTRUCTOR, "CommandXmlHandler( anXmlreader )", true);
+		LOG.trace(Mark.CONSTRUCTOR, "{}, {}", anXmlReader, anInterfaceList);
 
 		myInterfaces = anInterfaceList;
 		if( myInterfaces.getInterface(DEFAULT_INTERFACE_NAME) == null )
@@ -54,8 +57,7 @@ public class CommandXmlHandler extends GenericTagAndStringXmlHandler
 	@Override
     public void processElementAttributes(String aQualifiedName, Attributes att) throws TestSuiteException
     {
-		Trace.println(Trace.SUITE, "processElementAttributes( "
-				+ aQualifiedName + " )", true );
+		LOG.trace(Mark.SUITE, "{}, {}", aQualifiedName, att);
     	if (aQualifiedName.equalsIgnoreCase(this.getStartElement()))
     	{
 		    for (int i = 0; i < att.getLength(); i++)
@@ -71,7 +73,7 @@ public class CommandXmlHandler extends GenericTagAndStringXmlHandler
 							this.reset();
 							throw new TestSuiteException( "Unknown interface: " + iFaceName );
 						}
-			    		Trace.println( Trace.ALL, "        myInterface -> " + iFaceName);
+			    		LOG.trace(Mark.ALL, "        myInterface -> {}", iFaceName);
 		    		}
 		    	}
 		    }
@@ -112,7 +114,7 @@ public class CommandXmlHandler extends GenericTagAndStringXmlHandler
 	@Override
 	public void reset()
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 		myInterface = myInterfaces.getInterface( DEFAULT_INTERFACE_NAME );
 
 		super.reset();

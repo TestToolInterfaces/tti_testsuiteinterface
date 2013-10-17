@@ -1,9 +1,11 @@
 package org.testtoolinterfaces.testsuiteinterface;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testtoolinterfaces.testsuite.TestCaseLink;
 import org.testtoolinterfaces.testsuite.TestLink;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
-import org.testtoolinterfaces.utils.Trace;
+import org.testtoolinterfaces.utils.Mark;
 import org.xml.sax.XMLReader;
 
 /**
@@ -18,7 +20,9 @@ import org.xml.sax.XMLReader;
  */
 public class TestCaseLinkXmlHandler extends TestExecItemLinkXmlHandler
 {
-	public static final String START_ELEMENT = "testcaselink";
+    private static final Logger LOG = LoggerFactory.getLogger(TestCaseLinkXmlHandler.class);
+
+    public static final String START_ELEMENT = "testcaselink";
 
 	/**
 	 * Creates the XML Handler
@@ -28,7 +32,7 @@ public class TestCaseLinkXmlHandler extends TestExecItemLinkXmlHandler
 	public TestCaseLinkXmlHandler( XMLReader anXmlReader )
 	{
 		super(anXmlReader, START_ELEMENT);
-		Trace.println(Trace.CONSTRUCTOR);
+		LOG.trace(Mark.CONSTRUCTOR, "{}", anXmlReader);
 		
 		this.reset();
 	}
@@ -39,7 +43,7 @@ public class TestCaseLinkXmlHandler extends TestExecItemLinkXmlHandler
 	 */
 	public TestCaseLink getTestCaseLink() throws TestSuiteException
 	{
-		Trace.println(Trace.SUITE);
+		LOG.trace(Mark.SUITE, "");
 
 		TestLink link = this.getLink();
 		String id = this.getId();

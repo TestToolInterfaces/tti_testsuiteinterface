@@ -113,11 +113,11 @@ public class IfExecItemLinkXmlHandler extends TestGroupEntryXmlHandler
 		this.addElementHandler(myScriptXmlHandler);
 
 		myThenXmlHandler = new TestGroupEntrySequenceXmlHandler(this.getXmlReader(),
-				THEN_ELEMENT, myInterfaces, myCheckStepParams);
+				THEN_ELEMENT, anInterfaceList, aCheckStepParameter);
 		this.addElementHandler(myThenXmlHandler);
 
 		myElseXmlHandler = new TestGroupEntrySequenceXmlHandler(this.getXmlReader(),
-				ELSE_ELEMENT, myInterfaces, myCheckStepParams);
+				ELSE_ELEMENT, anInterfaceList, aCheckStepParameter);
 		this.addElementHandler(myElseXmlHandler);
 
 		myInterfaces = anInterfaceList;
@@ -180,7 +180,7 @@ public class IfExecItemLinkXmlHandler extends TestGroupEntryXmlHandler
     	{
     		if ( myCommand != null )
     		{
-				Warning.println( "Command is defined twice. Last one is used." );   			
+				Warning.println( "Command \"" + myCommand + "\" is defined twice. Last one is used." );   			
     		}
     		if ( myScript != null )
     		{
@@ -195,7 +195,7 @@ public class IfExecItemLinkXmlHandler extends TestGroupEntryXmlHandler
     	{
     		if ( myScript != null )
     		{
-				Warning.println( "Script is defined twice. Last one is used." );   			
+				Warning.println( "Script \"" + myScript + "\" is defined twice. Last one is used." );   			
     		}
     		if ( myCommand != null )
     		{
